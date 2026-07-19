@@ -164,7 +164,7 @@ body {
   pointer-events: none;
 }
 
-.cell-inner { width: 62%; height: 62%; position: relative; z-index: 1; }
+.cell-inner { width: 75%; height: 75%; position: relative; z-index: 1; }
 
 .cell.hidden .cell-q {
   font-size: 18px;
@@ -447,70 +447,120 @@ body {
 
 <!-- SVG символы -->
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
-  <symbol id="ico-gem" viewBox="0 0 40 40">
+  <symbol id="ico-gem" viewBox="0 0 100 100">
     <defs>
-      <radialGradient id="gem-glow" cx="45%" cy="35%" r="65%">
-        <stop offset="0%" stop-color="#e9d5ff"/>
-        <stop offset="30%" stop-color="#c084fc"/>
-        <stop offset="70%" stop-color="#9333ea"/>
-        <stop offset="100%" stop-color="#5b21b6"/>
-      </radialGradient>
-      <radialGradient id="gem-face-top" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#f3e8ff" stop-opacity="1"/>
-        <stop offset="100%" stop-color="#e9d5ff" stop-opacity="0.9"/>
-      </radialGradient>
-      <linearGradient id="gem-left" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#d8b4fe"/>
+      <!-- грань: верхняя таблица (светлая) -->
+      <linearGradient id="g-table" x1="30%" y1="0%" x2="70%" y2="100%">
+        <stop offset="0%"   stop-color="#f5eeff"/>
+        <stop offset="50%"  stop-color="#e2c8ff"/>
+        <stop offset="100%" stop-color="#c084fc"/>
+      </linearGradient>
+      <!-- левая верхняя грань (светло-сиреневая) -->
+      <linearGradient id="g-ul" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%"   stop-color="#e9d5ff"/>
         <stop offset="100%" stop-color="#a855f7"/>
       </linearGradient>
-      <linearGradient id="gem-right" x1="100%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#9333ea"/>
-        <stop offset="100%" stop-color="#6d28d9"/>
-      </linearGradient>
-      <linearGradient id="gem-bot-left" x1="0%" y1="0%" x2="60%" y2="100%">
-        <stop offset="0%" stop-color="#a855f7"/>
+      <!-- правая верхняя грань (средне-фиолетовая) -->
+      <linearGradient id="g-ur" x1="100%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%"   stop-color="#c084fc"/>
         <stop offset="100%" stop-color="#7c3aed"/>
       </linearGradient>
-      <linearGradient id="gem-bot-right" x1="100%" y1="0%" x2="40%" y2="100%">
-        <stop offset="0%" stop-color="#7c3aed"/>
-        <stop offset="100%" stop-color="#4c1d95"/>
+      <!-- левая нижняя грань -->
+      <linearGradient id="g-bl" x1="0%" y1="0%" x2="80%" y2="100%">
+        <stop offset="0%"   stop-color="#a855f7"/>
+        <stop offset="100%" stop-color="#6d28d9"/>
       </linearGradient>
-      <filter id="gem-blur">
-        <feGaussianBlur in="SourceGraphic" stdDeviation="0.5"/>
+      <!-- центральная нижняя грань -->
+      <linearGradient id="g-bc" x1="50%" y1="0%" x2="50%" y2="100%">
+        <stop offset="0%"   stop-color="#9333ea"/>
+        <stop offset="100%" stop-color="#5b21b6"/>
+      </linearGradient>
+      <!-- правая нижняя грань (самая тёмная) -->
+      <linearGradient id="g-br" x1="100%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%"   stop-color="#7c3aed"/>
+        <stop offset="100%" stop-color="#3b0764"/>
+      </linearGradient>
+      <!-- свечение блика -->
+      <radialGradient id="g-flare" cx="50%" cy="50%" r="50%">
+        <stop offset="0%"   stop-color="#ffffff" stop-opacity="1"/>
+        <stop offset="40%"  stop-color="#f0e0ff" stop-opacity="0.8"/>
+        <stop offset="100%" stop-color="#c084fc" stop-opacity="0"/>
+      </radialGradient>
+      <!-- голубой отлив снизу-слева -->
+      <radialGradient id="g-teal" cx="20%" cy="80%" r="50%">
+        <stop offset="0%"   stop-color="#67e8f9" stop-opacity="0.55"/>
+        <stop offset="100%" stop-color="#a855f7" stop-opacity="0"/>
+      </radialGradient>
+      <!-- мягкий blur для лучей блика -->
+      <filter id="f-blur-sm" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="1.2"/>
+      </filter>
+      <filter id="f-blur-lg" x="-100%" y="-100%" width="300%" height="300%">
+        <feGaussianBlur stdDeviation="3"/>
       </filter>
     </defs>
-    <!-- тень/свечение под алмазом -->
-    <ellipse cx="20" cy="37" rx="9" ry="2.5" fill="#c084fc" opacity="0.25" filter="url(#gem-blur)"/>
-    <!-- верхняя площадка (корона) -->
-    <polygon points="14,8 26,8 23,14 17,14" fill="url(#gem-face-top)"/>
-    <!-- левая верхняя грань -->
-    <polygon points="8,16 14,8 17,14" fill="#ddd6fe"/>
-    <!-- правая верхняя грань -->
-    <polygon points="32,16 26,8 23,14" fill="#c4b5fd"/>
-    <!-- левая нижняя грань -->
-    <polygon points="8,16 17,14 20,35" fill="url(#gem-bot-left)"/>
-    <!-- центр-левая нижняя -->
-    <polygon points="17,14 23,14 20,35" fill="#9333ea"/>
-    <!-- правая нижняя грань -->
-    <polygon points="32,16 23,14 20,35" fill="url(#gem-bot-right)"/>
-    <!-- пояс (girdle) -->
-    <polygon points="8,16 17,14 23,14 32,16" fill="#c084fc" opacity="0.6"/>
-    <!-- контуры -->
-    <polygon points="14,8 26,8 32,16 20,35 8,16" fill="none" stroke="#4c1d95" stroke-width="0.8" stroke-linejoin="round"/>
-    <line x1="17" y1="14" x2="23" y2="14" stroke="#7c3aed" stroke-width="0.6" opacity="0.8"/>
-    <line x1="8" y1="16" x2="17" y2="14" stroke="#7c3aed" stroke-width="0.5" opacity="0.6"/>
-    <line x1="32" y1="16" x2="23" y2="14" stroke="#7c3aed" stroke-width="0.5" opacity="0.6"/>
-    <line x1="17" y1="14" x2="20" y2="35" stroke="#4c1d95" stroke-width="0.5" opacity="0.5"/>
-    <line x1="23" y1="14" x2="20" y2="35" stroke="#4c1d95" stroke-width="0.5" opacity="0.5"/>
-    <!-- главный блик (звезда) -->
-    <line x1="16" y1="11" x2="16" y2="7" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.95"/>
-    <line x1="14" y1="11" x2="18" y2="11" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.95"/>
-    <line x1="14.5" y1="9" x2="17.5" y2="13" stroke="white" stroke-width="0.8" stroke-linecap="round" opacity="0.6"/>
-    <line x1="17.5" y1="9" x2="14.5" y2="13" stroke="white" stroke-width="0.8" stroke-linecap="round" opacity="0.6"/>
-    <!-- маленький блик верхний правый -->
-    <circle cx="24" cy="9" r="1.2" fill="white" opacity="0.8"/>
-    <!-- микро бликs на гранях -->
-    <line x1="11" y1="22" x2="13" y2="20" stroke="white" stroke-width="0.6" stroke-linecap="round" opacity="0.35"/>
+
+    <!-- ═══ ФОРМА БРИЛЛИАНТА ═══
+         Пропорции как на референсе:
+         корона (верх): широкий пятиугольник
+         павильон (низ): сходится в точку
+         пояс (girdle) ~на y=42
+    -->
+
+    <!-- Левая верхняя грань (корона) -->
+    <polygon points="18,38  36,18  50,28" fill="url(#g-ul)"/>
+    <!-- Правая верхняя грань (корона) -->
+    <polygon points="82,38  64,18  50,28" fill="url(#g-ur)"/>
+    <!-- Верхняя таблица (центр короны) -->
+    <polygon points="36,18  64,18  50,28" fill="url(#g-table)"/>
+    <!-- Крайняя левая грань короны -->
+    <polygon points="10,42  18,38  36,18  28,18" fill="#ddd6fe" opacity="0.9"/>
+    <!-- Крайняя правая грань короны -->
+    <polygon points="90,42  82,38  64,18  72,18" fill="#9333ea" opacity="0.85"/>
+
+    <!-- Пояс (girdle) — горизонтальная полоска -->
+    <polygon points="10,42  28,38  50,42  72,38  90,42  72,46  50,44  28,46" fill="#c084fc" opacity="0.5"/>
+
+    <!-- Левая нижняя грань (павильон) -->
+    <polygon points="10,42  28,46  50,92" fill="url(#g-bl)"/>
+    <!-- Центральная нижняя грань -->
+    <polygon points="28,46  72,46  50,92" fill="url(#g-bc)"/>
+    <!-- Правая нижняя грань -->
+    <polygon points="90,42  72,46  50,92" fill="url(#g-br)"/>
+
+    <!-- Голубоватый отлив на левой нижней грани -->
+    <polygon points="10,42  28,46  50,92" fill="url(#g-teal)"/>
+
+    <!-- Контурные линии граней -->
+    <!-- внешний контур -->
+    <polygon points="28,18  72,18  90,42  50,92  10,42"
+             fill="none" stroke="#3b0764" stroke-width="1.2" stroke-linejoin="round"/>
+    <!-- внутренние рёбра короны -->
+    <line x1="36" y1="18" x2="50" y2="28" stroke="#7c3aed" stroke-width="0.8" opacity="0.7"/>
+    <line x1="64" y1="18" x2="50" y2="28" stroke="#7c3aed" stroke-width="0.8" opacity="0.7"/>
+    <line x1="18" y1="38" x2="50" y2="28" stroke="#6d28d9" stroke-width="0.7" opacity="0.6"/>
+    <line x1="82" y1="38" x2="50" y2="28" stroke="#6d28d9" stroke-width="0.7" opacity="0.6"/>
+    <!-- рёбра пояса к точке -->
+    <line x1="28" y1="46" x2="50" y2="92" stroke="#4c1d95" stroke-width="0.7" opacity="0.5"/>
+    <line x1="72" y1="46" x2="50" y2="92" stroke="#4c1d95" stroke-width="0.7" opacity="0.5"/>
+
+    <!-- ═══ БЛИК-ВСПЫШКА (звезда) ═══ -->
+    <!-- мягкое свечение вокруг блика -->
+    <circle cx="42" cy="30" r="14" fill="url(#g-flare)" filter="url(#f-blur-lg)" opacity="0.9"/>
+    <!-- лучи (длинные) -->
+    <line x1="42" y1="12" x2="42" y2="48" stroke="white" stroke-width="2.5" stroke-linecap="round" filter="url(#f-blur-sm)" opacity="0.85"/>
+    <line x1="24" y1="30" x2="60" y2="30" stroke="white" stroke-width="2.5" stroke-linecap="round" filter="url(#f-blur-sm)" opacity="0.85"/>
+    <!-- лучи (диагональные, короткие) -->
+    <line x1="30" y1="18" x2="54" y2="42" stroke="white" stroke-width="1.2" stroke-linecap="round" filter="url(#f-blur-sm)" opacity="0.5"/>
+    <line x1="54" y1="18" x2="30" y2="42" stroke="white" stroke-width="1.2" stroke-linecap="round" filter="url(#f-blur-sm)" opacity="0.5"/>
+    <!-- яркое ядро блика -->
+    <circle cx="42" cy="30" r="4" fill="white" opacity="0.95"/>
+    <circle cx="42" cy="30" r="2" fill="white"/>
+
+    <!-- маленький блик справа-сверху -->
+    <circle cx="68" cy="22" r="3" fill="white" opacity="0.75"/>
+    <line x1="68" y1="16" x2="68" y2="28" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
+    <line x1="62" y1="22" x2="74" y2="22" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
   </symbol>
 
   <symbol id="ico-mine" viewBox="0 0 40 40">
