@@ -32,16 +32,25 @@ body {
   color: var(--text);
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+}
+
+.app {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   padding-bottom: 24px;
 }
 
-body::before {
+.app::before {
   content: '';
-  position: fixed;
+  position: absolute;
   top: -200px; left: -100px;
   width: 500px; height: 500px;
   background: radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 65%);
@@ -147,9 +156,9 @@ body::before {
 .cell.hidden:active { transform: scale(0.88); background: #1e1a38; }
 
 .cell.gem {
-  background: linear-gradient(145deg, #21134a, #2c1860);
-  border-color: var(--purple-light);
-  box-shadow: 0 0 18px var(--purple-glow), inset 0 0 14px rgba(167,139,250,0.12);
+  background: linear-gradient(145deg, #0a2e22, #0d3828);
+  border-color: var(--green);
+  box-shadow: 0 0 16px var(--green-glow), inset 0 0 12px rgba(52,211,153,0.06);
   animation: popIn 0.3s cubic-bezier(.36,.07,.19,.97);
 }
 
@@ -404,35 +413,29 @@ body::before {
 </style>
 </head>
 <body>
+<div class="app">
 
 <!-- SVG символы -->
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
   <symbol id="ico-gem" viewBox="0 0 40 40">
-    <defs>
-      <linearGradient id="gem-g1" x1="15%" y1="0%" x2="85%" y2="100%">
-        <stop offset="0%" stop-color="#f3e8ff"/>
-        <stop offset="45%" stop-color="#c084fc"/>
-        <stop offset="100%" stop-color="#7c3aed"/>
-      </linearGradient>
-      <linearGradient id="gem-g2" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#a78bfa"/>
-        <stop offset="100%" stop-color="#6d28d9"/>
-      </linearGradient>
-    </defs>
-    <!-- основа кристалла -->
-    <polygon points="20,3 33,14 29,37 11,37 7,14" fill="url(#gem-g2)" stroke="#c4b5fd" stroke-width="1.4" stroke-linejoin="round"/>
-    <!-- верхняя корона -->
-    <polygon points="20,3 33,14 25,14 20,8 15,14 7,14" fill="url(#gem-g1)"/>
-    <!-- боковые грани -->
-    <polygon points="7,14 15,14 11,37" fill="#6d28d9" opacity="0.55"/>
-    <polygon points="33,14 25,14 29,37" fill="#5b21b6" opacity="0.55"/>
-    <!-- центральный блик -->
-    <polygon points="15,14 20,8 25,14 20,22" fill="#f3e8ff" opacity="0.55"/>
-    <!-- искра -->
-    <polygon points="24,18 26,20 24,22 22,20" fill="#ffffff" opacity="0.9"/>
-    <!-- контурные линии -->
-    <line x1="7" y1="14" x2="33" y2="14" stroke="#e9d5ff" stroke-width="0.8" opacity="0.6"/>
-    <line x1="20" y1="8" x2="20" y2="37" stroke="#e9d5ff" stroke-width="0.7" opacity="0.35"/>
+    <!-- верхняя площадка -->
+    <polygon points="13,5 27,5 23,13 17,13" fill="#f5e9ff"/>
+    <!-- верхние боковые грани -->
+    <polygon points="13,5 17,13 4,15" fill="#d8b4fe"/>
+    <polygon points="27,5 36,15 23,13" fill="#b076f5"/>
+    <!-- нижние грани -->
+    <polygon points="4,15 17,13 20,36" fill="#a855f7"/>
+    <polygon points="36,15 23,13 20,36" fill="#6d28d9"/>
+    <!-- контуры граней -->
+    <polygon points="13,5 27,5 36,15 20,36 4,15" fill="none" stroke="#3b0764" stroke-width="1.1" stroke-linejoin="round"/>
+    <line x1="17" y1="13" x2="23" y2="13" stroke="#3b0764" stroke-width="0.7" opacity="0.6"/>
+    <line x1="4" y1="15" x2="17" y2="13" stroke="#3b0764" stroke-width="0.6" opacity="0.5"/>
+    <line x1="36" y1="15" x2="23" y2="13" stroke="#3b0764" stroke-width="0.6" opacity="0.5"/>
+    <line x1="17" y1="13" x2="20" y2="36" stroke="#3b0764" stroke-width="0.6" opacity="0.4"/>
+    <line x1="23" y1="13" x2="20" y2="36" stroke="#3b0764" stroke-width="0.6" opacity="0.4"/>
+    <!-- блик -->
+    <polygon points="9,10 11,7 13,10 11,13" fill="#ffffff" opacity="0.9"/>
+    <circle cx="24" cy="8" r="1.1" fill="#ffffff" opacity="0.75"/>
   </symbol>
 
   <symbol id="ico-mine" viewBox="0 0 40 40">
@@ -805,5 +808,6 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove("show"), 2500);
 }
 </script>
+</div>
 </body>
 </html>
