@@ -608,7 +608,8 @@ function launchCrash(){
 function animateCrash(){
   if(CC.phase!=='flying')return;
   const t=(performance.now()-CC.startTime)/1000;
-  CC.mult = Math.pow(Math.E, 0.06*t*5);
+  // Медленный старт, плавное ускорение: mult растёт как t^1.6 / 8 + 1
+  CC.mult = Math.max(1, 1 + Math.pow(t, 1.6) / 8);
   CC.points.push([t, CC.mult]);
 
   // авто-вывод
