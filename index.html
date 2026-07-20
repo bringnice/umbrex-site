@@ -553,6 +553,14 @@ let sharedBalance = 0;
 
 // ── NAV ──
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+// Тап вне поля ввода закрывает виртуальную клавиатуру (иначе в Telegram WebView она виснет открытой)
+document.addEventListener('click', function(e){
+  const t = e.target;
+  const isField = t.tagName==='INPUT' || t.tagName==='TEXTAREA';
+  if(!isField && document.activeElement && (document.activeElement.tagName==='INPUT' || document.activeElement.tagName==='TEXTAREA')){
+    document.activeElement.blur();
+  }
+});
 function goMenu(){showScreen('screen-menu');}
 function openMines(){showScreen('screen-mines');document.getElementById('mines-balance-val').textContent=fmt(sharedBalance);buildGrid();buildMineOpts();setupMinesInput();checkActiveGame();}
 function openCrash(){showScreen('screen-crash');document.getElementById('crash-balance-val').textContent=fmt(sharedBalance);initCrash();}
@@ -588,6 +596,7 @@ function multBet(f){const i=document.getElementById('bet-input');i.value=Math.ma
 function setBetAll(){document.getElementById('bet-input').value=Math.floor(sharedBalance);}
 
 // ── КРАШ ──
+const CRASH_GROWTH_RATE = 0.15; // скорость роста множителя (mult = e^(RATE*t)); было 0.3 — вдвое медленнее
 let CC = {
   phase: 'waiting',
   mult: 1, targetCrash: 2,
@@ -686,7 +695,7 @@ function launchCrash(){
 function animateCrash(){
   if(CC.phase!=='flying')return;
   const t=(performance.now()-CC.startTime)/1000;
-  CC.mult = Math.pow(Math.E, 0.06*t*5);
+  CC.mult = Math.pow(Math.E, CRASH_GROWTH_RATE*t);
   CC.points.push([t, CC.mult]);
 
   // авто-вывод
