@@ -174,6 +174,35 @@ body {
 .crash-big-val.crashed { color:#f87171; text-shadow:0 0 30px rgba(248,113,113,.8); }
 .crash-big-val.crashed-gold { color:#8b5cf6; text-shadow:0 0 30px rgba(139,92,246,.9), 0 0 60px rgba(139,92,246,.4); }
 
+.crash-countdown-wrap {
+  pointer-events:none; display:flex; flex-direction:column; align-items:center;
+  gap:6px; margin-top:12px; width:140px;
+}
+.crash-countdown-bar {
+  width:100%; height:4px; border-radius:4px; overflow:hidden;
+  background:rgba(139,92,246,.15);
+}
+.crash-countdown-fill {
+  height:100%; width:100%; border-radius:4px;
+  background:linear-gradient(90deg,#7c3aed,#c084fc);
+  transition:width .1s linear;
+}
+.crash-countdown-txt { font-size:11px; font-weight:700; color:var(--muted); letter-spacing:.3px; }
+
+@keyframes crashShake {
+  0%,100% { transform:translate(0,0); }
+  20% { transform:translate(-6px,3px); }
+  40% { transform:translate(5px,-4px); }
+  60% { transform:translate(-4px,3px); }
+  80% { transform:translate(3px,-2px); }
+}
+.crash-field.shake { animation:crashShake .35s ease; }
+.crash-field.flash::after {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:rgba(248,113,113,.32); animation:crashFlash .45s ease-out forwards;
+}
+@keyframes crashFlash { 0%{opacity:1} 100%{opacity:0} }
+
 #crash-rocket {
   position:absolute; font-size:22px; pointer-events:none;
   transform:translate(-50%,-50%);
@@ -236,7 +265,12 @@ body {
 .crash-main-btn:active { transform:scale(.96); }
 .crash-main-btn:disabled { opacity:.4; cursor:default; }
 .cmb-waiting { background:var(--card2); color:var(--muted); border:1px solid var(--border); }
-.cmb-ready   { background:linear-gradient(135deg,#7c3aed,#5b21b6); color:#fff; box-shadow:0 6px 24px rgba(124,58,237,.45); }
+.cmb-ready   {
+  background:linear-gradient(135deg,#7c3aed,#5b21b6); color:#fff;
+  box-shadow:0 6px 24px rgba(124,58,237,.45);
+  animation:readyPulse 1.8s ease-in-out infinite;
+}
+@keyframes readyPulse{0%,100%{box-shadow:0 6px 24px rgba(124,58,237,.45)}50%{box-shadow:0 8px 34px rgba(167,139,250,.7)}}
 .cmb-placed  { background:linear-gradient(135deg,#0d6e4e,#065f46); color:#fff; box-shadow:0 4px 16px rgba(5,150,105,.3); }
 .cmb-cashout {
   background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff;
@@ -387,7 +421,7 @@ body {
       <div class="lbl">Баланс</div>
       <div class="val"><span id="menu-balance-val">—</span> <span style="font-size:26px">🪙</span></div>
     </div>
-    <button class="menu-balance-btn" onclick="tg?.openTelegramLink('https://t.me/umbrex_gamebot?start=donate')||window.open('https://t.me/umbrex_gamebot?start=donate','_blank')">Пополнить</button>
+    <button class="menu-balance-btn" onclick="window.open('https://t.me/umbrex_gamebot?start=donate','_blank')">Пополнить</button>
   </div>
   <div class="menu-section-title">Игры</div>
   <div class="games-grid">
@@ -465,6 +499,10 @@ body {
     <div id="crash-rocket">🚀</div>
     <div class="crash-big-mult">
       <div class="crash-big-val waiting" id="crash-big-val">ОЖИДАНИЕ РАУНДА...</div>
+      <div class="crash-countdown-wrap" id="crash-countdown-wrap" style="display:none">
+        <div class="crash-countdown-bar"><div class="crash-countdown-fill" id="crash-countdown-fill"></div></div>
+        <div class="crash-countdown-txt" id="crash-countdown-txt"></div>
+      </div>
     </div>
   </div>
   <!-- живой счётчик суммы -->
@@ -571,6 +609,19 @@ function initCrash(){
   cCanvas.height = wrap.clientHeight * window.devicePixelRatio;
   cCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
   cW = wrap.clientWidth; cH = wrap.clientHeight;
+
+  // Если мини-апп был закрыт/перезапущен посреди раунда — ставка оставалась
+  // "зависшей" на сервере и деньги не возвращались. Проверяем и возвращаем.
+  apiCall('GET','/api/crash/state').then(r=>{
+    if(r.ok && r.refunded){
+      sharedBalance = r.new_balance; syncBalanceUI();
+      document.getElementById('crash-balance-val').textContent=fmt(sharedBalance);
+      showToast('Незавершённая ставка '+fmt(r.refund_amount)+' 🪙 возвращена');
+      CC.betPlaced=false; CC.cashedOut=false; CC.gameId=null;
+      updateCrashBtn();
+    }
+  }).catch(()=>{});
+
   // Загружаем историю с сервера
   apiCall('GET','/api/crash/history').then(r=>{
     if(r.ok && r.history) CC.history = r.history;
@@ -581,6 +632,30 @@ function initCrash(){
   updateCrashBtn();
 }
 
+let crashCountdownTimer=null;
+function startCrashCountdown(durationMs, label){
+  clearInterval(crashCountdownTimer);
+  const wrap=document.getElementById('crash-countdown-wrap');
+  const fill=document.getElementById('crash-countdown-fill');
+  const txt=document.getElementById('crash-countdown-txt');
+  const start=performance.now();
+  wrap.style.display='flex';
+  const tick=()=>{
+    const elapsed=performance.now()-start;
+    const left=Math.max(0,durationMs-elapsed);
+    const pct=Math.max(0,Math.min(1,1-elapsed/durationMs));
+    fill.style.width=(pct*100)+'%';
+    txt.textContent=label+' '+(left/1000).toFixed(1)+'с';
+    if(left<=0) clearInterval(crashCountdownTimer);
+  };
+  tick();
+  crashCountdownTimer=setInterval(tick,100);
+}
+function stopCrashCountdown(){
+  clearInterval(crashCountdownTimer);
+  document.getElementById('crash-countdown-wrap').style.display='none';
+}
+
 function scheduleCrash(){
   CC.phase='waiting'; CC.mult=1; CC.betPlaced=false; CC.cashedOut=false;
   CC.cashoutMult=null; CC.points=[];
@@ -589,7 +664,9 @@ function scheduleCrash(){
   document.getElementById('crash-payout-bar').style.display='none';
   drawCrashGraph();
   updateCrashBtn();
-  CC.waitTimer = setTimeout(()=>{CC.waitTimer=null;launchCrash();}, 4000+Math.random()*2000);
+  const wait = 4000+Math.random()*2000;
+  startCrashCountdown(wait, 'Старт через');
+  CC.waitTimer = setTimeout(()=>{CC.waitTimer=null;launchCrash();}, wait);
 }
 
 function launchCrash(){
@@ -601,6 +678,7 @@ function launchCrash(){
                  : 15+Math.random()*30;
   CC.targetCrash = Math.max(1.01, CC.targetCrash);
   document.getElementById('crash-rocket').style.display='block';
+  stopCrashCountdown();
   updateCrashBtn();
   animateCrash();
 }
@@ -608,8 +686,7 @@ function launchCrash(){
 function animateCrash(){
   if(CC.phase!=='flying')return;
   const t=(performance.now()-CC.startTime)/1000;
-  // Медленный старт, плавное ускорение: mult растёт как t^1.6 / 8 + 1
-  CC.mult = Math.max(1, 1 + Math.pow(t, 1.6) / 8);
+  CC.mult = Math.pow(Math.E, 0.06*t*5);
   CC.points.push([t, CC.mult]);
 
   // авто-вывод
@@ -660,7 +737,12 @@ function doCrash(){
   document.getElementById('crash-rocket').style.display='none';
   renderCrashHistory();
   updateCrashBtn();
-  setTimeout(()=>scheduleCrash(), 3500);
+  const field=document.querySelector('.crash-field');
+  field.classList.add('shake','flash');
+  setTimeout(()=>field.classList.remove('shake','flash'), 450);
+  const cooldown = 3500;
+  startCrashCountdown(cooldown, 'Новый раунд через');
+  setTimeout(()=>scheduleCrash(), cooldown);
 }
 
 function doCashout(){
@@ -688,7 +770,7 @@ function doCashout(){
 
 function crashMainAction(){
   if(CC.phase==='flying'&&CC.betPlaced&&!CC.cashedOut){ doCashout(); return; }
-  if(CC.phase==='flying'){ showToast('Раунд уже идёт'); return; }
+  if(CC.phase!=='waiting'||CC.betPlaced){ showToast('Дождись начала нового раунда'); return; }
   const bet=parseFloat(document.getElementById('crash-bet-input').value);
   if(!bet||bet<100){showToast('Мин. ставка 100');return;}
   if(bet>sharedBalance){showToast('Недостаточно средств');return;}
@@ -706,25 +788,33 @@ function updateCrashBtn(){
   const btn=document.getElementById('crash-main-btn');
   btn.className='crash-main-btn';
   if(CC.phase==='waiting'&&CC.betPlaced){
+    // ставка уже принята, ждём старта ракеты
     btn.classList.add('cmb-placed');
     btn.textContent='✅ Ставка принята';
     btn.disabled=true;
   } else if(CC.phase==='flying'&&CC.betPlaced&&!CC.cashedOut){
+    // единственное активное состояние помимо самой ставки — кешаут
     btn.classList.add('cmb-cashout');
     btn.textContent=`💰 Забрать ×${CC.mult.toFixed(2)}`;
     btn.disabled=false;
   } else if(CC.phase==='flying'){
     btn.classList.add('cmb-waiting');
-    btn.textContent='Раунд идёт...';
+    btn.textContent='🔒 Раунд идёт...';
     btn.disabled=true;
   } else if(CC.phase==='crashed'){
+    // раунд завершился, но новый ещё не открылся — ставить нельзя
+    btn.classList.add('cmb-waiting');
+    btn.textContent='🔒 Раунд завершён...';
+    btn.disabled=true;
+  } else if(CC.phase==='waiting'&&!CC.betPlaced){
+    // единственное окно, когда реально можно поставить
     btn.classList.add('cmb-ready');
     btn.textContent='🚀 Поставить';
     btn.disabled=false;
   } else {
-    btn.classList.add('cmb-ready');
-    btn.textContent='🚀 Поставить';
-    btn.disabled=false;
+    btn.classList.add('cmb-waiting');
+    btn.textContent='🔒 Ожидание...';
+    btn.disabled=true;
   }
 }
 
