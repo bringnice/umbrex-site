@@ -387,7 +387,7 @@ body {
       <div class="lbl">Баланс</div>
       <div class="val"><span id="menu-balance-val">—</span> <span style="font-size:26px">🪙</span></div>
     </div>
-    <button class="menu-balance-btn">Пополнить</button>
+    <button class="menu-balance-btn" onclick="window.open('https://t.me/umbrex_gamebot?start=donate','_blank')">Пополнить</button>
   </div>
   <div class="menu-section-title">Игры</div>
   <div class="games-grid">
@@ -493,14 +493,6 @@ body {
     <button class="crash-main-btn cmb-ready" id="crash-main-btn" onclick="crashMainAction()">🚀 Поставить</button>
   </div>
 
-  <!-- игроки -->
-  <div class="crash-players">
-    <div class="crash-players-header">
-      <div class="crash-players-title">Игроки</div>
-      <div class="crash-players-count" id="crash-players-count">0</div>
-    </div>
-    <div id="crash-players-list"></div>
-  </div>
 </div>
 
 <!-- TOAST / RESULT -->
@@ -566,7 +558,6 @@ let CC = {
   startTime: null, animId: null, waitTimer: null,
   points: [],
   history: [1.02,1.55,1.97,2.96,1.55,2.58,3.64,4.80,7.22,1.18,12.4,1.03],
-  fakePlayers: [],
 };
 
 let cCanvas, cCtx, cW, cH;
@@ -580,7 +571,6 @@ function initCrash(){
   cCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
   cW = wrap.clientWidth; cH = wrap.clientHeight;
   renderCrashHistory();
-  renderFakePlayers();
   if(CC.phase === 'waiting' && !CC.waitTimer) scheduleCrash();
   else if(CC.phase === 'flying') animateCrash();
   updateCrashBtn();
@@ -592,9 +582,8 @@ function scheduleCrash(){
   setBigVal('waiting','ОЖИДАНИЕ РАУНДА...');
   document.getElementById('crash-rocket').style.display='none';
   document.getElementById('crash-payout-bar').style.display='none';
-  drawCrashBg();
+  drawCrashGraph();
   updateCrashBtn();
-  renderFakePlayers();
   CC.waitTimer = setTimeout(()=>{CC.waitTimer=null;launchCrash();}, 4000+Math.random()*2000);
 }
 
@@ -660,7 +649,6 @@ function doCrash(){
   document.getElementById('crash-rocket').style.display='none';
   renderCrashHistory();
   updateCrashBtn();
-  renderFakePlayers(true);
   setTimeout(()=>scheduleCrash(), 3500);
 }
 
@@ -812,60 +800,6 @@ function renderCrashHistory(){
     d.textContent=m.toFixed(2)+'×';
     el.appendChild(d);
   });
-}
-
-// фейковые игроки
-const FAKE_NAMES=['Lex_w','_drop99','Viktor','AlexPro','Nikita_K','MrBig','crypto_k','Денис','Pavel_88','sunbird'];
-function renderFakePlayers(showResults){
-  const list=document.getElementById('crash-players-list');
-  const cnt=document.getElementById('crash-players-count');
-  if(!list)return;
-  if(CC.phase==='waiting'||!showResults){
-    const n=2+Math.floor(Math.random()*4);
-    CC.fakePlayers=[];
-    for(let i=0;i<n;i++){
-      CC.fakePlayers.push({
-        name:FAKE_NAMES[Math.floor(Math.random()*FAKE_NAMES.length)],
-        bet:100+Math.floor(Math.random()*4900),
-        cashout:null,
-        emoji:['🎮','🔥','💎','⚡','🎯'][Math.floor(Math.random()*5)]
-      });
-    }
-  }
-  cnt.textContent=CC.fakePlayers.length+(CC.betPlaced?1:0);
-  list.innerHTML='';
-  CC.fakePlayers.forEach(p=>{
-    const row=document.createElement('div');
-    row.className='crash-player-row';
-    let multHTML='';
-    if(showResults){
-      const cashed=Math.random()>0.5;
-      const cm=(1.1+Math.random()*(CC.mult-1)).toFixed(2);
-      if(cashed&&parseFloat(cm)<CC.mult){
-        multHTML=`<span class="crash-player-mult won">×${cm}</span>`;
-      } else {
-        multHTML=`<span class="crash-player-mult lost">💥</span>`;
-      }
-    } else {
-      multHTML=`<span class="crash-player-mult playing">${fmt(p.bet)} 🪙</span>`;
-    }
-    row.innerHTML=`<div class="crash-player-avatar">${p.emoji}</div><div class="crash-player-name">${p.name}</div>${multHTML}`;
-    list.appendChild(row);
-  });
-  // своя ставка
-  if(CC.betPlaced){
-    const row=document.createElement('div');
-    row.className='crash-player-row';
-    let myMult='';
-    if(showResults){
-      myMult=CC.cashedOut?`<span class="crash-player-mult won">×${CC.cashoutMult.toFixed(2)}</span>`
-                         :`<span class="crash-player-mult lost">💥</span>`;
-    } else {
-      myMult=`<span class="crash-player-mult playing">${fmt(CC.bet)} 🪙</span>`;
-    }
-    row.innerHTML=`<div class="crash-player-avatar">😎</div><div class="crash-player-name" style="color:var(--purple-light)">Вы</div>${myMult}`;
-    list.prepend(row);
-  }
 }
 
 function crashSetBet(fn){const i=document.getElementById('crash-bet-input');i.value=Math.max(100,Math.round(fn(parseFloat(i.value)||500)));}
