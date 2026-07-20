@@ -542,9 +542,7 @@ body {
 
 <script>
 const tg = window.Telegram?.WebApp;
-if (tg) {
-  alert('initData: ' + (tg.initData ? tg.initData.substring(0, 50) : 'ПУСТОЙ'));
-}
+if(tg){tg.ready();tg.expand();}
 const API = "https://bot-1782901267-5094-bringnice.bothost.tech";
 let sharedBalance = 0;
 
