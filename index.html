@@ -387,7 +387,7 @@ body {
       <div class="lbl">Баланс</div>
       <div class="val"><span id="menu-balance-val">—</span> <span style="font-size:26px">🪙</span></div>
     </div>
-    <button class="menu-balance-btn" onclick="window.open('https://t.me/umbrex_gamebot?start=donate','_blank')">Пополнить</button>
+    <button class="menu-balance-btn" onclick="tg?.openTelegramLink('https://t.me/umbrex_gamebot?start=donate')||window.open('https://t.me/umbrex_gamebot?start=donate','_blank')">Пополнить</button>
   </div>
   <div class="menu-section-title">Игры</div>
   <div class="games-grid">
@@ -551,13 +551,14 @@ function setBetAll(){document.getElementById('bet-input').value=Math.floor(share
 
 // ── КРАШ ──
 let CC = {
-  phase: 'waiting', // waiting | flying | crashed
+  phase: 'waiting',
   mult: 1, targetCrash: 2,
   betPlaced: false, cashedOut: false,
   bet: 500, cashoutMult: null,
+  gameId: null,
   startTime: null, animId: null, waitTimer: null,
   points: [],
-  history: [1.02,1.55,1.97,2.96,1.55,2.58,3.64,4.80,7.22,1.18,12.4,1.03],
+  history: [],
 };
 
 let cCanvas, cCtx, cW, cH;
@@ -570,7 +571,11 @@ function initCrash(){
   cCanvas.height = wrap.clientHeight * window.devicePixelRatio;
   cCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
   cW = wrap.clientWidth; cH = wrap.clientHeight;
-  renderCrashHistory();
+  // Загружаем историю с сервера
+  apiCall('GET','/api/crash/history').then(r=>{
+    if(r.ok && r.history) CC.history = r.history;
+    renderCrashHistory();
+  }).catch(()=>renderCrashHistory());
   if(CC.phase === 'waiting' && !CC.waitTimer) scheduleCrash();
   else if(CC.phase === 'flying') animateCrash();
   updateCrashBtn();
@@ -637,10 +642,15 @@ function doCrash(){
   cancelAnimationFrame(CC.animId);
   CC.phase='crashed';
   if(CC.betPlaced&&!CC.cashedOut){
-    sharedBalance=Math.max(0,sharedBalance-CC.bet);
-    syncBalanceUI();
-    showResult(false,CC.bet,CC.mult);
     tg?.HapticFeedback?.notificationOccurred('error');
+    if(CC.gameId){
+      apiCall('POST','/api/crash/result',{game_id:CC.gameId, crash_point:CC.mult}).then(r=>{
+        if(r.ok){ sharedBalance=Math.max(0,sharedBalance); syncBalanceUI(); }
+        // История обновится на следующем открытии
+      }).catch(()=>{});
+    }
+    sharedBalance=Math.max(0,sharedBalance-CC.bet); syncBalanceUI();
+    showResult(false,CC.bet,CC.mult);
   }
   CC.history.unshift(+CC.mult.toFixed(2));
   if(CC.history.length>15)CC.history.pop();
@@ -653,15 +663,26 @@ function doCrash(){
 }
 
 function doCashout(){
+  if(CC.cashedOut) return;
   CC.cashedOut=true; CC.cashoutMult=CC.mult;
-  const win=Math.round(CC.bet*CC.mult);
-  const profit=win-CC.bet;
-  sharedBalance+=win;
-  syncBalanceUI();
   document.getElementById('crash-payout-bar').style.display='none';
   tg?.HapticFeedback?.notificationOccurred('success');
   updateCrashBtn();
-  showResult(true, profit, CC.mult);
+  apiCall('POST','/api/crash/cashout',{game_id:CC.gameId, mult:CC.mult}).then(r=>{
+    if(!r.ok){
+      // Краш уже был — проигрыш
+      showResult(false, CC.bet, CC.mult);
+      sharedBalance=Math.max(0,sharedBalance); syncBalanceUI();
+      return;
+    }
+    sharedBalance=r.new_balance; syncBalanceUI();
+    showResult(true, r.profit, CC.mult);
+  }).catch(()=>{
+    // Оффлайн fallback
+    const win=Math.round(CC.bet*CC.mult);
+    sharedBalance+=win; syncBalanceUI();
+    showResult(true, win-CC.bet, CC.mult);
+  });
 }
 
 function crashMainAction(){
@@ -670,9 +691,14 @@ function crashMainAction(){
   const bet=parseFloat(document.getElementById('crash-bet-input').value);
   if(!bet||bet<100){showToast('Мин. ставка 100');return;}
   if(bet>sharedBalance){showToast('Недостаточно средств');return;}
-  CC.bet=bet; CC.betPlaced=true; CC.cashedOut=false;
-  updateCrashBtn();
-  showToast('Ставка принята!');
+  // Ставка через API — списываем реально
+  apiCall('POST','/api/crash/start',{bet}).then(r=>{
+    if(!r.ok){showToast(r.error||'Ошибка');return;}
+    CC.bet=bet; CC.betPlaced=true; CC.cashedOut=false; CC.gameId=r.game_id;
+    sharedBalance-=bet; syncBalanceUI();
+    updateCrashBtn();
+    showToast('Ставка принята!');
+  }).catch(()=>showToast('Ошибка соединения'));
 }
 
 function updateCrashBtn(){
