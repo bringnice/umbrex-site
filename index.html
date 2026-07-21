@@ -380,13 +380,13 @@ body {
 }
 .global-topbar > * { pointer-events:all; }
 .global-topbar-divider {
-  position:fixed; top:52px; left:50%; transform:translateX(-50%);
+  position:fixed; top:62px; left:50%; transform:translateX(-50%);
   width:100%; max-width:480px; z-index:699;
   height:2px;
   background:linear-gradient(90deg,transparent,rgba(139,92,246,.7) 20%,rgba(167,139,250,.9) 50%,rgba(139,92,246,.7) 80%,transparent);
   box-shadow:0 0 10px rgba(139,92,246,.35);
 }
-.screen { padding-top:58px; }
+.screen { padding-top:68px; }
 .menu-topbar {
   display:flex; align-items:center; justify-content:space-between;
   padding:14px 16px 0; flex-shrink:0; position:relative; z-index:10;
@@ -403,7 +403,7 @@ body {
   background:var(--text); border-radius:2px; transition:all .15s;
 }
 .menu-topbar-logo {
-  font-size:22px; font-weight:900;
+  font-size:22px; font-weight:700;
   background:linear-gradient(135deg,#e9d5ff,#a855f7,#7c3aed);
   -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
   letter-spacing:-0.5px;
@@ -632,6 +632,25 @@ body {
   background:var(--card); border:1px solid var(--border); border-radius:16px;
   padding:14px; flex-shrink:0;
 }
+
+.topbar-logo-text {
+  position:absolute;
+  left:0; right:0;
+  text-align:center;
+  font-family:'SF Pro Display',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-size:22px;
+  font-weight:700;
+  letter-spacing:3px;
+  background:linear-gradient(90deg,#c4b5fd,#a855f7,#7c3aed);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  text-shadow:none;
+  filter:drop-shadow(0 0 8px rgba(168,85,247,0.55));
+  cursor:pointer;
+  user-select:none;
+  pointer-events:all;
+}
 </style>
 </head>
 <body>
@@ -759,28 +778,10 @@ body {
 
 <!-- ═══ МЕНЮ ═══ -->
 <!-- ═══ ГЛОБАЛЬНЫЙ ТОПБАР ═══ -->
+<canvas id="particles-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.6"></canvas>
 <div class="global-topbar">
   <div class="menu-hamburger" onclick="openDrawer()"><span></span><span></span><span></span></div>
-  <div onclick="goMenu()" style="cursor:pointer;display:flex;align-items:center;position:absolute;left:50%;transform:translateX(-50%)">
-    <svg height="32" viewBox="0 0 180 38" xmlns="http://www.w3.org/2000/svg" style="display:block">
-      <defs>
-        <linearGradient id="lg-logo" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="#d8b4fe"/>
-          <stop offset="50%" stop-color="#a855f7"/>
-          <stop offset="100%" stop-color="#7c3aed"/>
-        </linearGradient>
-      </defs>
-      <text x="2" y="30" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif"
-            font-size="30" font-weight="900" letter-spacing="-0.5" fill="url(#lg-logo)">umbrex</text>
-      <!-- rocket -->
-      <g transform="translate(154,0) rotate(35,12,18)" fill="url(#lg-logo)" opacity="0.9">
-        <ellipse cx="12" cy="14" rx="5" ry="10"/>
-        <polygon points="12,2 7,10 17,10"/>
-        <rect x="7" y="20" width="3" height="5" rx="1"/>
-        <rect x="14" y="20" width="3" height="5" rx="1"/>
-      </g>
-    </svg>
-  </div>
+  <span onclick="goMenu()" class="topbar-logo-text">umbrex</span>
   <div class="menu-topbar-placeholder"></div>
 </div>
 <div class="global-topbar-divider"></div>
@@ -795,7 +796,7 @@ body {
       <div class="lbl">Баланс</div>
       <div class="val"><span id="menu-balance-val">—</span> <span style="font-size:26px">🪙</span></div>
     </div>
-    <button class="menu-balance-btn" onclick="window.open('https://t.me/umbrex_gamebot?start=donate','_blank')">Пополнить</button>
+    <button class="menu-balance-btn" onclick="if(tg){tg.openTelegramLink('https://t.me/umbrex_gamebot?start=donate');}else{window.open('https://t.me/umbrex_gamebot?start=donate','_blank');}">Пополнить</button>
   </div>
   <div class="games-section-head">
     <div class="menu-section-title">Игры</div>
@@ -1878,5 +1879,57 @@ window.addEventListener('load',()=>{
   if(tg){tg.expand();}
 });
 </script>
+
+<script>
+(function(){
+  var c = document.getElementById('particles-canvas');
+  if(!c) return;
+  var ctx = c.getContext('2d');
+  var W, H, pts = [];
+  function resize(){
+    W = c.width = window.innerWidth;
+    H = c.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Создаём ~40 частиц
+  for(var i=0; i<130; i++){
+    pts.push({
+      x: Math.random()*1000,
+      y: Math.random()*2000,
+      r: Math.random()*1.5 + 0.3,
+      vx: (Math.random()-0.5)*0.15,
+      vy: -(Math.random()*0.3 + 0.05),
+      a: Math.random(),
+      va: (Math.random()-0.5)*0.005,
+      hue: 270 + Math.random()*30
+    });
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    for(var i=0; i<pts.length; i++){
+      var p = pts[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.a += p.va;
+      if(p.a < 0) p.va = Math.abs(p.va);
+      if(p.a > 1) p.va = -Math.abs(p.va);
+      if(p.y < -10) { p.y = H + 10; p.x = Math.random()*W; }
+      if(p.x < -10) p.x = W + 10;
+      if(p.x > W+10) p.x = -10;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = 'hsla('+p.hue+',70%,75%,'+p.a+')';
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
 </body>
 </html>
+
