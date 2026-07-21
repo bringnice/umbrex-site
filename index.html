@@ -57,19 +57,26 @@ body {
 .games-section-head .menu-section-title { padding:0; }
 .allgames-link { font-size:11px;font-weight:800;color:var(--purple-light);cursor:pointer;display:flex;align-items:center;gap:3px;letter-spacing:.2px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.3);border-radius:20px;padding:5px 11px;transition:transform .12s,background .15s; }
 .allgames-link:active { transform:scale(.93);background:rgba(139,92,246,.22); }
-.games-grid { position:relative;z-index:10;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:140px;gap:12px;margin:0 16px;flex-shrink:0; }
-.game-card { border-radius:20px;padding:18px 16px;cursor:pointer;position:relative;overflow:hidden;transition:transform .15s;border:1px solid transparent;display:flex;flex-direction:column;justify-content:flex-end; }
-.game-card:active { transform:scale(.96); }
-.game-card-mines { background:linear-gradient(145deg,#0f1f3a,#0a1628);border-color:rgba(52,211,153,.3);box-shadow:0 8px 32px rgba(0,0,0,.4),inset 0 1px 0 rgba(52,211,153,.1); }
-.game-card-crash { background:linear-gradient(145deg,#1a0f2e,#100920);border-color:rgba(251,146,60,.3);box-shadow:0 8px 32px rgba(0,0,0,.4),inset 0 1px 0 rgba(251,146,60,.1); }
-.game-card-icon { font-size:46px;line-height:1;margin-bottom:10px; }
+.games-grid { position:relative;z-index:10;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:152px;gap:12px;margin:0 16px;flex-shrink:0; }
+.game-card { border-radius:22px;padding:16px 14px 14px;cursor:pointer;position:relative;overflow:hidden;transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .2s;border:1px solid transparent;display:flex;flex-direction:column;justify-content:flex-end; }
+.game-card:hover { transform:translateY(-2px); }
+.game-card:active { transform:scale(.94); }
+.game-card-mines { background:linear-gradient(145deg,#0c1e38,#091525);border-color:rgba(52,211,153,.35);box-shadow:0 8px 28px rgba(0,0,0,.5),inset 0 1px 0 rgba(52,211,153,.15); }
+.game-card-mines:hover { box-shadow:0 12px 36px rgba(52,211,153,.2),0 8px 28px rgba(0,0,0,.5),inset 0 1px 0 rgba(52,211,153,.15); }
+.game-card-crash { background:linear-gradient(145deg,#1a0f2e,#100920);border-color:rgba(251,146,60,.35);box-shadow:0 8px 28px rgba(0,0,0,.5),inset 0 1px 0 rgba(251,146,60,.15); }
+.game-card-crash:hover { box-shadow:0 12px 36px rgba(251,146,60,.2),0 8px 28px rgba(0,0,0,.5),inset 0 1px 0 rgba(251,146,60,.15); }
+.game-card-icon { font-size:46px;line-height:1;margin-bottom:8px;transition:transform .2s;display:block; }
+.game-card:hover .game-card-icon { transform:scale(1.12) rotate(-5deg); }
+.game-card:active .game-card-icon { transform:scale(.9); }
 .game-card-name { font-size:16px;font-weight:900;margin-bottom:2px; }
 .game-card-desc { font-size:11px;color:var(--muted); }
 .game-card-badge { position:absolute;top:12px;right:12px;border-radius:8px;padding:3px 8px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px; }
 .badge-green { background:rgba(52,211,153,.2);color:var(--green);border:1px solid rgba(52,211,153,.3); }
 .badge-orange { background:rgba(251,146,60,.2);color:var(--orange);border:1px solid rgba(251,146,60,.3); }
-.game-card-glow-mines { position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:radial-gradient(circle,rgba(52,211,153,.15) 0%,transparent 70%);pointer-events:none; }
-.game-card-glow-crash { position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:radial-gradient(circle,rgba(251,146,60,.15) 0%,transparent 70%);pointer-events:none; }
+.game-card-glow-mines { position:absolute;top:-10px;right:-10px;width:120px;height:120px;background:radial-gradient(circle,rgba(52,211,153,.2) 0%,transparent 70%);pointer-events:none;transition:opacity .3s; }
+.game-card-glow-crash { position:absolute;top:-10px;right:-10px;width:120px;height:120px;background:radial-gradient(circle,rgba(251,146,60,.2) 0%,transparent 70%);pointer-events:none;transition:opacity .3s; }
+/* Блеск при наведении */
+.game-card::after { content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.04) 0%,transparent 50%);border-radius:22px;pointer-events:none; }
 
 /* ══════════ МИНЫ ══════════ */
 .grid-wrap { position:relative;z-index:10;margin:0 14px 16px;background:linear-gradient(145deg,rgba(18,14,38,.95),rgba(14,10,30,.98));border:1px solid rgba(60,48,100,.6);border-radius:22px;padding:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 60px rgba(80,30,180,.12),inset 0 1px 0 rgba(255,255,255,.04),inset 0 0 40px rgba(30,15,70,.3);flex-shrink:0; }
@@ -439,7 +446,7 @@ body {
   display:flex; align-items:center; justify-content:center;
   font-size:12px; font-weight:800; color:#fff; flex-shrink:0;
 }
-.mini-lb-name { flex:1; font-size:13px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.mini-lb-name { flex:1; font-size:13px; font-weight:800; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .mini-lb-val { font-size:13px; font-weight:800; color:var(--purple-light); flex-shrink:0; }
 .mini-lb-loading { text-align:center; color:var(--muted); padding:22px; font-size:13px; }
 
@@ -553,7 +560,7 @@ body {
 .ph-row:last-child { border-bottom:none; }
 .ph-icon { font-size:20px;width:28px;text-align:center;flex-shrink:0; }
 .ph-info { flex:1;overflow:hidden; }
-.ph-name { font-size:12px;font-weight:700;color:var(--muted); }
+.ph-name { font-size:12px;font-weight:800;color:var(--text); }
 .ph-game { font-size:13px;font-weight:800;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
 .ph-time { font-size:10px;color:var(--muted);margin-top:1px; }
 .ph-amount { font-size:13px;font-weight:900;flex-shrink:0; }
@@ -726,30 +733,115 @@ body {
 }
 
 /* ══════════ ЛАЙВ СТАВКИ ══════════ */
+/* ══════════ LIVE СЕКЦИЯ ══════════ */
+.live-section {
+  position:relative; z-index:10;
+  margin:16px 16px 0;
+}
+.live-pill {
+  display:inline-flex; align-items:center; gap:8px;
+  background:linear-gradient(135deg,rgba(139,92,246,.15),rgba(192,132,252,.08));
+  border:1px solid rgba(139,92,246,.35);
+  border-radius:20px; padding:7px 16px 7px 12px;
+  margin-bottom:12px;
+}
+.live-dot {
+  width:8px; height:8px; border-radius:50%;
+  background:#ef4444;
+  box-shadow:0 0 8px rgba(239,68,68,.9);
+  animation:livePulse 1.2s ease-in-out infinite;
+  flex-shrink:0;
+}
+@keyframes livePulse {
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:.5;transform:scale(1.4)}
+}
+.live-pill-label {
+  font-size:11px; font-weight:900; color:#c084fc;
+  letter-spacing:1.5px; text-transform:uppercase;
+}
+.live-pill-count {
+  font-size:10px; font-weight:700; color:var(--muted);
+  background:rgba(139,92,246,.15); border-radius:10px;
+  padding:2px 7px; margin-left:2px;
+}
+
+/* Горизонтальный скролл лайв-карточек */
+.live-cards-scroll {
+  display:flex; gap:10px;
+  overflow-x:auto; padding-bottom:4px;
+  scrollbar-width:none;
+}
+.live-cards-scroll::-webkit-scrollbar { display:none; }
+
+.live-card {
+  flex-shrink:0;
+  width:148px;
+  background:linear-gradient(145deg,rgba(20,15,40,.97),rgba(13,10,28,.99));
+  border:1px solid rgba(60,48,100,.6);
+  border-radius:16px; padding:12px 12px 10px;
+  position:relative; overflow:hidden;
+  animation:liveCardIn .3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes liveCardIn {
+  0%{opacity:0;transform:scale(.88) translateY(8px)}
+  100%{opacity:1;transform:scale(1) translateY(0)}
+}
+.live-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(139,92,246,.4),transparent);
+}
+.live-card-game {
+  font-size:10px; font-weight:700; color:var(--muted);
+  text-transform:uppercase; letter-spacing:.8px; margin-bottom:4px;
+  display:flex; align-items:center; gap:4px;
+}
+.live-card-name {
+  font-size:13px; font-weight:800; color:var(--text);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  margin-bottom:6px;
+}
+.live-card-amount {
+  font-size:15px; font-weight:900;
+}
+.live-card-amount.win { color:#34d399; text-shadow:0 0 10px rgba(52,211,153,.4); }
+.live-card-amount.lose { color:#f87171; text-shadow:0 0 10px rgba(248,113,113,.3); }
+.live-card-glow-win {
+  position:absolute; bottom:-20px; right:-20px; width:80px; height:80px;
+  background:radial-gradient(circle,rgba(52,211,153,.12) 0%,transparent 70%);
+  pointer-events:none;
+}
+.live-card-glow-lose {
+  position:absolute; bottom:-20px; right:-20px; width:80px; height:80px;
+  background:radial-gradient(circle,rgba(248,113,113,.1) 0%,transparent 70%);
+  pointer-events:none;
+}
+
+/* Тикер (полоска) */
 .live-ticker-wrap {
   position:relative; z-index:10;
-  margin:18px 16px 0;
+  margin:12px 16px 0;
   overflow:hidden;
-  height:32px;
-  background:rgba(139,92,246,.07);
-  border:1px solid rgba(139,92,246,.2);
-  border-radius:10px;
+  height:30px;
+  background:rgba(139,92,246,.06);
+  border:1px solid rgba(139,92,246,.18);
+  border-radius:8px;
   display:flex; align-items:center;
 }
 .live-ticker-label {
   flex-shrink:0;
   padding:0 10px;
-  font-size:10px; font-weight:800;
+  font-size:9px; font-weight:800;
   color:#a855f7;
   letter-spacing:1px;
   text-transform:uppercase;
   border-right:1px solid rgba(139,92,246,.2);
 }
 .live-ticker-track {
-  display:flex; align-items:center; gap:24px;
-  padding:0 16px;
+  display:flex; align-items:center; gap:20px;
+  padding:0 14px;
   white-space:nowrap;
-  animation: ticker-scroll 30s linear infinite;
+  animation: ticker-scroll 28s linear infinite;
   will-change: transform;
 }
 .live-ticker-wrap:hover .live-ticker-track { animation-play-state: paused; }
@@ -758,15 +850,14 @@ body {
   100% { transform: translateX(-50%); }
 }
 .live-tick-item {
-  display:flex; align-items:center; gap:6px;
-  font-size:12px; font-weight:700;
-  color:var(--text-dim);
+  display:flex; align-items:center; gap:5px;
+  font-size:11px; font-weight:700;
 }
-.live-tick-name { color:var(--muted); }
-.live-tick-game { color:var(--text); }
+.live-tick-name { color:var(--text); font-weight:800; }
+.live-tick-game { color:var(--muted); }
 .live-tick-amount.win  { color:#34d399; }
 .live-tick-amount.lose { color:#f87171; }
-.live-tick-sep { color:rgba(255,255,255,.12); }
+.live-tick-sep { color:rgba(255,255,255,.1); }
 
 /* ══════════ ПОСЛЕДНИЕ ИГРЫ ══════════ */
 .recent-games { position:relative; z-index:10; margin:20px 16px 0; flex-shrink:0; }
@@ -785,7 +876,7 @@ body {
 .rg-row:last-child { border-bottom:none; }
 .rg-icon { font-size:20px; width:28px; text-align:center; flex-shrink:0; }
 .rg-info { flex:1; overflow:hidden; }
-.rg-name { font-size:12px; font-weight:700; color:var(--muted); }
+.rg-name { font-size:12px; font-weight:800; color:var(--text); }
 .rg-game { font-size:13px; font-weight:800; color:var(--text); }
 .rg-amount { font-size:13px; font-weight:900; flex-shrink:0; }
 .rg-amount.win  { color:#34d399; }
@@ -983,9 +1074,20 @@ body {
     </div>
     <button class="menu-balance-btn" onclick="if(tg){tg.openTelegramLink('https://t.me/umbrex_gamebot?start=donate');}else{window.open('https://t.me/umbrex_gamebot?start=donate','_blank');}">Пополнить</button>
   </div>
-  <!-- ЛАЙВ СТАВКИ -->
-  <div class="live-ticker-wrap">
-    <div class="live-ticker-label">🔴 Live</div>
+  <!-- ЛАЙВ СЕКЦИЯ -->
+  <div class="live-section">
+    <div class="live-pill">
+      <div class="live-dot"></div>
+      <span class="live-pill-label">Live</span>
+      <span class="live-pill-count" id="live-count">•••</span>
+    </div>
+    <div class="live-cards-scroll" id="live-cards-scroll">
+      <!-- карточки загружаются JS -->
+    </div>
+  </div>
+  <!-- ЛАЙВ ТИКЕР -->
+  <div class="live-ticker-wrap" style="margin-top:10px">
+    <div class="live-ticker-label">Live</div>
     <div class="live-ticker-track" id="live-ticker-track">
       <span class="live-tick-item"><span class="live-tick-name">Загрузка...</span></span>
     </div>
@@ -1451,18 +1553,38 @@ async function loadLiveBets(){
   try{
     const r=await apiCall('GET','/api/live-bets');
     if(!r.ok||!r.bets||!r.bets.length) return;
+    const bets=r.bets;
+    // Счётчик
+    const countEl=document.getElementById('live-count');
+    if(countEl) countEl.textContent=bets.length+' игр';
+    // Карточки
+    const scroll=document.getElementById('live-cards-scroll');
+    if(scroll){
+      scroll.innerHTML=bets.slice(0,10).map((b,idx)=>{
+        const icon=GAME_ICONS[b.game]||'🎮';
+        const win=b.result==='win';
+        const amount=win?'+'+fmt(b.profit):'-'+fmt(b.bet);
+        const cls=win?'win':'lose';
+        return `<div class="live-card" style="animation-delay:${idx*0.05}s">
+          ${win?'<div class="live-card-glow-win"></div>':'<div class="live-card-glow-lose"></div>'}
+          <div class="live-card-game">${icon} ${b.game}</div>
+          <div class="live-card-name">${escapeHtml(b.name)}</div>
+          <div class="live-card-amount ${cls}">${amount} 🪙</div>
+        </div>`;
+      }).join('');
+    }
+    // Тикер
     const track=document.getElementById('live-ticker-track');
     if(!track) return;
-    // Дублируем массив для бесшовной прокрутки
-    const items=[...r.bets,...r.bets];
+    const items=[...bets,...bets];
     track.innerHTML=items.map(b=>{
       const icon=GAME_ICONS[b.game]||'🎮';
       const win=b.result==='win';
-      const amount=win?'+'+fmtLive(b.profit):'-'+fmtLive(b.bet);
+      const amount=win?'+'+fmt(b.profit):'-'+fmt(b.bet);
       const cls=win?'win':'lose';
       return `<span class="live-tick-item">
-        <span class="live-tick-name">${b.name}</span>
-        <span class="live-tick-game">${icon} ${b.game}</span>
+        <span class="live-tick-name">${escapeHtml(b.name)}</span>
+        <span class="live-tick-game">${icon}</span>
         <span class="live-tick-amount ${cls}">${amount}</span>
       </span><span class="live-tick-sep">·</span>`;
     }).join('');
@@ -1481,7 +1603,7 @@ async function loadRecentGames(){
     el.innerHTML=r.games.map(g=>{
       const icon=GAME_ICONS[g.game]||'🎮';
       const win=g.result==='win';
-      const amount=win?'+'+fmtLive(g.profit):'-'+fmtLive(g.bet);
+      const amount=win?'+'+fmt(g.profit):'-'+fmt(g.bet);
       const cls=win?'win':'lose';
       return `<div class="rg-row">
         <div class="rg-icon">${icon}</div>
@@ -2037,7 +2159,7 @@ async function loadProfileHistory(tab){
       list.innerHTML=items.map(g=>{
         const icon=GAME_ICONS_H[g.game]||'🎮';
         const win=g.result==='win';
-        const amount=win?'+'+fmtLive(g.profit):'-'+fmtLive(g.bet);
+        const amount=win?'+'+fmt(g.profit):'-'+fmt(g.bet);
         const cls=win?'win':'lose';
         const timeStr=fmtTime(g.ts||g.time||g.created_at);
         return `<div class="ph-row">
