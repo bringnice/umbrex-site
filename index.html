@@ -620,17 +620,17 @@ body {
 <div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-logo-area">
-    <div style="height:34px;display:flex;align-items:center">
-      <svg height="34" viewBox="0 0 240 80" xmlns="http://www.w3.org/2000/svg">
+    <div style="height:32px;display:flex;align-items:center">
+      <svg height="32" viewBox="0 0 178 38" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="lg-drawer" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#c084fc"/>
+            <stop offset="0%" stop-color="#d8b4fe"/>
             <stop offset="50%" stop-color="#a855f7"/>
             <stop offset="100%" stop-color="#7c3aed"/>
           </linearGradient>
         </defs>
-        <text x="0" y="62" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif"
-              font-size="72" font-weight="900" letter-spacing="-3" fill="url(#lg-drawer)">umbrex</text>
+        <text x="2" y="30" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif"
+              font-size="30" font-weight="900" letter-spacing="-0.5" fill="url(#lg-drawer)">umbrex</text>
       </svg>
     </div>
     <div class="drawer-sub">Gaming Platform</div>
@@ -668,17 +668,17 @@ body {
 <!-- ═══ ГЛОБАЛЬНЫЙ ТОПБАР ═══ -->
 <div class="global-topbar">
   <div class="menu-hamburger" onclick="openDrawer()"><span></span><span></span><span></span></div>
-  <div onclick="goMenu()" style="cursor:pointer;height:28px;display:flex;align-items:center">
-    <svg height="28" viewBox="0 0 220 80" xmlns="http://www.w3.org/2000/svg" style="display:block">
+  <div onclick="goMenu()" style="cursor:pointer;height:26px;display:flex;align-items:center">
+    <svg height="26" viewBox="0 0 148 34" xmlns="http://www.w3.org/2000/svg" style="display:block">
       <defs>
         <linearGradient id="lg-logo" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="#c084fc"/>
+          <stop offset="0%" stop-color="#d8b4fe"/>
           <stop offset="50%" stop-color="#a855f7"/>
           <stop offset="100%" stop-color="#7c3aed"/>
         </linearGradient>
       </defs>
-      <text x="0" y="62" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif"
-            font-size="72" font-weight="900" letter-spacing="-3" fill="url(#lg-logo)">umbrex</text>
+      <text x="2" y="26" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif"
+            font-size="26" font-weight="900" letter-spacing="-0.5" fill="url(#lg-logo)">umbrex</text>
     </svg>
   </div>
   <div class="menu-topbar-placeholder"></div>
@@ -907,7 +907,7 @@ body {
     <svg class="tab-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="8" r="6.2"/><polyline points="8.3 13.6 7 22 12 19 17 22 15.7 13.6"/>
     </svg>
-    <span class="tab-label">Лидерборд</span>
+    <span class="tab-label">Топ</span>
   </div>
   <div class="tab-item" data-tab="bonus" onclick="goBonus()">
     <svg class="tab-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -1507,19 +1507,20 @@ async function loadMiniLeaderboard(){
   const list=document.getElementById('mini-lb-list');
   if(!list)return;
   try{
-    const r=await apiCall('GET','/api/leaderboard');
+    const r=await apiCall('GET','/api/lb');
     if(!r.ok){list.innerHTML='<div class="mini-lb-loading">—</div>';return;}
     const medals=['🥇','🥈','🥉'];
     const top5=(r.players||[]).slice(0,5);
-    if(!top5.length){list.innerHTML='<div class="mini-lb-loading">Пока никого нет</div>';return;}
+    if(!top5.length){list.innerHTML='<div class="mini-lb-loading">Сегодня ещё никто не играл</div>';return;}
     list.innerHTML=top5.map((p,i)=>{
       const rank=i+1;
       const medal=rank<=3?medals[rank-1]:rank;
+      const val=p.total>0?'+'+fmt(p.total):fmt(p.total);
       return `<div class="mini-lb-row">
         <div class="mini-lb-rank">${medal}</div>
         <div class="mini-lb-av">${escapeHtml((p.name||'?').charAt(0).toUpperCase())}</div>
         <div class="mini-lb-name">${escapeHtml(p.name)}</div>
-        <div class="mini-lb-val">${fmt(p.balance)} 🪙</div>
+        <div class="mini-lb-val" style="color:${p.total>=0?'var(--green)':'var(--red)'}">${val} 🪙</div>
       </div>`;
     }).join('');
   }catch(e){list.innerHTML='<div class="mini-lb-loading">—</div>';}
