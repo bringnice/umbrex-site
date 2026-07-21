@@ -403,8 +403,10 @@ body {
 }
 .menu-topbar-placeholder { width:38px; }
 .menu-divider {
-  height:1px; background:rgba(60,45,100,.4);
-  margin:10px 16px 0; flex-shrink:0; position:relative; z-index:10;
+  height:2px;
+  background:linear-gradient(90deg,transparent,rgba(139,92,246,.7) 20%,rgba(167,139,250,.9) 50%,rgba(139,92,246,.7) 80%,transparent);
+  box-shadow:0 0 10px rgba(139,92,246,.35);
+  margin:10px 0 0; flex-shrink:0; position:relative; z-index:10;
 }
 
 /* ══════════ МИНИ-ЛИДЕРБОРД ══════════ */
@@ -618,7 +620,19 @@ body {
 <div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-logo-area">
-    <div class="drawer-logo">umbrex</div>
+    <div style="height:34px;display:flex;align-items:center">
+      <svg height="34" viewBox="0 0 240 80" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="lg-drawer" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#c084fc"/>
+            <stop offset="50%" stop-color="#a855f7"/>
+            <stop offset="100%" stop-color="#7c3aed"/>
+          </linearGradient>
+        </defs>
+        <text x="0" y="62" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif"
+              font-size="72" font-weight="900" letter-spacing="-3" fill="url(#lg-drawer)">umbrex</text>
+      </svg>
+    </div>
     <div class="drawer-sub">Gaming Platform</div>
   </div>
   <nav class="drawer-nav">
@@ -654,7 +668,19 @@ body {
 <!-- ═══ ГЛОБАЛЬНЫЙ ТОПБАР ═══ -->
 <div class="global-topbar">
   <div class="menu-hamburger" onclick="openDrawer()"><span></span><span></span><span></span></div>
-  <div class="menu-topbar-logo" onclick="goMenu()" style="cursor:pointer">umbrex</div>
+  <div onclick="goMenu()" style="cursor:pointer;height:28px;display:flex;align-items:center">
+    <svg height="28" viewBox="0 0 220 80" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <defs>
+        <linearGradient id="lg-logo" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#c084fc"/>
+          <stop offset="50%" stop-color="#a855f7"/>
+          <stop offset="100%" stop-color="#7c3aed"/>
+        </linearGradient>
+      </defs>
+      <text x="0" y="62" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif"
+            font-size="72" font-weight="900" letter-spacing="-3" fill="url(#lg-logo)">umbrex</text>
+    </svg>
+  </div>
   <div class="menu-topbar-placeholder"></div>
 </div>
 
@@ -881,7 +907,7 @@ body {
     <svg class="tab-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="8" r="6.2"/><polyline points="8.3 13.6 7 22 12 19 17 22 15.7 13.6"/>
     </svg>
-    <span class="tab-label">Топ</span>
+    <span class="tab-label">Лидерборд</span>
   </div>
   <div class="tab-item" data-tab="bonus" onclick="goBonus()">
     <svg class="tab-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -1373,8 +1399,10 @@ async function loadLeaderboard(){
     if(!players.length) list.innerHTML='<div class="top-loading">Пока никого нет</div>';
     if(r.you){
       youCard.style.display='flex';
+      const youVal=currentTopTab==='games'?r.you.games_played:currentTopTab==='bank'?r.you.bank:r.you.balance;
+      const youLbl=currentTopTab==='games'?'Игр сыграно':currentTopTab==='bank'?'Банк':'Баланс';
       youCard.innerHTML=`<div><div class="top-you-label">Твоё место</div><div class="top-you-place">#${r.you.place}</div></div>`+
-        `<div style="text-align:right"><div class="top-you-label">Баланс</div><div class="top-you-bal">${fmt(r.you.balance)} 🪙</div></div>`;
+        `<div style="text-align:right"><div class="top-you-label">${youLbl}</div><div class="top-you-bal">${fmt(youVal??r.you.balance)} ${currentTopTab==='games'?' игр':' 🪙'}</div></div>`;
     } else { youCard.style.display='none'; }
   }catch(e){ list.innerHTML='<div class="top-loading">Ошибка соединения</div>'; }
 }
