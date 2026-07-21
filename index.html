@@ -539,6 +539,92 @@ body {
 .result-mult { font-size:11px;color:var(--muted);margin-top:2px; }
 .toast { position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--card2);border:1px solid var(--border);color:var(--text);padding:10px 20px;border-radius:24px;font-size:13px;font-weight:600;opacity:0;transition:all .28s;pointer-events:none;white-space:nowrap;z-index:2000;box-shadow:0 4px 24px rgba(0,0,0,.5); }
 .toast.show { opacity:1;transform:translateX(-50%) translateY(0); }
+
+/* ══════════ ХИЛО ══════════ */
+#screen-hilo { background:
+  radial-gradient(ellipse 80% 60% at 20% 10%,rgba(80,30,140,.55) 0%,transparent 60%),
+  radial-gradient(ellipse 60% 50% at 80% 80%,rgba(60,20,120,.45) 0%,transparent 55%),
+  radial-gradient(ellipse 100% 100% at 50% 50%,#0a0818 40%,#130c2a 100%);
+}
+.hilo-card-wrap {
+  position:relative; z-index:10;
+  display:flex; align-items:center; justify-content:center;
+  margin:8px 16px 16px; flex-shrink:0;
+}
+.hilo-card {
+  width:180px; height:260px; border-radius:20px;
+  background:linear-gradient(145deg,#1a1235,#0f0a22);
+  border:2px solid rgba(139,92,246,.6);
+  box-shadow:0 0 40px rgba(139,92,246,.4),0 0 80px rgba(139,92,246,.15),inset 0 1px 0 rgba(255,255,255,.08);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  position:relative; overflow:hidden; transition:all .3s;
+  flex-shrink:0;
+}
+.hilo-card.win  { border-color:var(--green); box-shadow:0 0 40px rgba(52,211,153,.5),0 0 80px rgba(52,211,153,.2); animation:hiloCardWin .4s ease; }
+.hilo-card.lose { border-color:var(--red);   box-shadow:0 0 40px rgba(248,113,113,.5),0 0 80px rgba(248,113,113,.2); animation:hiloCardLose .4s ease; }
+@keyframes hiloCardWin  { 0%{transform:scale(.92)} 60%{transform:scale(1.06)} 100%{transform:scale(1)} }
+@keyframes hiloCardLose { 0%{transform:scale(1.08) rotate(-3deg)} 50%{transform:scale(.95) rotate(2deg)} 100%{transform:scale(1) rotate(0)} }
+.hilo-card-val {
+  font-size:72px; font-weight:900; line-height:1;
+  color:#f0eeff; text-shadow:0 0 20px rgba(167,139,250,.5);
+}
+.hilo-card-suit {
+  font-size:48px; line-height:1; margin-top:4px;
+}
+.hilo-card-tl { position:absolute; top:14px; left:16px; font-size:22px; font-weight:900; color:#f0eeff; opacity:.7; }
+.hilo-card-br { position:absolute; bottom:14px; right:16px; font-size:22px; font-weight:900; color:#f0eeff; opacity:.7; transform:rotate(180deg); }
+.hilo-card-glow { position:absolute; top:-30px; left:-30px; width:140px; height:140px;
+  background:radial-gradient(circle,rgba(139,92,246,.2) 0%,transparent 70%); pointer-events:none; }
+
+.hilo-info { position:relative; z-index:10; margin:0 16px 16px; display:flex; gap:10px; flex-shrink:0; }
+.hilo-info-box {
+  flex:1; background:linear-gradient(145deg,rgba(18,14,38,.97),rgba(13,10,28,.99));
+  border:1px solid rgba(55,42,100,.6); border-radius:16px; padding:12px 14px; text-align:center;
+}
+.hilo-info-lbl { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; font-weight:600; margin-bottom:4px; }
+.hilo-info-val { font-size:20px; font-weight:900; color:var(--purple-light); text-shadow:0 0 12px rgba(167,139,250,.5); }
+.hilo-info-val.green { color:var(--green); text-shadow:0 0 12px rgba(52,211,153,.5); }
+
+.hilo-btns { position:relative; z-index:10; margin:0 16px 12px; display:flex; gap:10px; flex-shrink:0; }
+.hilo-btn {
+  flex:1; padding:18px 8px; border:none; border-radius:18px;
+  font-size:15px; font-weight:900; cursor:pointer; letter-spacing:.5px;
+  transition:transform .12s, box-shadow .15s; display:flex; flex-direction:column;
+  align-items:center; gap:4px;
+}
+.hilo-btn:active { transform:scale(.95); }
+.hilo-btn:disabled { opacity:.35; cursor:default; }
+.hilo-btn-higher {
+  background:linear-gradient(145deg,#065f3c,#047a4e);
+  color:#fff; box-shadow:0 6px 24px rgba(5,150,105,.4);
+}
+.hilo-btn-higher:hover:not(:disabled) { box-shadow:0 8px 30px rgba(5,150,105,.6); }
+.hilo-btn-lower {
+  background:linear-gradient(145deg,#7f1d1d,#991b1b);
+  color:#fff; box-shadow:0 6px 24px rgba(185,28,28,.4);
+}
+.hilo-btn-lower:hover:not(:disabled) { box-shadow:0 8px 30px rgba(185,28,28,.6); }
+.hilo-btn-arrow { font-size:22px; }
+.hilo-btn-label { font-size:16px; font-weight:900; letter-spacing:.5px; }
+.hilo-btn-mult  { font-size:12px; font-weight:700; opacity:.85; }
+
+.hilo-cashout-btn {
+  position:relative; z-index:10; margin:0 16px 8px;
+  width:calc(100% - 32px); padding:16px; border:none; border-radius:18px;
+  background:linear-gradient(135deg,#4c1d95,#6d28d9);
+  color:#fff; font-size:16px; font-weight:900; cursor:pointer; letter-spacing:.3px;
+  box-shadow:0 6px 24px rgba(109,40,217,.4); transition:transform .12s, box-shadow .15s;
+  display:flex; flex-direction:column; align-items:center; gap:2px; flex-shrink:0;
+}
+.hilo-cashout-btn:active { transform:scale(.97); }
+.hilo-cashout-btn:disabled { opacity:.3; cursor:default; }
+.hilo-cashout-sub { font-size:13px; font-weight:600; opacity:.8; }
+
+.hilo-settings {
+  position:relative; z-index:10; margin:0 16px 8px;
+  background:var(--card); border:1px solid var(--border); border-radius:16px;
+  padding:14px; flex-shrink:0;
+}
 </style>
 </head>
 <body>
@@ -715,6 +801,13 @@ body {
       <div class="game-card-name">Краш</div>
       <div class="game-card-desc">Забери до краша</div>
     </div>
+    <div class="game-card" style="background:linear-gradient(145deg,#1a1235,#0f0922);border-color:rgba(139,92,246,.3);box-shadow:0 8px 32px rgba(0,0,0,.4),inset 0 1px 0 rgba(139,92,246,.1)" onclick="openHilo()">
+      <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:radial-gradient(circle,rgba(139,92,246,.15) 0%,transparent 70%);pointer-events:none"></div>
+      <div class="game-card-badge" style="background:rgba(139,92,246,.2);color:#a78bfa;border:1px solid rgba(139,92,246,.3)">Карты</div>
+      <div class="game-card-icon">🃏</div>
+      <div class="game-card-name">HiLo</div>
+      <div class="game-card-desc">Выше или ниже?</div>
+    </div>
   </div>
   <!-- МИНИ-ЛИДЕРБОРД -->
   <div class="mini-lb">
@@ -747,6 +840,13 @@ body {
       <div class="game-card-icon">🚀</div>
       <div class="game-card-name">Краш</div>
       <div class="game-card-desc">Забери до краша</div>
+    </div>
+    <div class="game-card" style="background:linear-gradient(145deg,#1a1235,#0f0922);border-color:rgba(139,92,246,.3);box-shadow:0 8px 32px rgba(0,0,0,.4),inset 0 1px 0 rgba(139,92,246,.1)" onclick="openHilo()">
+      <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:radial-gradient(circle,rgba(139,92,246,.15) 0%,transparent 70%);pointer-events:none"></div>
+      <div class="game-card-badge" style="background:rgba(139,92,246,.2);color:#a78bfa;border:1px solid rgba(139,92,246,.3)">Карты</div>
+      <div class="game-card-icon">🃏</div>
+      <div class="game-card-name">HiLo</div>
+      <div class="game-card-desc">Выше или ниже?</div>
     </div>
   </div>
 </div>
@@ -927,6 +1027,78 @@ body {
   </div>
 </nav>
 
+
+<!-- ═══ ХИЛО ═══ -->
+<div id="screen-hilo" class="screen">
+  <div class="header">
+    <div class="header-back" onclick="goMenu()">←</div>
+    <div class="header-title"><h1>🃏 HiLo</h1><p>Umbrex</p></div>
+    <div class="balance-card">
+      <div class="balance-label">Баланс</div>
+      <div class="balance-amount"><span id="hilo-balance-val">—</span> 🪙</div>
+    </div>
+  </div>
+
+  <!-- Карта -->
+  <div class="hilo-card-wrap">
+    <div class="hilo-card" id="hilo-card">
+      <div class="hilo-card-glow"></div>
+      <div class="hilo-card-tl" id="hilo-card-tl">?</div>
+      <div class="hilo-card-val" id="hilo-card-val">?</div>
+      <div class="hilo-card-suit" id="hilo-card-suit"></div>
+      <div class="hilo-card-br" id="hilo-card-br">?</div>
+    </div>
+  </div>
+
+  <!-- Инфо: множитель + выигрыш -->
+  <div class="hilo-info" id="hilo-info" style="display:none">
+    <div class="hilo-info-box">
+      <div class="hilo-info-lbl">Текущий множитель</div>
+      <div class="hilo-info-val" id="hilo-mult">×1.00</div>
+    </div>
+    <div class="hilo-info-box">
+      <div class="hilo-info-lbl">Выигрыш</div>
+      <div class="hilo-info-val green" id="hilo-payout">0 🪙</div>
+    </div>
+  </div>
+
+  <!-- Кнопки ВЫШЕ / НИЖЕ -->
+  <div class="hilo-btns" id="hilo-action-btns" style="display:none">
+    <button class="hilo-btn hilo-btn-higher" id="hilo-btn-higher" onclick="hiloMove('higher')">
+      <span class="hilo-btn-arrow">↑</span>
+      <span class="hilo-btn-label">ВЫШЕ</span>
+      <span class="hilo-btn-mult" id="hilo-higher-mult">×—</span>
+    </button>
+    <button class="hilo-btn hilo-btn-lower" id="hilo-btn-lower" onclick="hiloMove('lower')">
+      <span class="hilo-btn-arrow">↓</span>
+      <span class="hilo-btn-label">НИЖЕ</span>
+      <span class="hilo-btn-mult" id="hilo-lower-mult">×—</span>
+    </button>
+  </div>
+
+  <!-- ЗАБРАТЬ -->
+  <button class="hilo-cashout-btn" id="hilo-cashout-btn" onclick="hiloCashout()" style="display:none">
+    ЗАБРАТЬ
+    <span class="hilo-cashout-sub" id="hilo-cashout-sub">0 🪙</span>
+  </button>
+
+  <!-- Настройки ставки (до старта) -->
+  <div class="hilo-settings" id="hilo-settings">
+    <div class="setting-row">
+      <span class="setting-label">Ставка</span>
+      <div class="bet-input-wrap">
+        <button class="bet-mod" onclick="hiloMultBet(.5)">½</button>
+        <button class="bet-mod" onclick="hiloMultBet(2)">×2</button>
+        <input id="hilo-bet-input" class="bet-inp" type="number" value="500" min="50" step="50">
+        <button class="bet-mod" onclick="document.getElementById('hilo-bet-input').value=Math.floor(sharedBalance)">MAX</button>
+      </div>
+    </div>
+  </div>
+  <div class="btn-row" id="hilo-start-row">
+    <button class="btn btn-start" id="hilo-start-btn" onclick="hiloStart()">🃏 Начать</button>
+  </div>
+</div>
+
 <!-- TOAST / RESULT -->
 <div class="result-toast" id="result-overlay">
   <div class="result-icon" id="res-icon"></div>
@@ -975,6 +1147,11 @@ document.addEventListener('click', function(e){
   }
 });
 function goMenu(){showScreen('screen-menu');updateDrawerActive('menu');}
+function openHilo(){
+  showScreen('screen-hilo');
+  document.getElementById('hilo-balance-val').textContent=fmt(sharedBalance);
+  hiloReset();
+}
 function openMines(){showScreen('screen-mines');document.getElementById('mines-balance-val').textContent=fmt(sharedBalance);buildGrid();buildMineOpts();setupMinesInput();checkActiveGame();}
 function openCrash(){showScreen('screen-crash');document.getElementById('crash-balance-val').textContent=fmt(sharedBalance);initCrash();}
 
@@ -1524,6 +1701,122 @@ async function loadMiniLeaderboard(){
       </div>`;
     }).join('');
   }catch(e){list.innerHTML='<div class="mini-lb-loading">—</div>';}
+}
+
+
+// ── ХИЛО ──
+let HS = { playing:false, bet:500, cumulative:1, streak:0 };
+
+function hiloReset(){
+  HS = { playing:false, bet:500, cumulative:1, streak:0 };
+  document.getElementById('hilo-settings').style.display='block';
+  document.getElementById('hilo-start-row').style.display='flex';
+  document.getElementById('hilo-info').style.display='none';
+  document.getElementById('hilo-action-btns').style.display='none';
+  document.getElementById('hilo-cashout-btn').style.display='none';
+  document.getElementById('hilo-card-val').textContent='?';
+  document.getElementById('hilo-card-suit').textContent='';
+  document.getElementById('hilo-card-tl').textContent='?';
+  document.getElementById('hilo-card-br').textContent='?';
+  document.getElementById('hilo-card').className='hilo-card';
+}
+
+function hiloMultBet(f){
+  const i=document.getElementById('hilo-bet-input');
+  i.value=Math.max(50,Math.round(parseFloat(i.value||500)*f));
+}
+
+function hiloUpdateCard(val, suit){
+  const suitMap={'♠':'♠️','♥':'❤️','♦':'♦️','♣':'♣️'};
+  const s = suitMap[suit] || suit;
+  document.getElementById('hilo-card-val').textContent = val;
+  document.getElementById('hilo-card-suit').textContent = s;
+  document.getElementById('hilo-card-tl').textContent = val;
+  document.getElementById('hilo-card-br').textContent = val;
+}
+
+function hiloUpdateInfo(data){
+  document.getElementById('hilo-mult').textContent = '×' + data.cumulative;
+  document.getElementById('hilo-payout').textContent = fmt(data.payout) + ' 🪙';
+  document.getElementById('hilo-higher-mult').textContent = '×' + data.higher_mult;
+  document.getElementById('hilo-lower-mult').textContent = '×' + data.lower_mult;
+  // disable buttons on edge cards
+  document.getElementById('hilo-btn-higher').disabled = !data.can_higher;
+  document.getElementById('hilo-btn-lower').disabled = !data.can_lower;
+  // cashout only after first win
+  const cashoutBtn = document.getElementById('hilo-cashout-btn');
+  if(data.streak > 0){
+    cashoutBtn.style.display='flex';
+    document.getElementById('hilo-cashout-sub').textContent = fmt(data.payout) + ' 🪙';
+  }
+}
+
+async function hiloStart(){
+  const bet = parseFloat(document.getElementById('hilo-bet-input').value);
+  if(!bet || bet < 50){ showToast('Мин. ставка 50'); return; }
+  if(bet > sharedBalance){ showToast('Недостаточно средств'); return; }
+  document.getElementById('hilo-start-btn').disabled = true;
+  try{
+    const r = await apiCall('POST','/api/hilo/start',{bet});
+    if(!r.ok){ showToast(r.error||'Ошибка'); document.getElementById('hilo-start-btn').disabled=false; return; }
+    HS.playing = true;
+    HS.bet = bet;
+    sharedBalance = r.new_balance;
+    syncBalanceUI();
+    document.getElementById('hilo-balance-val').textContent = fmt(sharedBalance);
+    hiloUpdateCard(r.current_val, r.current_suit);
+    // show play UI
+    document.getElementById('hilo-settings').style.display='none';
+    document.getElementById('hilo-start-row').style.display='none';
+    document.getElementById('hilo-info').style.display='flex';
+    document.getElementById('hilo-action-btns').style.display='flex';
+    hiloUpdateInfo(r);
+    document.getElementById('hilo-card').className = 'hilo-card';
+  }catch(e){ showToast('Ошибка соединения'); document.getElementById('hilo-start-btn').disabled=false; }
+}
+
+async function hiloMove(direction){
+  document.getElementById('hilo-btn-higher').disabled = true;
+  document.getElementById('hilo-btn-lower').disabled = true;
+  document.getElementById('hilo-cashout-btn').disabled = true;
+  try{
+    const r = await apiCall('POST','/api/hilo/move',{direction});
+    if(!r.ok){ showToast(r.error||'Ошибка'); return; }
+    hiloUpdateCard(r.new_val, r.new_suit);
+    if(r.result === 'win'){
+      document.getElementById('hilo-card').className = 'hilo-card win';
+      setTimeout(()=>{ document.getElementById('hilo-card').className='hilo-card'; }, 400);
+      hiloUpdateInfo(r);
+      document.getElementById('hilo-cashout-btn').disabled = false;
+      tg?.HapticFeedback?.impactOccurred('light');
+    } else {
+      document.getElementById('hilo-card').className = 'hilo-card lose';
+      document.getElementById('hilo-action-btns').style.display='none';
+      document.getElementById('hilo-cashout-btn').style.display='none';
+      sharedBalance = r.new_balance;
+      syncBalanceUI();
+      document.getElementById('hilo-balance-val').textContent = fmt(sharedBalance);
+      tg?.HapticFeedback?.notificationOccurred('error');
+      showResult(false, HS.bet, 0);
+      setTimeout(()=>hiloReset(), 2800);
+    }
+  }catch(e){ showToast('Ошибка'); }
+}
+
+async function hiloCashout(){
+  document.getElementById('hilo-cashout-btn').disabled = true;
+  document.getElementById('hilo-btn-higher').disabled = true;
+  document.getElementById('hilo-btn-lower').disabled = true;
+  try{
+    const r = await apiCall('POST','/api/hilo/cashout',{});
+    if(!r.ok){ showToast(r.error||'Ошибка'); return; }
+    sharedBalance = r.new_balance;
+    syncBalanceUI();
+    document.getElementById('hilo-balance-val').textContent = fmt(sharedBalance);
+    tg?.HapticFeedback?.notificationOccurred('success');
+    showResult(true, r.payout - HS.bet, r.mult);
+    setTimeout(()=>hiloReset(), 2800);
+  }catch(e){ showToast('Ошибка'); }
 }
 
 document.addEventListener('DOMContentLoaded',async()=>{
