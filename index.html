@@ -1548,31 +1548,20 @@ let sharedBalance = 0;
 // ── NAV ──
 const TAB_SCREENS={'screen-menu':'menu','screen-games':'games','screen-top':'top','screen-bonus':'bonus','screen-profile':'profile'};
 function showScreen(id){
-  // Fade-out текущего экрана, fade-in нового
-  const prev = document.querySelector('.screen.active.screen-visible');
-  if(prev && prev.id !== id){
-    prev.classList.remove('screen-visible');
-    setTimeout(()=>{
-      document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active','screen-visible'));
-      const el=document.getElementById(id);
-      el.classList.add('active');
-      el.scrollTop=0;
-      requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('screen-visible')));
-      _afterShowScreen(id);
-    }, 180);
-    return;
-  }
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active','screen-visible'));
   const el=document.getElementById(id);
   el.classList.add('active');
   el.scrollTop=0;
-  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('screen-visible')));
-  _afterShowScreen(id);
-}
-function _afterShowScreen(id){
+  // Небольшой delay чтобы display:flex успел примениться до opacity transition
+  setTimeout(()=>{ el.classList.add('screen-visible'); }, 20);
   const tb=document.getElementById('tabbar');
   const tabKey=TAB_SCREENS[id];
-  if(tabKey){ tb.classList.remove('hidden'); document.querySelectorAll('.tab-item').forEach(t=>t.classList.toggle('active',t.dataset.tab===tabKey)); } else { tb.classList.add('hidden'); }
+  if(tabKey){
+    tb.classList.remove('hidden');
+    document.querySelectorAll('.tab-item').forEach(t=>t.classList.toggle('active',t.dataset.tab===tabKey));
+  } else {
+    tb.classList.add('hidden');
+  }
 }
 function goGames(){showScreen('screen-games');updateDrawerActive('games');}
 let currentTopTab = 'balance';
@@ -2555,7 +2544,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   document.querySelectorAll('.screen').forEach(s=>{s.scrollTop=0;});
   // Показываем начальный экран с fade
   const initScreen = document.querySelector('.screen.active');
-  if(initScreen) requestAnimationFrame(()=>requestAnimationFrame(()=>initScreen.classList.add('screen-visible')));
+  if(initScreen) setTimeout(()=>{ initScreen.classList.add('screen-visible'); }, 20);
   await loadBalance();
   loadLiveBets();
   loadRecentGames();checkBonusDot();loadMiniLeaderboard();
