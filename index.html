@@ -1534,7 +1534,9 @@ let resultTimer=null;
 function clearResultToast(){clearTimeout(resultTimer);document.getElementById('result-overlay').classList.remove('show');}
 function showResult(win,profit,mult){
   document.getElementById('res-icon').textContent=win?'💎':'💥';
-  const t=document.getElementById('res-title');t.textContent=win?'Победа!':'Краш!';t.className='result-title '+(win?'win':'lose');
+  const isCrash = document.getElementById('screen-crash')?.style.display !== 'none';
+  const loseText = isCrash ? 'Краш!' : 'Проигрыш';
+  const t=document.getElementById('res-title');t.textContent=win?'Победа!':loseText;t.className='result-title '+(win?'win':'lose');
   const a=document.getElementById('res-amt');a.textContent=(win?'+':'-')+fmt(Math.abs(Math.round(profit)))+' 🪙';a.className='result-amt '+(win?'win':'lose');
   document.getElementById('res-mult').textContent=win?`множитель ×${mult.toFixed(2)}`:'Удачи в следующий раз!';
   document.getElementById('result-overlay').classList.add('show');
@@ -1711,6 +1713,7 @@ function hiloReset(){
   HS = { playing:false, bet:500, cumulative:1, streak:0 };
   document.getElementById('hilo-settings').style.display='block';
   document.getElementById('hilo-start-row').style.display='flex';
+  document.getElementById('hilo-start-btn').disabled=false;
   document.getElementById('hilo-info').style.display='none';
   document.getElementById('hilo-action-btns').style.display='none';
   document.getElementById('hilo-cashout-btn').style.display='none';
@@ -1738,11 +1741,42 @@ function hiloUpdateCard(val, suit){
 function hiloUpdateInfo(data){
   document.getElementById('hilo-mult').textContent = '×' + data.cumulative;
   document.getElementById('hilo-payout').textContent = fmt(data.payout) + ' 🪙';
-  document.getElementById('hilo-higher-mult').textContent = '×' + data.higher_mult;
-  document.getElementById('hilo-lower-mult').textContent = '×' + data.lower_mult;
-  // disable buttons on edge cards
-  document.getElementById('hilo-btn-higher').disabled = !data.can_higher;
-  document.getElementById('hilo-btn-lower').disabled = !data.can_lower;
+  const canHigher = data.can_higher;
+  const canLower  = data.can_lower;
+  const sameMultDisplay = data.same_mult ? ('×' + data.same_mult) : '×—';
+
+  const btnHigher = document.getElementById('hilo-btn-higher');
+  const btnLower  = document.getElementById('hilo-btn-lower');
+
+  if(!canHigher){
+    // Туз — кнопка "Выше" становится "Та же"
+    btnHigher.disabled = false;
+    btnHigher.onclick = ()=>hiloMove('same');
+    btnHigher.querySelector('.hilo-btn-arrow').textContent = '=';
+    btnHigher.querySelector('.hilo-btn-label').textContent = 'ТА ЖЕ';
+    document.getElementById('hilo-higher-mult').textContent = sameMultDisplay;
+  } else {
+    btnHigher.disabled = false;
+    btnHigher.onclick = ()=>hiloMove('higher');
+    btnHigher.querySelector('.hilo-btn-arrow').textContent = '↑';
+    btnHigher.querySelector('.hilo-btn-label').textContent = 'ВЫШЕ';
+    document.getElementById('hilo-higher-mult').textContent = '×' + data.higher_mult;
+  }
+
+  if(!canLower){
+    // Двойка — кнопка "Ниже" становится "Та же"
+    btnLower.disabled = false;
+    btnLower.onclick = ()=>hiloMove('same');
+    btnLower.querySelector('.hilo-btn-arrow').textContent = '=';
+    btnLower.querySelector('.hilo-btn-label').textContent = 'ТА ЖЕ';
+    document.getElementById('hilo-lower-mult').textContent = sameMultDisplay;
+  } else {
+    btnLower.disabled = false;
+    btnLower.onclick = ()=>hiloMove('lower');
+    btnLower.querySelector('.hilo-btn-arrow').textContent = '↓';
+    btnLower.querySelector('.hilo-btn-label').textContent = 'НИЖЕ';
+    document.getElementById('hilo-lower-mult').textContent = '×' + data.lower_mult;
+  }
   // cashout only after first win
   const cashoutBtn = document.getElementById('hilo-cashout-btn');
   if(data.streak > 0){
@@ -1781,7 +1815,7 @@ async function hiloMove(direction){
   document.getElementById('hilo-cashout-btn').disabled = true;
   try{
     const r = await apiCall('POST','/api/hilo/move',{direction});
-    if(!r.ok){ showToast(r.error||'Ошибка'); return; }
+    if(!r.ok){ showToast(r.error||'Ошибка'); hiloUpdateInfo(r._state||{}); document.getElementById('hilo-btn-higher').disabled=false; document.getElementById('hilo-btn-lower').disabled=false; document.getElementById('hilo-cashout-btn').disabled=false; return; }
     hiloUpdateCard(r.new_val, r.new_suit);
     if(r.result === 'win'){
       document.getElementById('hilo-card').className = 'hilo-card win';
