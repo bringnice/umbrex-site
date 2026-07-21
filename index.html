@@ -1272,7 +1272,7 @@ body {
 <!-- ═══ МИНЫ ═══ -->
 <div id="screen-mines" class="screen">
   <div class="header">
-    <div class="header-back" onclick="goMenu()">←</div>
+    <div class="header-back" onclick="goBack()">←</div>
     <div class="header-title"><h1>Мины</h1><p>Umbrex</p></div>
     <div class="balance-card">
       <div class="balance-label">Баланс</div>
@@ -1312,7 +1312,7 @@ body {
 
   <!-- хедер -->
   <div class="crash-header">
-    <div class="crash-header-back" onclick="goMenu()">←</div>
+    <div class="crash-header-back" onclick="goBack()">←</div>
     <div class="crash-header-title">🚀 Краш</div>
     <div class="crash-header-bal"><span id="crash-balance-val">—</span> 🪙</div>
   </div>
@@ -1459,7 +1459,7 @@ body {
 <!-- ═══ ХИЛО ═══ -->
 <div id="screen-hilo" class="screen">
   <div class="header">
-    <div class="header-back" onclick="goMenu()">←</div>
+    <div class="header-back" onclick="goBack()">←</div>
     <div class="header-title"><h1>🃏 HiLo</h1><p>Umbrex</p></div>
     <div class="balance-card">
       <div class="balance-label">Баланс</div>
@@ -1552,8 +1552,8 @@ function showScreen(id){
   const el=document.getElementById(id);
   el.classList.add('active');
   el.scrollTop=0;
-  // Небольшой delay чтобы display:flex успел примениться до opacity transition
-  setTimeout(()=>{ el.classList.add('screen-visible'); }, 20);
+  // rAF гарантирует что display:flex применится до opacity — без мигания
+  requestAnimationFrame(()=>{ el.classList.add('screen-visible'); });
   const tb=document.getElementById('tabbar');
   const tabKey=TAB_SCREENS[id];
   if(tabKey){
@@ -1577,13 +1577,24 @@ document.addEventListener('click', function(e){
   }
 });
 function goMenu(){showScreen('screen-menu');updateDrawerActive('menu');}
+let _prevScreen = 'screen-menu';
 function openHilo(){
+  _prevScreen = document.querySelector('.screen.active')?.id || 'screen-menu';
   showScreen('screen-hilo');
   document.getElementById('hilo-balance-val').textContent=fmt(sharedBalance);
   hiloReset();
 }
-function openMines(){showScreen('screen-mines');document.getElementById('mines-balance-val').textContent=fmt(sharedBalance);buildGrid();buildMineOpts();setupMinesInput();checkActiveGame();}
-function openCrash(){showScreen('screen-crash');document.getElementById('crash-balance-val').textContent=fmt(sharedBalance);initCrash();}
+function openMines(){
+  _prevScreen = document.querySelector('.screen.active')?.id || 'screen-menu';
+  showScreen('screen-mines');document.getElementById('mines-balance-val').textContent=fmt(sharedBalance);buildGrid();buildMineOpts();setupMinesInput();checkActiveGame();
+}
+function openCrash(){
+  _prevScreen = document.querySelector('.screen.active')?.id || 'screen-menu';
+  showScreen('screen-crash');document.getElementById('crash-balance-val').textContent=fmt(sharedBalance);initCrash();
+}
+function goBack(){
+  if(_prevScreen==='screen-games'){goGames();}else{goMenu();}
+}
 
 // ── API ──
 async function apiCall(method,path,body){
@@ -2542,9 +2553,9 @@ async function hiloCashout(){
 document.addEventListener('DOMContentLoaded',async()=>{
   // Reset scroll on all screens so TG WebApp never opens mid-scroll
   document.querySelectorAll('.screen').forEach(s=>{s.scrollTop=0;});
-  // Показываем начальный экран с fade
-  const initScreen = document.querySelector('.screen.active');
-  if(initScreen) setTimeout(()=>{ initScreen.classList.add('screen-visible'); }, 20);
+  // Инициализируем начальный экран через showScreen чтобы таббар тоже инициализировался
+  showScreen('screen-menu');
+  updateDrawerActive('menu');
   await loadBalance();
   loadLiveBets();
   loadRecentGames();checkBonusDot();loadMiniLeaderboard();
