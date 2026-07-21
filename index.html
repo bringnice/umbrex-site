@@ -57,27 +57,76 @@ body {
 .games-section-head .menu-section-title { padding:0; }
 .allgames-link { font-size:11px;font-weight:800;color:var(--purple-light);cursor:pointer;display:flex;align-items:center;gap:3px;letter-spacing:.2px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.3);border-radius:20px;padding:5px 11px;transition:transform .12s,background .15s; }
 .allgames-link:active { transform:scale(.93);background:rgba(139,92,246,.22); }
-.games-grid { position:relative;z-index:10;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:152px;gap:12px;margin:0 16px;flex-shrink:0; }
-.game-card { border-radius:22px;padding:16px 14px 14px;cursor:pointer;position:relative;overflow:hidden;transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .2s;border:1px solid transparent;display:flex;flex-direction:column;justify-content:flex-end; }
-.game-card:hover { transform:translateY(-2px); }
-.game-card:active { transform:scale(.94); }
-.game-card-mines { background:linear-gradient(145deg,#0c1e38,#091525);border-color:rgba(52,211,153,.35);box-shadow:0 8px 28px rgba(0,0,0,.5),inset 0 1px 0 rgba(52,211,153,.15); }
-.game-card-mines:hover { box-shadow:0 12px 36px rgba(52,211,153,.2),0 8px 28px rgba(0,0,0,.5),inset 0 1px 0 rgba(52,211,153,.15); }
-.game-card-crash { background:linear-gradient(145deg,#1a0f2e,#100920);border-color:rgba(251,146,60,.35);box-shadow:0 8px 28px rgba(0,0,0,.5),inset 0 1px 0 rgba(251,146,60,.15); }
-.game-card-crash:hover { box-shadow:0 12px 36px rgba(251,146,60,.2),0 8px 28px rgba(0,0,0,.5),inset 0 1px 0 rgba(251,146,60,.15); }
-.game-card-icon { font-size:46px;line-height:1;margin-bottom:8px;transition:transform .2s;display:block; }
-.game-card:hover .game-card-icon { transform:scale(1.12) rotate(-5deg); }
-.game-card:active .game-card-icon { transform:scale(.9); }
-.game-card-name { font-size:16px;font-weight:900;margin-bottom:2px; }
-.game-card-desc { font-size:11px;color:var(--muted); }
-.game-card-badge { position:absolute;top:12px;right:12px;border-radius:8px;padding:3px 8px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px; }
-.badge-green { background:rgba(52,211,153,.2);color:var(--green);border:1px solid rgba(52,211,153,.3); }
-.badge-orange { background:rgba(251,146,60,.2);color:var(--orange);border:1px solid rgba(251,146,60,.3); }
-.game-card-glow-mines { position:absolute;top:-10px;right:-10px;width:120px;height:120px;background:radial-gradient(circle,rgba(52,211,153,.2) 0%,transparent 70%);pointer-events:none;transition:opacity .3s; }
-.game-card-glow-crash { position:absolute;top:-10px;right:-10px;width:120px;height:120px;background:radial-gradient(circle,rgba(251,146,60,.2) 0%,transparent 70%);pointer-events:none;transition:opacity .3s; }
-/* Блеск при наведении */
-.game-card::after { content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.04) 0%,transparent 50%);border-radius:22px;pointer-events:none; }
+.games-grid { position:relative;z-index:10;display:flex;flex-direction:column;gap:12px;margin:0 16px;flex-shrink:0; }
 
+/* Краш — широкая карточка */
+.game-card-crash-wide {
+  height:185px; border-radius:22px; position:relative; overflow:hidden;
+  cursor:pointer; border:1px solid rgba(251,146,60,.28);
+  box-shadow:0 8px 32px rgba(0,0,0,.6),inset 0 1px 0 rgba(251,146,60,.1);
+  background:linear-gradient(155deg,#120820 0%,#0e0618 55%,#080410 100%);
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1);
+}
+.game-card-crash-wide:active { transform:scale(.97); }
+.game-card-crash-wide::before {
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(251,146,60,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(251,146,60,.03) 1px,transparent 1px);
+  background-size:28px 28px; pointer-events:none;
+}
+.gc-crash-glow { position:absolute;top:-40px;right:-40px;width:220px;height:220px;background:radial-gradient(circle,rgba(251,146,60,.17) 0%,transparent 65%);pointer-events:none; }
+.gc-live-badge { position:absolute;top:14px;right:14px;background:linear-gradient(135deg,#16a34a,#15803d);border-radius:8px;padding:3px 10px;font-size:10px;font-weight:900;color:#fff;letter-spacing:1px;text-transform:uppercase;box-shadow:0 0 10px rgba(22,163,74,.45); }
+.gc-crash-mult { position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);font-size:50px;font-weight:900;color:#60a5fa;text-shadow:0 0 22px rgba(96,165,250,.7),0 0 55px rgba(59,130,246,.3);letter-spacing:-1px;line-height:1;pointer-events:none; }
+.gc-crash-canvas { position:absolute;inset:0;width:100%;height:100%;display:block; }
+.gc-crash-info { position:absolute;bottom:16px;left:16px; }
+.gc-crash-name { font-size:20px;font-weight:900;color:#fff; }
+.gc-crash-desc { font-size:11px;color:rgba(255,255,255,.4);margin-top:2px; }
+
+/* 2-колоночная сетка для малых карточек */
+.games-grid-row { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+
+.game-card-small {
+  height:165px;border-radius:22px;position:relative;overflow:hidden;
+  cursor:pointer;border:1px solid transparent;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1);
+}
+.game-card-small:active { transform:scale(.94); }
+.game-card-small::after { content:'';position:absolute;inset:0;background:linear-gradient(140deg,rgba(255,255,255,.05) 0%,transparent 50%);border-radius:22px;pointer-events:none; }
+
+.game-card-mines {
+  background:linear-gradient(155deg,#091e14 0%,#061510 60%,#040e0a 100%);
+  border-color:rgba(52,211,153,.28);
+  box-shadow:0 10px 28px rgba(0,0,0,.55),inset 0 1px 0 rgba(52,211,153,.1);
+}
+.game-card-hilo {
+  background:linear-gradient(155deg,#100920 0%,#0a0618 60%,#060410 100%);
+  border-color:rgba(139,92,246,.28);
+  box-shadow:0 10px 28px rgba(0,0,0,.55),inset 0 1px 0 rgba(139,92,246,.1);
+}
+.game-card-glow-mines { position:absolute;top:-20px;right:-20px;width:120px;height:120px;background:radial-gradient(circle,rgba(52,211,153,.2) 0%,transparent 65%);pointer-events:none; }
+.game-card-glow-hilo  { position:absolute;top:-20px;right:-20px;width:120px;height:120px;background:radial-gradient(circle,rgba(139,92,246,.2) 0%,transparent 65%);pointer-events:none; }
+
+.game-card-badge { position:absolute;top:12px;right:12px;border-radius:8px;padding:3px 9px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px; }
+.badge-green  { background:rgba(52,211,153,.18);color:#34d399;border:1px solid rgba(52,211,153,.35); }
+.badge-purple { background:rgba(139,92,246,.18);color:#a78bfa;border:1px solid rgba(139,92,246,.35); }
+
+.gc-card-bottom { position:absolute;bottom:0;left:0;right:0;padding:12px 14px 15px; }
+.gc-card-name { font-size:17px;font-weight:900;color:#fff;margin-bottom:2px; }
+.gc-card-desc { font-size:11px;color:rgba(255,255,255,.38); }
+.gc-fade-mines { position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(transparent,rgba(4,14,10,.96));pointer-events:none;border-radius:0 0 22px 22px; }
+.gc-fade-hilo  { position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(transparent,rgba(6,4,16,.96));pointer-events:none;border-radius:0 0 22px 22px; }
+
+/* визуал мин */
+.mines-vis { position:absolute;top:12px;left:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:5px;width:90px;animation:gcFloat 3.5s ease-in-out infinite; }
+.mv { aspect-ratio:1;border-radius:7px;background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.13);display:flex;align-items:center;justify-content:center;font-size:11px; }
+.mv.gem { background:rgba(52,211,153,.14);border-color:rgba(52,211,153,.4);box-shadow:0 0 9px rgba(52,211,153,.28); }
+
+/* визуал хило */
+.hilo-vis { position:absolute;top:12px;left:50%;transform:translateX(-50%);width:60px;height:80px;background:linear-gradient(145deg,#1c1440,#120d30);border-radius:10px;border:1px solid rgba(139,92,246,.45);box-shadow:0 0 22px rgba(139,92,246,.28),0 5px 18px rgba(0,0,0,.5);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;animation:gcFloat2 4s ease-in-out infinite .6s; }
+.hilo-rank { font-size:26px;font-weight:900;color:#c4b5fd;text-shadow:0 0 14px rgba(167,139,250,.55);line-height:1; }
+.hilo-suit { font-size:14px;color:rgba(167,139,250,.6); }
+
+@keyframes gcFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+@keyframes gcFloat2 { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(-4px)} }
 /* ══════════ МИНЫ ══════════ */
 .grid-wrap { position:relative;z-index:10;margin:0 14px 16px;background:linear-gradient(145deg,rgba(18,14,38,.95),rgba(14,10,30,.98));border:1px solid rgba(60,48,100,.6);border-radius:22px;padding:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 60px rgba(80,30,180,.12),inset 0 1px 0 rgba(255,255,255,.04),inset 0 0 40px rgba(30,15,70,.3);flex-shrink:0; }
 .grid { display:grid;grid-template-columns:repeat(5,1fr);gap:10px;width:100%; }
@@ -1098,28 +1147,46 @@ body {
     <div class="allgames-link" onclick="goGames()">Все игры <span style="font-size:12px">→</span></div>
   </div>
   <div class="games-grid">
-    <div class="game-card game-card-mines" onclick="openMines()">
-      <div class="game-card-glow-mines"></div>
-      <div class="game-card-badge badge-green">Хит</div>
-      <div class="game-card-icon">💎</div>
-      <div class="game-card-name">Мины</div>
-      <div class="game-card-desc">Найди алмазы, избегай мин</div>
-    </div>
-    <div class="game-card game-card-crash" onclick="openCrash()">
-      <div class="game-card-glow-crash"></div>
-      <div class="game-card-badge badge-orange">Новое</div>
-      <div class="game-card-icon">🚀</div>
-      <div class="game-card-name">Краш</div>
-      <div class="game-card-desc">Забери до краша</div>
-    </div>
-    <div class="game-card" style="background:linear-gradient(145deg,#1a1235,#0f0922);border-color:rgba(139,92,246,.3);box-shadow:0 8px 32px rgba(0,0,0,.4),inset 0 1px 0 rgba(139,92,246,.1)" onclick="openHilo()">
-      <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:radial-gradient(circle,rgba(139,92,246,.15) 0%,transparent 70%);pointer-events:none"></div>
-      <div class="game-card-badge" style="background:rgba(139,92,246,.2);color:#a78bfa;border:1px solid rgba(139,92,246,.3)">Карты</div>
-      <div class="game-card-icon">🃏</div>
-      <div class="game-card-name">HiLo</div>
-      <div class="game-card-desc">Выше или ниже?</div>
+  <div class="game-card-crash-wide" onclick="openCrash()">
+    <div class="gc-crash-glow"></div>
+    <canvas class="gc-crash-canvas" id="menu-crash-cv"></canvas>
+    <div class="gc-live-badge">LIVE</div>
+    <div class="gc-crash-mult" id="menu-crash-mult">1.00×</div>
+    <div class="gc-crash-info">
+      <div class="gc-crash-name">Краш</div>
+      <div class="gc-crash-desc">Забери до краша</div>
     </div>
   </div>
+  <div class="games-grid-row">
+    <div class="game-card-small game-card-mines" onclick="openMines()">
+      <div class="game-card-glow-mines"></div>
+      <div class="game-card-badge badge-green">Хит</div>
+      <div class="mines-vis">
+        <div class="mv"></div><div class="mv gem">💎</div><div class="mv"></div>
+        <div class="mv gem">💎</div><div class="mv"></div><div class="mv"></div>
+        <div class="mv"></div><div class="mv"></div><div class="mv gem">💎</div>
+      </div>
+      <div class="gc-fade-mines"></div>
+      <div class="gc-card-bottom">
+        <div class="gc-card-name">Мины</div>
+        <div class="gc-card-desc">Найди алмазы, избегай мин</div>
+      </div>
+    </div>
+    <div class="game-card-small game-card-hilo" onclick="openHilo()">
+      <div class="game-card-glow-hilo"></div>
+      <div class="game-card-badge badge-purple">Карты</div>
+      <div class="hilo-vis">
+        <div class="hilo-rank" id="menu-hilo-rank">8</div>
+        <div class="hilo-suit" id="menu-hilo-suit">♣</div>
+      </div>
+      <div class="gc-fade-hilo"></div>
+      <div class="gc-card-bottom">
+        <div class="gc-card-name">HiLo</div>
+        <div class="gc-card-desc">Выше или ниже?</div>
+      </div>
+    </div>
+  </div>
+</div>
   <!-- ПОСЛЕДНИЕ ИГРЫ -->
   <div class="recent-games">
     <div class="recent-games-head">
@@ -1161,26 +1228,43 @@ body {
   </div>
   <div class="games-no-results" id="games-no-results">Ничего не найдено 🎮</div>
   <div class="games-grid" id="games-grid-all" style="margin-top:4px">
-    <div class="game-card game-card-mines" data-name="мины mines алмазы" onclick="openMines()">
+  <div class="game-card-crash-wide" data-name="краш crash ракета" onclick="openCrash()">
+    <div class="gc-crash-glow"></div>
+    <canvas class="gc-crash-canvas" id="games-crash-cv"></canvas>
+    <div class="gc-live-badge">LIVE</div>
+    <div class="gc-crash-mult" id="games-crash-mult">1.00×</div>
+    <div class="gc-crash-info">
+      <div class="gc-crash-name">Краш</div>
+      <div class="gc-crash-desc">Забери до краша</div>
+    </div>
+  </div>
+  <div class="games-grid-row">
+    <div class="game-card-small game-card-mines" data-name="мины mines алмазы" onclick="openMines()">
       <div class="game-card-glow-mines"></div>
       <div class="game-card-badge badge-green">Хит</div>
-      <div class="game-card-icon">💎</div>
-      <div class="game-card-name">Мины</div>
-      <div class="game-card-desc">Найди алмазы, избегай мин</div>
+      <div class="mines-vis">
+        <div class="mv"></div><div class="mv gem">💎</div><div class="mv"></div>
+        <div class="mv gem">💎</div><div class="mv"></div><div class="mv"></div>
+        <div class="mv"></div><div class="mv"></div><div class="mv gem">💎</div>
+      </div>
+      <div class="gc-fade-mines"></div>
+      <div class="gc-card-bottom">
+        <div class="gc-card-name">Мины</div>
+        <div class="gc-card-desc">Найди алмазы, избегай мин</div>
+      </div>
     </div>
-    <div class="game-card game-card-crash" data-name="краш crash ракета" onclick="openCrash()">
-      <div class="game-card-glow-crash"></div>
-      <div class="game-card-badge badge-orange">Новое</div>
-      <div class="game-card-icon">🚀</div>
-      <div class="game-card-name">Краш</div>
-      <div class="game-card-desc">Забери до краша</div>
-    </div>
-    <div class="game-card" data-name="хило hilo карты выше ниже" style="background:linear-gradient(145deg,#1a1235,#0f0922);border-color:rgba(139,92,246,.3);box-shadow:0 8px 32px rgba(0,0,0,.4),inset 0 1px 0 rgba(139,92,246,.1)" onclick="openHilo()">
-      <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:radial-gradient(circle,rgba(139,92,246,.15) 0%,transparent 70%);pointer-events:none"></div>
-      <div class="game-card-badge" style="background:rgba(139,92,246,.2);color:#a78bfa;border:1px solid rgba(139,92,246,.3)">Карты</div>
-      <div class="game-card-icon">🃏</div>
-      <div class="game-card-name">HiLo</div>
-      <div class="game-card-desc">Выше или ниже?</div>
+    <div class="game-card-small game-card-hilo" data-name="хило hilo карты выше ниже" onclick="openHilo()">
+      <div class="game-card-glow-hilo"></div>
+      <div class="game-card-badge badge-purple">Карты</div>
+      <div class="hilo-vis">
+        <div class="hilo-rank" id="games-hilo-rank">8</div>
+        <div class="hilo-suit" id="games-hilo-suit">♣</div>
+      </div>
+      <div class="gc-fade-hilo"></div>
+      <div class="gc-card-bottom">
+        <div class="gc-card-name">HiLo</div>
+        <div class="gc-card-desc">Выше или ниже?</div>
+      </div>
     </div>
   </div>
 </div>
@@ -2538,6 +2622,83 @@ window.addEventListener('load',()=>{
     requestAnimationFrame(draw);
   }
   draw();
+})();
+</script>
+/* ── АНИМАЦИИ КАРТОЧЕК ── */
+(function(){
+  function initCrashCard(canvasId, multId){
+    const cv=document.getElementById(canvasId);
+    if(!cv)return;
+    const ctx=cv.getContext('2d');
+    const wrap=cv.parentElement;
+    const multEl=document.getElementById(multId);
+    let t=0;
+    const TARGET=4.89;
+    function resize(){
+      const r=wrap.getBoundingClientRect();
+      if(!r.width)return;
+      cv.width=r.width*window.devicePixelRatio;
+      cv.height=r.height*window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio,window.devicePixelRatio);
+    }
+    setTimeout(resize,100);
+    window.addEventListener('resize',resize);
+    function draw(){
+      const r=wrap.getBoundingClientRect();
+      const W=r.width,H=r.height;
+      if(!W||!H){requestAnimationFrame(draw);return;}
+      t+=0.009; if(t>1.4)t=0;
+      const mult=Math.min(TARGET,1+t*t*2.8);
+      ctx.clearRect(0,0,W,H);
+      const steps=60,pts=[];
+      for(let i=0;i<=steps;i++){
+        const f=i/steps;
+        const px=W*.07+(W*.86)*f;
+        const norm=Math.pow(f,1.65)*(mult-1)/(TARGET-1);
+        const py=H*.88-norm*H*.72;
+        pts.push({x:px,y:py});
+      }
+      const fg=ctx.createLinearGradient(0,H*.15,0,H*.9);
+      fg.addColorStop(0,'rgba(59,130,246,.1)');fg.addColorStop(1,'rgba(59,130,246,.01)');
+      ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
+      pts.forEach(p=>ctx.lineTo(p.x,p.y));
+      ctx.lineTo(pts[pts.length-1].x,H*.9);ctx.lineTo(pts[0].x,H*.9);
+      ctx.closePath();ctx.fillStyle=fg;ctx.fill();
+      const lg=ctx.createLinearGradient(pts[0].x,0,pts[pts.length-1].x,0);
+      lg.addColorStop(0,'rgba(96,165,250,0)');lg.addColorStop(.4,'rgba(96,165,250,.5)');lg.addColorStop(1,'rgba(96,165,250,.9)');
+      ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
+      pts.forEach(p=>ctx.lineTo(p.x,p.y));
+      ctx.strokeStyle=lg;ctx.lineWidth=2.5;ctx.lineCap='round';
+      ctx.shadowColor='rgba(96,165,250,.6)';ctx.shadowBlur=10;ctx.stroke();ctx.shadowBlur=0;
+      const tip=pts[pts.length-1];
+      ctx.beginPath();ctx.arc(tip.x,tip.y,5,0,Math.PI*2);
+      ctx.fillStyle='#93c5fd';ctx.shadowColor='rgba(96,165,250,.9)';ctx.shadowBlur=14;ctx.fill();ctx.shadowBlur=0;
+      if(multEl)multEl.textContent=mult.toFixed(2)+'×';
+      requestAnimationFrame(draw);
+    }
+    draw();
+  }
+
+  function initHiloCard(rankId,suitId){
+    const ranks=['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+    const suits=['♠','♥','♦','♣'];
+    const sc={'♠':'#c4b5fd','♥':'#f87171','♦':'#f87171','♣':'#c4b5fd'};
+    let ri=6,si=3;
+    const re=document.getElementById(rankId),se=document.getElementById(suitId);
+    if(!re||!se)return;
+    setInterval(()=>{
+      ri=(ri+Math.floor(Math.random()*4)+1)%ranks.length;
+      si=Math.floor(Math.random()*4);
+      re.textContent=ranks[ri];se.textContent=suits[si];se.style.color=sc[suits[si]];
+    },2200);
+  }
+
+  document.addEventListener('DOMContentLoaded',function(){
+    initCrashCard('menu-crash-cv','menu-crash-mult');
+    initCrashCard('games-crash-cv','games-crash-mult');
+    initHiloCard('menu-hilo-rank','menu-hilo-suit');
+    initHiloCard('games-hilo-rank','games-hilo-suit');
+  });
 })();
 </script>
 </body>
