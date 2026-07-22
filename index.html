@@ -1091,6 +1091,7 @@ body {
 /* Центральный хаб — таймер */
 .wheel-hub {
   position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  transition: opacity .3s;
   width:64px; height:64px; border-radius:50%;
   background:radial-gradient(circle at 35% 35%,#2a2060,#0e0a1e);
   border:3px solid rgba(139,92,246,.5);
@@ -1153,15 +1154,20 @@ body {
 }
 .wheel-mult-btn:active { transform:scale(.93); }
 .wheel-mult-btn .wm-label { font-size:9px; font-weight:600; opacity:.7; text-transform:uppercase; letter-spacing:.5px; }
-.wm-x2  { background:linear-gradient(145deg,#1c1635,#181230); color:#9ca3af; border:1px solid rgba(100,100,120,.4); }
+.wm-x2  { background:linear-gradient(145deg,#111111,#0a0a0a); color:#d1d5db; border:1px solid rgba(80,80,80,.5); box-shadow:0 3px 12px rgba(0,0,0,.4); }
 .wm-x3  { background:linear-gradient(145deg,#1a1030,#14092b); color:#a78bfa; border:1px solid rgba(139,92,246,.4); box-shadow:0 3px 12px rgba(139,92,246,.2); }
 .wm-x5  { background:linear-gradient(145deg,#1e0f0f,#1a0d0d); color:#f87171; border:1px solid rgba(248,113,113,.4); box-shadow:0 3px 12px rgba(248,113,113,.2); }
 .wm-x50 { background:linear-gradient(145deg,#0d2318,#091a10); color:#34d399; border:1px solid rgba(52,211,153,.5); box-shadow:0 3px 14px rgba(52,211,153,.25); }
 
-.wm-x2.active  { background:linear-gradient(145deg,#2a2545,#201c38); border-color:rgba(100,100,120,.7); box-shadow:0 4px 14px rgba(100,100,120,.25); }
+.wm-x2.active  { background:linear-gradient(145deg,#2a2a2a,#1a1a1a); border-color:rgba(180,180,180,.6); box-shadow:0 4px 16px rgba(180,180,180,.2); }
 .wm-x3.active  { background:linear-gradient(145deg,#2e1e55,#221645); border-color:rgba(139,92,246,.7); box-shadow:0 4px 16px rgba(139,92,246,.4); }
 .wm-x5.active  { background:linear-gradient(145deg,#3d1010,#2e0c0c); border-color:rgba(248,113,113,.7); box-shadow:0 4px 16px rgba(248,113,113,.4); }
 .wm-x50.active { background:linear-gradient(145deg,#1a3d28,#112a1b); border-color:rgba(52,211,153,.8); box-shadow:0 4px 18px rgba(52,211,153,.4); }
+
+.wm-x2.win-highlight  { background:linear-gradient(145deg,#0a2a0a,#061806) !important; border-color:#34d399 !important; box-shadow:0 0 20px rgba(52,211,153,.7),0 0 40px rgba(52,211,153,.3) !important; color:#34d399 !important; }
+.wm-x3.win-highlight  { background:linear-gradient(145deg,#0a2a0a,#061806) !important; border-color:#34d399 !important; box-shadow:0 0 20px rgba(52,211,153,.7),0 0 40px rgba(52,211,153,.3) !important; color:#34d399 !important; }
+.wm-x5.win-highlight  { background:linear-gradient(145deg,#0a2a0a,#061806) !important; border-color:#34d399 !important; box-shadow:0 0 20px rgba(52,211,153,.7),0 0 40px rgba(52,211,153,.3) !important; color:#34d399 !important; }
+.wm-x50.win-highlight { background:linear-gradient(145deg,#0a2a0a,#061806) !important; border-color:#34d399 !important; box-shadow:0 0 20px rgba(52,211,153,.7),0 0 40px rgba(52,211,153,.3) !important; color:#34d399 !important; }
 
 /* Кнопка крутить */
 .wheel-btn-row { position:relative; z-index:10; padding:0 14px 14px; flex-shrink:0; }
@@ -1818,7 +1824,7 @@ body {
   <!-- Кнопки цветов — клик = поставить на этот цвет -->
   <div class="wheel-mult-row" id="wheel-mult-row">
     <div class="wheel-mult-btn wm-x2"  id="wm-x2"  onclick="wheelPlaceBet(2)">
-      <span>×2</span><span class="wm-label" id="wm-x2-bet">серый</span>
+      <span>×2</span><span class="wm-label" id="wm-x2-bet">чёрный</span>
     </div>
     <div class="wheel-mult-btn wm-x3"  id="wm-x3"  onclick="wheelPlaceBet(3)">
       <span>×3</span><span class="wm-label" id="wm-x3-bet">фиолет</span>
@@ -3336,7 +3342,7 @@ function _updateBetButtons() {
 
 function _renderMyBets() {
   const mults = [2, 3, 5, 50];
-  const labels = {2:'серый', 3:'фиолет', 5:'красный', 50:'🔥 джекпот'};
+  const labels = {2:'чёрный', 3:'фиолет', 5:'красный', 50:'🔥 джекпот'};
   mults.forEach(m => {
     const btn   = document.getElementById('wm-' + (m===50?'x50':'x'+m));
     const label = document.getElementById('wm-' + (m===50?'x50':'x'+m) + '-bet');
@@ -3424,8 +3430,11 @@ function _wheelOnRoundEnd(mult, prevBets) {
   const overlay = document.getElementById('wheel-result-overlay');
   if (overlay) overlay.classList.remove('visible');
 
+  const hub = document.getElementById('wheel-hub');
+  if (hub) hub.style.opacity = '0';
   animateWheel(WS.angle, finalAngle, 4000, function() {
     _wheelSpinning = false;
+    if (hub) hub.style.opacity = '1';
     // Показать результат
     const multEl  = document.getElementById('wheel-result-mult');
     const labelEl = document.getElementById('wheel-result-label');
@@ -3458,6 +3467,22 @@ function _wheelOnRoundEnd(mult, prevBets) {
     }, 2500);
     // Запустить отсчёт ставок с 15 сек после остановки колеса
     _wheelStartCountdown(15);
+    // Подсветить кнопку выигравшего цвета зелёным
+    _highlightWinBtn(mult);
+    setTimeout(function() { _clearWinHighlight(); }, 2500);
+  });
+}
+
+function _highlightWinBtn(mult) {
+  _clearWinHighlight();
+  const idMap = {2:'wm-x2', 3:'wm-x3', 5:'wm-x5', 50:'wm-x50'};
+  const btn = document.getElementById(idMap[mult]);
+  if (btn) btn.classList.add('win-highlight');
+}
+function _clearWinHighlight() {
+  ['wm-x2','wm-x3','wm-x5','wm-x50'].forEach(function(id) {
+    const b = document.getElementById(id);
+    if (b) b.classList.remove('win-highlight');
   });
 }
 
