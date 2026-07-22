@@ -3221,31 +3221,47 @@ function wheelGetResult() {
 }
 
 // ── Глобальное колесо (один раунд на всех) ──
-let _wheelPollTimer = null;
-let _wheelRoundId   = -1;
-let _wheelMyBets    = {};   // {mult: amount}
-let _wheelLocked    = false;
-let _wheelSpinning  = false;
+let _wheelPollTimer      = null;
+let _wheelCountdownTimer = null;
+let _wheelRoundId        = -1;
+let _wheelSecsLeft       = 0;
+let _wheelMyBets         = {};
+let _wheelLocked         = false;
+let _wheelSpinning       = false;
 
-// Запустить поллинг при открытии экрана
+// Локальный отсчёт — обновляет хаб каждые 100мс
+function _wheelStartCountdown(secs) {
+  if (_wheelCountdownTimer) clearInterval(_wheelCountdownTimer);
+  _wheelSecsLeft = secs;
+  _updateHubTimer(Math.ceil(_wheelSecsLeft));
+  _wheelCountdownTimer = setInterval(function() {
+    _wheelSecsLeft = Math.max(0, _wheelSecsLeft - 0.1);
+    _updateHubTimer(Math.ceil(_wheelSecsLeft));
+  }, 100);
+}
+
 function wheelStartPoll() {
   if (_wheelPollTimer) return;
-  _wheelPollTimer = setInterval(wheelPollState, 1000);
-  wheelPollState(); // сразу
+  _wheelPollTimer = setInterval(wheelPollState, 1500);
+  wheelPollState();
 }
 
 function wheelStopPoll() {
   if (_wheelPollTimer) { clearInterval(_wheelPollTimer); _wheelPollTimer = null; }
+  if (_wheelCountdownTimer) { clearInterval(_wheelCountdownTimer); _wheelCountdownTimer = null; }
 }
 
 async function wheelPollState() {
   try {
     const r = await apiCall('GET', '/api/wheel/state');
-    if (!r.ok) return;
+    if (!r.ok) {
+      _updateHubTimer(-1);
+      showToast('Wheel error: ' + (r.error || 'unknown'));
+      return;
+    }
 
-    // Обновить таймер
-    const secs = Math.ceil(r.secs_left);
-    _updateHubTimer(secs);
+    // Обновить таймер — запускаем локальный отсчёт
+    _wheelStartCountdown(r.secs_left);
     _wheelLocked = r.locked;
     _updateBetButtons();
 
@@ -3266,26 +3282,26 @@ async function wheelPollState() {
 
     // Новый раунд — показать результат предыдущего
     if (r.round_id !== _wheelRoundId) {
-      if (_wheelRoundId >= 0 && r.history.length > 0) {
-        const last = r.history[0];
+      const isFirst = (_wheelRoundId === -1);
+      _wheelRoundId = r.round_id;
+      if (!isFirst && r.history.length > 0) {
         // Сохраняем ставки до очистки — нужны для отображения выигрыша
         const prevBets = Object.assign({}, _wheelMyBets);
         _wheelMyBets = {};
         _renderMyBets();
-        _wheelSpinning = false; // сброс на случай застрявшей анимации
-        _wheelOnRoundEnd(last.mult, prevBets);
+        _wheelSpinning = false;
+        _wheelOnRoundEnd(r.history[0].mult, prevBets);
       } else {
         _wheelMyBets = {};
         _renderMyBets();
         _wheelSpinning = false;
       }
-      _wheelRoundId = r.round_id;
     }
 
     // История
     _renderHistory(r.history);
 
-  } catch(e) { /* оффлайн */ }
+  } catch(e) { showToast('Wheel poll err: ' + e.message); }
 }
 
 function _updateHubTimer(secs) {
