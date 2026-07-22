@@ -3076,8 +3076,6 @@ function openWheel() {
   showScreen('screen-wheel');
   document.getElementById('wheel-balance-val').textContent = fmt(sharedBalance);
   wheelInitCanvas();
-  if (!WS.historyInited) { WS.historyInited = true; }
-  wheelRenderHistory();
   wheelStartPoll();
 }
 
@@ -3360,6 +3358,18 @@ function _renderHistory(history) {
     return { label: '×' + h.mult, cls };
   });
   wheelRenderHistory();
+}
+
+function wheelRenderHistory() {
+  const el = document.getElementById('wheel-history');
+  if (!el) return;
+  const colors = { grey: '#6b7280', purple: '#a78bfa', red: '#f87171', green: '#34d399' };
+  el.innerHTML = (WS.history || []).map(h =>
+    '<span style="display:inline-flex;align-items:center;justify-content:center;' +
+    'min-width:38px;padding:4px 8px;border-radius:20px;font-size:12px;font-weight:800;' +
+    'background:rgba(0,0,0,.35);border:1px solid ' + colors[h.cls] + ';' +
+    'color:' + colors[h.cls] + ';flex-shrink:0;">' + h.label + '</span>'
+  ).join('');
 }
 
 function animateWheel(fromAngle, toAngle, duration, onDone) {
