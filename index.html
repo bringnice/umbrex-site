@@ -777,11 +777,23 @@ body {
 .live-card {
   flex-shrink:0;
   width:148px;
-  background:linear-gradient(145deg,rgba(20,15,40,.97),rgba(13,10,28,.99));
-  border:1px solid rgba(60,48,100,.6);
-  border-radius:16px; padding:12px 12px 10px;
+  background:linear-gradient(145deg,rgba(20,15,42,.98),rgba(12,9,26,.99));
+  border:1px solid rgba(60,48,100,.5);
+  border-radius:18px; padding:14px 14px 12px;
   position:relative; overflow:hidden;
   animation:liveCardIn .3s cubic-bezier(.34,1.56,.64,1);
+  transition:transform .15s;
+}
+.live-card:active { transform:scale(.95); }
+.live-card.is-win {
+  border-color:rgba(52,211,153,.4);
+  background:linear-gradient(145deg,rgba(5,40,25,.97),rgba(3,22,14,.99));
+  box-shadow:0 8px 28px rgba(0,0,0,.5),0 0 0 1px rgba(52,211,153,.12),inset 0 1px 0 rgba(52,211,153,.12);
+}
+.live-card.is-lose {
+  border-color:rgba(248,113,113,.4);
+  background:linear-gradient(145deg,rgba(40,8,8,.97),rgba(22,4,4,.99));
+  box-shadow:0 8px 28px rgba(0,0,0,.5),0 0 0 1px rgba(248,113,113,.1),inset 0 1px 0 rgba(248,113,113,.12);
 }
 @keyframes liveCardIn {
   0%{opacity:0;transform:scale(.88) translateY(8px)}
@@ -789,31 +801,36 @@ body {
 }
 .live-card::before {
   content:''; position:absolute; top:0; left:0; right:0; height:1px;
-  background:linear-gradient(90deg,transparent,rgba(139,92,246,.4),transparent);
+}
+.live-card.is-win::before {
+  background:linear-gradient(90deg,transparent,rgba(52,211,153,.6),transparent);
+}
+.live-card.is-lose::before {
+  background:linear-gradient(90deg,transparent,rgba(248,113,113,.6),transparent);
 }
 .live-card-game {
   font-size:10px; font-weight:700; color:var(--muted);
-  text-transform:uppercase; letter-spacing:.8px; margin-bottom:4px;
+  text-transform:uppercase; letter-spacing:.8px; margin-bottom:5px;
   display:flex; align-items:center; gap:4px;
 }
 .live-card-name {
   font-size:13px; font-weight:800; color:var(--text);
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-  margin-bottom:6px;
+  margin-bottom:8px;
 }
 .live-card-amount {
-  font-size:15px; font-weight:900;
+  font-size:16px; font-weight:900; letter-spacing:-.3px;
 }
-.live-card-amount.win { color:#34d399; text-shadow:0 0 10px rgba(52,211,153,.4); }
-.live-card-amount.lose { color:#f87171; text-shadow:0 0 10px rgba(248,113,113,.3); }
+.live-card-amount.win { color:#34d399; text-shadow:0 0 16px rgba(52,211,153,.55); }
+.live-card-amount.lose { color:#f87171; text-shadow:0 0 16px rgba(248,113,113,.45); }
 .live-card-glow-win {
-  position:absolute; bottom:-20px; right:-20px; width:80px; height:80px;
-  background:radial-gradient(circle,rgba(52,211,153,.12) 0%,transparent 70%);
+  position:absolute; bottom:-30px; right:-30px; width:110px; height:110px;
+  background:radial-gradient(circle,rgba(52,211,153,.18) 0%,transparent 70%);
   pointer-events:none;
 }
 .live-card-glow-lose {
-  position:absolute; bottom:-20px; right:-20px; width:80px; height:80px;
-  background:radial-gradient(circle,rgba(248,113,113,.1) 0%,transparent 70%);
+  position:absolute; bottom:-30px; right:-30px; width:110px; height:110px;
+  background:radial-gradient(circle,rgba(248,113,113,.16) 0%,transparent 70%);
   pointer-events:none;
 }
 
@@ -866,7 +883,10 @@ body {
 .recent-games-card {
   background:var(--card); border:1px solid var(--border);
   border-radius:16px; overflow:hidden;
+  max-height:calc(5 * 57px); overflow-y:auto;
+  scrollbar-width:none;
 }
+.recent-games-card::-webkit-scrollbar { display:none; }
 .rg-row {
   display:flex; align-items:center; gap:10px;
   padding:10px 14px;
@@ -1624,7 +1644,27 @@ function goMenu(){showScreen('screen-menu');updateDrawerActive('menu');}
 function openHilo(){
   showScreen('screen-hilo');
   document.getElementById('hilo-balance-val').textContent=fmt(sharedBalance);
-  hiloReset();
+  checkActiveHiloGame();
+}
+
+async function checkActiveHiloGame(){
+  try{
+    const r=await apiCall('GET','/api/hilo/state');
+    if(r.ok && r.active){
+      // Восстанавливаем активную игру
+      HS.playing=true;
+      HS.bet=r.bet;
+      hiloUpdateCard(r.current_val, r.current_suit);
+      document.getElementById('hilo-settings').style.display='none';
+      document.getElementById('hilo-start-row').style.display='none';
+      document.getElementById('hilo-info').style.display='flex';
+      document.getElementById('hilo-action-btns').style.display='flex';
+      hiloUpdateInfo(r);
+      document.getElementById('hilo-card').className='hilo-card';
+    } else {
+      hiloReset();
+    }
+  }catch(e){ hiloReset(); }
 }
 function openMines(){showScreen('screen-mines');document.getElementById('mines-balance-val').textContent=fmt(sharedBalance);buildGrid();buildMineOpts();setupMinesInput();checkActiveGame();}
 function openCrash(){showScreen('screen-crash');document.getElementById('crash-balance-val').textContent=fmt(sharedBalance);initCrash();}
@@ -1673,7 +1713,8 @@ async function loadLiveBets(){
         const win=b.result==='win';
         const amount=win?'+'+fmt(b.profit):'-'+fmt(b.bet);
         const cls=win?'win':'lose';
-        return `<div class="live-card" style="animation-delay:${idx*0.05}s">
+        const wcls=win?'is-win':'is-lose';
+        return `<div class="live-card ${wcls}" style="animation-delay:${idx*0.05}s">
           ${win?'<div class="live-card-glow-win"></div>':'<div class="live-card-glow-lose"></div>'}
           <div class="live-card-game">${icon} ${b.game}</div>
           <div class="live-card-name">${escapeHtml(b.name)}</div>
@@ -1708,15 +1749,16 @@ async function loadRecentGames(){
       el.innerHTML='<div class="rg-loading">Пока нет игр</div>';
       return;
     }
-    el.innerHTML=r.games.map(g=>{
+    el.innerHTML=r.games.slice(0,10).map(g=>{
       const icon=GAME_ICONS[g.game]||'🎮';
       const win=g.result==='win';
       const amount=win?'+'+fmt(g.profit):'-'+fmt(g.bet);
       const cls=win?'win':'lose';
-      return `<div class="rg-row">
+      const borderColor=win?'rgba(52,211,153,.55)':'rgba(248,113,113,.55)';
+      return `<div class="rg-row" style="border-left:3px solid ${borderColor}">
         <div class="rg-icon">${icon}</div>
         <div class="rg-info">
-          <div class="rg-name">${g.name}</div>
+          <div class="rg-name">${escapeHtml(g.name)}</div>
           <div class="rg-game">${g.game}</div>
         </div>
         <div class="rg-amount ${cls}">${amount}</div>
