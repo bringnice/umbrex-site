@@ -3926,6 +3926,7 @@ const TW = {
   },
   // Состояние игры
   playing: false,
+  locked: false,      // блокировка двойных кликов во время запроса
   gameId: null,
   bet: 0,
   mines: 1,
@@ -4089,6 +4090,18 @@ function twUpdateRowNums() {
   const numsEl = document.getElementById('tower-row-nums');
   if (!numsEl) return;
   const total = TW.FLOORS;
+  // Если DOM уже построен — обновляем только классы (быстро)
+  const existing = numsEl.querySelectorAll('.tower-row-num');
+  if (existing.length === total) {
+    existing.forEach((d, idx) => {
+      const i = total - idx; // т.к. рендер идёт от total до 1
+      const isPassed = TW.passedFloors && TW.passedFloors.some(f => f.floorNum === i);
+      const isCurrent = TW.playing && TW.floorNum === i;
+      d.className = 'tower-row-num' + (isPassed ? ' num-passed' : isCurrent ? ' num-current' : '');
+    });
+    return;
+  }
+  // Первый раз — строим DOM
   numsEl.innerHTML = '';
   for (let i = total; i >= 1; i--) {
     const d = document.createElement('div');
@@ -4103,18 +4116,31 @@ function twUpdateRowNums() {
 }
 
 // Полоска иксов: x1.21 x1.46 ... для текущего кол-ва бомб
+let _twLastMinesForStrip = null;
 function twUpdateMultsStrip() {
   const strip = document.getElementById('tw-mults-strip');
   if (!strip) return;
   const mults = TW.MULTIPLIERS[TW.mines] || TW.MULTIPLIERS[1];
+  const lastPassed = TW.passedFloors && TW.passedFloors.length > 0
+    ? TW.passedFloors[TW.passedFloors.length - 1].floorNum : null;
+  // Если кол-во бомб не изменилось и чипы уже есть — только обновляем классы
+  const chips = strip.querySelectorAll('.tw-mult-chip');
+  if (_twLastMinesForStrip === TW.mines && chips.length === mults.length) {
+    chips.forEach((chip, i) => {
+      const floorN = i + 1;
+      const isPassed = TW.passedFloors && TW.passedFloors.some(f => f.floorNum === floorN);
+      const isCurrent = TW.playing && lastPassed !== null && lastPassed === floorN;
+      chip.className = 'tw-mult-chip' + (isCurrent ? ' active-floor' : '') + (isPassed && !isCurrent ? ' passed-floor' : '');
+    });
+    return;
+  }
+  // Полная перестройка (при смене бомб или первый раз)
+  _twLastMinesForStrip = TW.mines;
   strip.innerHTML = '';
   for (let i = 0; i < mults.length; i++) {
     const floorN = i + 1;
     const chip = document.createElement('div');
     const isPassed = TW.passedFloors && TW.passedFloors.some(f => f.floorNum === floorN);
-    // active-floor = последний пройденный этаж (то, что уже заработано)
-    const lastPassed = TW.passedFloors && TW.passedFloors.length > 0
-      ? TW.passedFloors[TW.passedFloors.length - 1].floorNum : null;
     const isCurrent = TW.playing && lastPassed !== null && lastPassed === floorN;
     chip.className = 'tw-mult-chip' + (isCurrent ? ' active-floor' : '') + (isPassed && !isCurrent ? ' passed-floor' : '');
     const val = mults[i];
@@ -4151,25 +4177,22 @@ function twExitPlay() {
 }
 
 function twShowResult(win, mult, prize) {
+  const t = document.getElementById('toast');
   if (!win) {
-    // Проигрыш — лёгкий toast, не блокирует UI, исчезает через 3 сек
+    // Проигрыш — лёгкий toast
     const msg = `💥 Проигрыш! −${twFmt(TW.bet)} 🪙 · этаж ${TW.floorNum} из ${TW.FLOORS}`;
-    const t = document.getElementById('toast');
     t.textContent = msg;
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3000);
-    return;
+  } else {
+    // Победа / кешаут — тоже toast, как при проигрыше
+    const profit = prize - TW.bet;
+    const multStr = mult.toFixed(2).replace(/\.?0+$/, '');
+    const msg = `✅ +${twFmt(profit)} 🪙 · ×${multStr}`;
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3500);
   }
-  // Победа / кешаут — стационарная полоска с деталями
-  const bar = document.getElementById('tower-result-bar');
-  bar.className = 'tower-result-bar win';
-  bar.style.display = 'block';
-  document.getElementById('tw-res-emoji').textContent = '✅';
-  document.getElementById('tw-res-title').textContent = 'Победа!';
-  const profit = prize - TW.bet;
-  document.getElementById('tw-res-val').className = 'tower-result-val plus';
-  document.getElementById('tw-res-val').textContent = `+${twFmt(profit)} 🪙`;
-  document.getElementById('tw-res-sub').textContent = `×${mult.toFixed(2).replace(/\.?0+$/,'')} · Получено: ${twFmt(prize)} 🪙`;
 }
 
 // ── СТАРТ ──
@@ -4186,6 +4209,8 @@ async function twStart() {
     if (!r.ok) { showToast(r.error || 'Ошибка'); document.getElementById('tower-btn-start').disabled = false; return; }
 
     TW.playing = true;
+    TW.locked = false;
+    _twLastMinesForStrip = null;
     TW.gameId = r.game_id;
     TW.bet = bet;
     TW.floorNum = 1;
@@ -4208,7 +4233,8 @@ async function twStart() {
 
 // ── КЛИК ──
 async function twClickCell(floor, cellIdx) {
-  if (!TW.playing || floor !== TW.floorNum) return;
+  if (!TW.playing || floor !== TW.floorNum || TW.locked) return;
+  TW.locked = true;
 
   // Блокируем все ячейки текущего этажа
   const floorDiv = document.getElementById(`tw-floor-${floor}`);
@@ -4220,6 +4246,7 @@ async function twClickCell(floor, cellIdx) {
     if (!r.ok) {
       showToast(r.error || 'Ошибка');
       floorDiv?.querySelectorAll('.tw-cell').forEach(c => c.classList.add('active'));
+      TW.locked = false;
       return;
     }
 
@@ -4227,6 +4254,7 @@ async function twClickCell(floor, cellIdx) {
       // Показываем взрыв
       twShowDeadFloor(floor, cellIdx, r.floor_cells);
       TW.playing = false;
+      TW.locked = false;
       sharedBalance = r.new_balance ?? sharedBalance;
       syncBalanceUI();
       document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);
@@ -4260,6 +4288,7 @@ async function twClickCell(floor, cellIdx) {
       if (r.result === 'win_all') {
         // Башня покорена!
         TW.playing = false;
+        TW.locked = false;
         sharedBalance = r.new_balance;
         syncBalanceUI();
         document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);
@@ -4271,6 +4300,7 @@ async function twClickCell(floor, cellIdx) {
       } else {
         // Следующий этаж
         TW.floorNum = r.floor_num;
+        TW.locked = false;
         twRefreshBoard();
         twUpdateInfo();
       }
@@ -4281,6 +4311,7 @@ async function twClickCell(floor, cellIdx) {
       TW.earnedMult = r.earned_mult ?? twMult(floor, TW.mines);
       TW.earnedPrize = r.earned_prize ?? Math.round(TW.bet * TW.earnedMult);
       TW.floorNum = r.floor_num ?? floor + 1;
+      TW.locked = false;
       tg?.HapticFeedback?.impactOccurred('light');
       twRefreshBoard();
       twUpdateInfo();
@@ -4288,6 +4319,7 @@ async function twClickCell(floor, cellIdx) {
 
   } catch(e) {
     showToast('Ошибка соединения');
+    TW.locked = false;
     floorDiv?.querySelectorAll('.tw-cell').forEach(c => c.classList.add('active'));
   }
 }
