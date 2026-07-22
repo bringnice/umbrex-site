@@ -732,6 +732,187 @@ body {
   z-index:1;
 }
 
+/* ══════════ БАШНЯ ══════════ */
+#screen-tower {
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(99,40,200,.45) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 60% at 20% 80%, rgba(60,20,120,.35) 0%, transparent 55%),
+    var(--bg);
+}
+.tower-wrap {
+  position: relative; z-index: 10;
+  margin: 0 14px 14px;
+  display: flex; flex-direction: column; gap: 0;
+  flex-shrink: 0;
+}
+/* Контейнер этажей — растёт снизу вверх */
+.tower-floors {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 5px;
+}
+.tower-floor {
+  display: flex;
+  gap: 5px;
+  padding: 0;
+  position: relative;
+}
+/* Метка этажа слева */
+.tower-floor-num {
+  width: 22px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: var(--muted);
+  letter-spacing: .3px;
+}
+.tower-cells {
+  display: flex; gap: 5px; flex: 1;
+}
+/* Ячейка башни */
+.tw-cell {
+  flex: 1; aspect-ratio: 1;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #1c1635, #16112b);
+  border: 1px solid rgba(55,42,100,.7);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  transition: transform .12s, background .15s, border-color .15s, box-shadow .15s;
+  user-select: none; -webkit-user-select: none;
+  position: relative; overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), inset 0 -1px 0 rgba(0,0,0,.3), 0 2px 6px rgba(0,0,0,.4);
+}
+.tw-cell::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:45%;
+  background: linear-gradient(180deg, rgba(255,255,255,.07) 0%, transparent 100%);
+  border-radius: 12px 12px 0 0; pointer-events: none;
+}
+.tw-cell.active:active { transform: scale(.87); }
+.tw-cell.active:hover { border-color: rgba(139,92,246,.6); }
+/* Состояния ячейки */
+.tw-cell.unknown { color: rgba(100,85,160,.7); font-size: 14px; font-weight: 800; }
+.tw-cell.gem {
+  background: linear-gradient(145deg, #0c3025, #0f3d2e);
+  border: 1.5px solid var(--green);
+  box-shadow: 0 0 18px rgba(52,211,153,.5), 0 0 36px rgba(52,211,153,.15), inset 0 1px 0 rgba(52,211,153,.2);
+  animation: twPop .28s cubic-bezier(.36,.07,.19,.97);
+}
+.tw-cell.bomb {
+  background: linear-gradient(145deg, #2e0f0f, #3d1212);
+  border-color: var(--red);
+  box-shadow: 0 0 18px var(--red-glow);
+}
+.tw-cell.exploded {
+  background: linear-gradient(145deg, #2e0f0f, #3d1212);
+  border-color: var(--red);
+  box-shadow: 0 0 22px var(--red-glow);
+  animation: twBoom .38s ease;
+}
+.tw-cell.safe {
+  background: linear-gradient(145deg, #1c1635, #16112b);
+  border-color: rgba(55,42,100,.4);
+  opacity: .55;
+}
+.tw-cell.dead { cursor: default; pointer-events: none; }
+@keyframes twPop { 0%{transform:scale(.65);opacity:.4} 65%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
+@keyframes twBoom { 0%{transform:scale(1.2) rotate(-4deg)} 30%{transform:scale(.85) rotate(3deg)} 65%{transform:scale(1.05) rotate(-1deg)} 100%{transform:scale(1) rotate(0)} }
+
+/* Подсветка активного этажа */
+.tower-floor.current .tw-cell.unknown {
+  border-color: rgba(139,92,246,.5);
+  box-shadow: 0 0 12px rgba(139,92,246,.2), inset 0 1px 0 rgba(255,255,255,.06);
+}
+/* Пройденный этаж */
+.tower-floor.passed .tw-cell {
+  cursor: default; pointer-events: none;
+}
+.tower-floor.future .tw-cell {
+  opacity: .35; cursor: default; pointer-events: none;
+}
+.tower-floor.future .tw-cell.unknown {
+  font-size: 0; /* скрываем ? на будущих */
+}
+/* Линия прогресса */
+.tower-floor.passed .tower-floor-num { color: var(--green); }
+.tower-floor.current .tower-floor-num { color: var(--purple-light); font-weight: 900; }
+
+/* Панель ставки и бомб */
+.tower-settings {
+  position: relative; z-index: 10;
+  margin: 0 14px 14px;
+  background: linear-gradient(145deg, rgba(18,14,38,.97), rgba(13,10,28,.99));
+  border: 1px solid rgba(55,42,100,.6);
+  border-radius: 16px;
+  padding: 14px 16px;
+  flex-shrink: 0;
+}
+.tower-setting-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+}
+.tower-setting-row:last-child { margin-bottom: 0; }
+.tower-setting-label { font-size: 12px; font-weight: 700; color: var(--muted); min-width: 52px; text-transform: uppercase; letter-spacing: .6px; }
+.tower-bet-wrap { display: flex; gap: 6px; flex: 1; }
+.tower-bet-mod { background: rgba(55,42,100,.6); border: 1px solid rgba(55,42,100,.8); border-radius: 9px; color: var(--text); font-size: 12px; font-weight: 800; padding: 6px 10px; cursor: pointer; transition: background .1s; }
+.tower-bet-mod:active { background: rgba(139,92,246,.25); }
+.tower-bet-inp { flex: 1; background: rgba(55,42,100,.3); border: 1px solid rgba(55,42,100,.7); border-radius: 9px; color: var(--text); font-size: 14px; font-weight: 800; padding: 6px 10px; text-align: center; outline: none; min-width: 0; }
+.tower-bombs-opts { display: flex; gap: 6px; flex: 1; }
+.tw-bomb-chip {
+  flex: 1; padding: 6px 4px; border-radius: 9px; text-align: center;
+  font-size: 12px; font-weight: 800; cursor: pointer;
+  background: rgba(55,42,100,.4); border: 1px solid rgba(55,42,100,.7);
+  color: var(--muted); transition: all .15s;
+}
+.tw-bomb-chip.sel {
+  background: rgba(139,92,246,.25); border-color: var(--purple);
+  color: var(--purple-light);
+  box-shadow: 0 0 8px rgba(139,92,246,.25);
+}
+
+/* Множители инфо-строка */
+.tower-info-row {
+  position: relative; z-index: 10;
+  margin: 0 14px 14px;
+  background: linear-gradient(145deg, rgba(18,14,38,.97), rgba(13,10,28,.99));
+  border: 1px solid rgba(55,42,100,.6);
+  border-radius: 16px;
+  padding: 12px 16px;
+  display: none; flex-shrink: 0;
+}
+.tower-info-item { flex: 1; text-align: center; position: relative; }
+.tower-info-item + .tower-info-item::before { content:''; position:absolute; left:0; top:15%; bottom:15%; width:1px; background:var(--border); }
+.tower-info-val { font-size: 18px; font-weight: 900; color: var(--purple-light); text-shadow: 0 0 14px rgba(167,139,250,.6); }
+.tower-info-val.green { color: var(--green); text-shadow: 0 0 14px rgba(52,211,153,.6); }
+.tower-info-lbl { font-size: 9px; color: var(--muted); margin-top: 3px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+
+/* Кнопки действий башни */
+.tower-btn-row {
+  position: relative; z-index: 10;
+  margin: 0 14px 14px;
+  display: flex; gap: 10px; flex-shrink: 0;
+}
+.tower-btn { flex: 1; padding: 14px; border-radius: 14px; border: none; font-size: 15px; font-weight: 900; cursor: pointer; letter-spacing: .3px; transition: transform .1s, box-shadow .15s; }
+.tower-btn:active { transform: scale(.95); }
+.tower-btn-start { background: linear-gradient(135deg, #7c3aed, #5b21b6); color: #fff; box-shadow: 0 6px 24px rgba(124,58,237,.4); }
+.tower-btn-start:disabled { opacity: .45; cursor: default; }
+.tower-btn-cashout { background: linear-gradient(135deg, #059669, #047857); color: #fff; box-shadow: 0 6px 24px rgba(5,150,105,.35); display: none; }
+
+/* Финальный оверлей башни */
+.tower-result-bar {
+  position: relative; z-index: 10;
+  margin: 0 14px 14px;
+  border-radius: 16px;
+  padding: 16px 20px;
+  text-align: center;
+  display: none; flex-shrink: 0;
+}
+.tower-result-bar.win { background: linear-gradient(135deg, rgba(5,150,105,.2), rgba(4,120,87,.12)); border: 1px solid rgba(52,211,153,.4); }
+.tower-result-bar.lose { background: linear-gradient(135deg, rgba(239,68,68,.15), rgba(220,38,38,.08)); border: 1px solid rgba(248,113,113,.35); }
+.tower-result-emoji { font-size: 32px; margin-bottom: 6px; }
+.tower-result-title { font-size: 17px; font-weight: 900; margin-bottom: 4px; }
+.tower-result-sub { font-size: 13px; color: var(--muted); }
+.tower-result-val { font-size: 22px; font-weight: 900; margin-top: 6px; }
+.tower-result-val.plus { color: var(--green); }
+.tower-result-val.minus { color: var(--red); }
+
 /* ══════════ ЛАЙВ СТАВКИ ══════════ */
 /* ══════════ LIVE СЕКЦИЯ ══════════ */
 .live-section {
@@ -1417,6 +1598,16 @@ body {
         </div>
       </div>
     </div>
+    <!-- Башня — широкая карточка -->
+    <div class="game-card-crash-new" style="background:linear-gradient(145deg,#1a0a2e,#100920);border-color:rgba(139,92,246,.4);box-shadow:0 8px 28px rgba(0,0,0,.5),inset 0 1px 0 rgba(139,92,246,.15)" onclick="openTower()">
+      <div class="gc-crash-glow-el" style="background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(139,92,246,.4) 0%,transparent 70%)"></div>
+      <div style="position:absolute;right:16px;bottom:54px;font-size:52px;line-height:1;filter:drop-shadow(0 0 12px rgba(139,92,246,.6))">🗼</div>
+      <div class="gc-live-badge" style="background:rgba(139,92,246,.3);border-color:rgba(139,92,246,.5);color:var(--purple-light)">9 ЭТАЖЕЙ</div>
+      <div class="gc-crash-info">
+        <div class="gc-crash-info-name" style="color:var(--purple-light)">Башня</div>
+        <div class="gc-crash-info-desc">Поднимайся выше, забери больше</div>
+      </div>
+    </div>
   </div>
   <!-- ПОСЛЕДНИЕ ИГРЫ -->
   <div class="recent-games">
@@ -1500,6 +1691,16 @@ body {
         </div>
       </div>
     </div>
+    <!-- Башня — широкая карточка -->
+    <div class="game-card-crash-new" data-name="башня tower этажи" style="background:linear-gradient(145deg,#1a0a2e,#100920);border-color:rgba(139,92,246,.4);box-shadow:0 8px 28px rgba(0,0,0,.5),inset 0 1px 0 rgba(139,92,246,.15)" onclick="openTower()">
+      <div class="gc-crash-glow-el" style="background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(139,92,246,.4) 0%,transparent 70%)"></div>
+      <div style="position:absolute;right:16px;bottom:54px;font-size:52px;line-height:1;filter:drop-shadow(0 0 12px rgba(139,92,246,.6))">🗼</div>
+      <div class="gc-live-badge" style="background:rgba(139,92,246,.3);border-color:rgba(139,92,246,.5);color:var(--purple-light)">9 ЭТАЖЕЙ</div>
+      <div class="gc-crash-info">
+        <div class="gc-crash-info-name" style="color:var(--purple-light)">Башня</div>
+        <div class="gc-crash-info-desc">Поднимайся выше, забери больше</div>
+      </div>
+    </div>
     <!-- Колесо — широкая карточка -->
     <div class="game-card-wheel-new" data-name="колесо wheel x50 рулетка fortune" onclick="openWheel()">
       <div class="gc-wheel-glow-el"></div>
@@ -1510,6 +1711,70 @@ body {
         <div class="gc-wheel-info-desc">Испытай удачу — выиграй x50</div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ═══ БАШНЯ ═══ -->
+<div id="screen-tower" class="screen">
+  <div class="header">
+    <div class="header-back" onclick="goMenu()">←</div>
+    <div class="header-title"><h1>Башня</h1><p>Umbrex</p></div>
+    <div class="balance-card">
+      <div class="balance-label">Баланс</div>
+      <div class="balance-amount"><span id="tower-balance-val">—</span> 🪙</div>
+    </div>
+  </div>
+
+  <!-- Поле башни -->
+  <div class="tower-wrap">
+    <div class="tower-floors" id="tower-floors"></div>
+  </div>
+
+  <!-- Инфо-строка (множитель / приз) -->
+  <div class="tower-info-row" id="tower-info-row" style="display:none">
+    <div class="tower-info-item">
+      <div class="tower-info-val" id="tw-info-floor">1</div>
+      <div class="tower-info-lbl">Этаж</div>
+    </div>
+    <div class="tower-info-item">
+      <div class="tower-info-val green" id="tw-info-mult">×1.21</div>
+      <div class="tower-info-lbl">Множитель</div>
+    </div>
+    <div class="tower-info-item">
+      <div class="tower-info-val" id="tw-info-prize">0</div>
+      <div class="tower-info-lbl">Выигрыш 🪙</div>
+    </div>
+  </div>
+
+  <!-- Результат -->
+  <div class="tower-result-bar" id="tower-result-bar">
+    <div class="tower-result-emoji" id="tw-res-emoji">✅</div>
+    <div class="tower-result-title" id="tw-res-title">Победа!</div>
+    <div class="tower-result-val" id="tw-res-val"></div>
+    <div class="tower-result-sub" id="tw-res-sub"></div>
+  </div>
+
+  <!-- Настройки ставки -->
+  <div class="tower-settings" id="tower-settings">
+    <div class="tower-setting-row">
+      <span class="tower-setting-label">Ставка</span>
+      <div class="tower-bet-wrap">
+        <button class="tower-bet-mod" onclick="twBetMod(.5)">½</button>
+        <button class="tower-bet-mod" onclick="twBetMod(2)">×2</button>
+        <input id="tower-bet-inp" class="tower-bet-inp" type="number" value="500" min="50" step="50" inputmode="numeric">
+        <button class="tower-bet-mod" onclick="twBetAll()">MAX</button>
+      </div>
+    </div>
+    <div class="tower-setting-row">
+      <span class="tower-setting-label">Бомбы</span>
+      <div class="tower-bombs-opts" id="tw-bomb-opts"></div>
+    </div>
+  </div>
+
+  <!-- Кнопки -->
+  <div class="tower-btn-row">
+    <button class="tower-btn tower-btn-start" id="tower-btn-start" onclick="twStart()">🚀 Начать</button>
+    <button class="tower-btn tower-btn-cashout" id="tower-btn-cashout" onclick="twCashout()">💰 Забрать</button>
   </div>
 </div>
 
@@ -2431,6 +2696,7 @@ function syncBalanceUI(){
   const mv=document.getElementById('mines-balance-val');if(mv)mv.textContent=fmt(sharedBalance);
   const cv=document.getElementById('crash-balance-val');if(cv)cv.textContent=fmt(sharedBalance);
   const wv=document.getElementById('wheel-balance-val');if(wv)wv.textContent=fmt(sharedBalance);
+  const tv=document.getElementById('tower-balance-val');if(tv)tv.textContent=twFmt(sharedBalance);
 }
 function updateAllBalances(){ syncBalanceUI(); }
 
@@ -3085,6 +3351,14 @@ function openWheel() {
   wheelStartPoll();
 }
 
+function openTower() {
+  showScreen('screen-tower');
+  document.getElementById('tower-balance-val').textContent = twFmt(sharedBalance);
+  twBuildBombChips();
+  twBuildBoard();
+  twCheckActiveGame();
+}
+
 const WS = {
   mode: 'x2',
   spinning: false,
@@ -3529,6 +3803,391 @@ function wheelBetMod(factor) {
 function wheelSetMax() {
   const inp = document.getElementById('wheel-bet-inp');
   inp.value = Math.max(1, Math.floor(sharedBalance));
+}
+
+// ═══════════════════════════════════════════
+//  🗼 БАШНЯ
+// ═══════════════════════════════════════════
+const TW = {
+  CELLS: 5, FLOORS: 9, MIN_BET: 50,
+  MULTIPLIERS: {
+    1: [1.21,1.52,1.89,2.37,2.96,3.70,4.63,5.79,7.24],
+    2: [1.62,2.62,4.25,6.89,11.16,18.08,29.28,47.44,76.85],
+    3: [2.50,5.20,10.80,22.50,46.80,97.50,202.00,420.00,875.00],
+    4: [4.50,13.50,40.50,121.50,364.50,1093.50,3280.00,9840.00,29520.00],
+  },
+  // Состояние игры
+  playing: false,
+  gameId: null,
+  bet: 0,
+  mines: 1,
+  floorNum: 1,        // текущий активный этаж (1-based)
+  passedFloors: [],   // [{gemPos, cells}]
+  earnedMult: 0,
+  earnedPrize: 0,
+};
+
+function twMult(floor, mines) {
+  const t = TW.MULTIPLIERS[mines] || TW.MULTIPLIERS[1];
+  return t[Math.max(0, Math.min(floor - 1, t.length - 1))];
+}
+function twFmt(n) { return new Intl.NumberFormat('ru').format(Math.round(n)); }
+
+// Инициализация чипов бомб
+function twBuildBombChips() {
+  const wrap = document.getElementById('tw-bomb-opts');
+  wrap.innerHTML = '';
+  const labels = {1:'1 💣',2:'2 💣',3:'3 💣',4:'4 💣'};
+  for (let b = 1; b <= 4; b++) {
+    const d = document.createElement('div');
+    d.className = 'tw-bomb-chip' + (b === TW.mines ? ' sel' : '');
+    d.textContent = labels[b];
+    d.dataset.b = b;
+    d.onclick = () => {
+      TW.mines = b;
+      document.querySelectorAll('.tw-bomb-chip').forEach(c => c.classList.toggle('sel', +c.dataset.b === b));
+    };
+    wrap.appendChild(d);
+  }
+}
+
+// Построить визуал башни (пустой / с состоянием)
+function twBuildBoard() {
+  const container = document.getElementById('tower-floors');
+  container.innerHTML = '';
+
+  for (let f = TW.FLOORS; f >= 1; f--) {
+    const floorDiv = document.createElement('div');
+    floorDiv.className = 'tower-floor';
+    floorDiv.id = `tw-floor-${f}`;
+
+    // Номер этажа
+    const numDiv = document.createElement('div');
+    numDiv.className = 'tower-floor-num';
+    numDiv.textContent = f;
+    floorDiv.appendChild(numDiv);
+
+    // Ячейки
+    const cellsDiv = document.createElement('div');
+    cellsDiv.className = 'tower-cells';
+    for (let c = 0; c < TW.CELLS; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'tw-cell unknown active';
+      cell.textContent = '❓';
+      cell.dataset.floor = f;
+      cell.dataset.cell = c;
+      cell.onclick = () => twClickCell(f, c);
+      cellsDiv.appendChild(cell);
+    }
+    floorDiv.appendChild(cellsDiv);
+    container.appendChild(floorDiv);
+  }
+
+  // Применить визуальные состояния
+  twRefreshBoard();
+}
+
+// Синхронизировать visual state с TW.*
+function twRefreshBoard() {
+  const active = TW.playing;
+
+  for (let f = 1; f <= TW.FLOORS; f++) {
+    const floorDiv = document.getElementById(`tw-floor-${f}`);
+    if (!floorDiv) continue;
+
+    const isActive = active && f === TW.floorNum;
+    const isPassed = TW.passedFloors.some(p => p.floorNum === f);
+    const isFuture = active && f > TW.floorNum;
+    const isDead = !active && !isPassed; // после проигрыша/победы
+
+    floorDiv.classList.remove('current','passed','future');
+
+    if (isActive) floorDiv.classList.add('current');
+    else if (isPassed) floorDiv.classList.add('passed');
+    else if (isFuture) floorDiv.classList.add('future');
+
+    const cells = floorDiv.querySelectorAll('.tw-cell');
+
+    if (isPassed) {
+      const pf = TW.passedFloors.find(p => p.floorNum === f);
+      cells.forEach((cell, c) => {
+        cell.classList.remove('unknown','active','future');
+        cell.classList.add('dead');
+        if (c === pf.gemPos) {
+          cell.classList.add('gem'); cell.textContent = '💎';
+        } else if (pf.cells && pf.cells[c]) {
+          cell.classList.add('bomb'); cell.textContent = '💣';
+        } else {
+          cell.classList.add('safe'); cell.textContent = '🧊';
+        }
+      });
+    } else if (isActive) {
+      cells.forEach(cell => {
+        cell.classList.remove('dead','gem','bomb','safe','exploded');
+        cell.classList.add('unknown','active');
+        cell.textContent = '❓';
+      });
+    } else if (isFuture || (!active && !isPassed)) {
+      cells.forEach(cell => {
+        cell.classList.remove('dead','active','gem','bomb','safe','exploded');
+        cell.classList.add('unknown','future');
+        cell.textContent = '❓';
+        if (isFuture) { cell.style.opacity = ''; }
+      });
+    }
+  }
+}
+
+function twShowDeadFloor(floorNum, deadIdx, cells) {
+  const floorDiv = document.getElementById(`tw-floor-${floorNum}`);
+  if (!floorDiv) return;
+  const cellEls = floorDiv.querySelectorAll('.tw-cell');
+  cellEls.forEach((cell, c) => {
+    cell.classList.remove('unknown','active','future');
+    cell.classList.add('dead');
+    if (c === deadIdx) {
+      cell.classList.add('exploded'); cell.textContent = '💥';
+    } else if (cells && cells[c]) {
+      cell.classList.add('bomb'); cell.textContent = '💣';
+    } else {
+      cell.classList.add('safe'); cell.textContent = '🧊';
+    }
+  });
+}
+
+// Инфо-строка
+function twUpdateInfo() {
+  if (!TW.playing) return;
+  const nextMult = twMult(TW.floorNum, TW.mines);
+  const nextPrize = Math.round(TW.bet * nextMult);
+  document.getElementById('tw-info-floor').textContent = TW.floorNum;
+  document.getElementById('tw-info-mult').textContent = `×${nextMult.toFixed(2).replace(/\.?0+$/,'')}`;
+  document.getElementById('tw-info-prize').textContent = twFmt(nextPrize);
+
+  // Кешаут — показываем если есть заработанное
+  const cashBtn = document.getElementById('tower-btn-cashout');
+  if (TW.passedFloors.length > 0) {
+    cashBtn.style.display = 'block';
+    cashBtn.textContent = `💰 Забрать (${twFmt(TW.earnedPrize)})`;
+  } else {
+    cashBtn.style.display = 'none';
+  }
+}
+
+function twEnterPlay() {
+  document.getElementById('tower-settings').style.display = 'none';
+  document.getElementById('tower-info-row').style.display = 'flex';
+  document.getElementById('tower-result-bar').style.display = 'none';
+  document.getElementById('tower-btn-start').style.display = 'none';
+  document.getElementById('tower-btn-cashout').style.display = 'none';
+}
+
+function twExitPlay() {
+  document.getElementById('tower-settings').style.display = 'block';
+  document.getElementById('tower-info-row').style.display = 'none';
+  document.getElementById('tower-btn-start').style.display = 'block';
+  document.getElementById('tower-btn-start').disabled = false;
+  document.getElementById('tower-btn-cashout').style.display = 'none';
+}
+
+function twShowResult(win, mult, prize) {
+  const bar = document.getElementById('tower-result-bar');
+  bar.className = 'tower-result-bar ' + (win ? 'win' : 'lose');
+  bar.style.display = 'block';
+  document.getElementById('tw-res-emoji').textContent = win ? '✅' : '💥';
+  document.getElementById('tw-res-title').textContent = win ? 'Победа!' : 'Проигрыш!';
+  if (win) {
+    const profit = prize - TW.bet;
+    document.getElementById('tw-res-val').className = 'tower-result-val plus';
+    document.getElementById('tw-res-val').textContent = `+${twFmt(profit)} 🪙`;
+    document.getElementById('tw-res-sub').textContent = `×${mult.toFixed(2).replace(/\.?0+$/,'')} · Получено: ${twFmt(prize)} 🪙`;
+  } else {
+    document.getElementById('tw-res-val').className = 'tower-result-val minus';
+    document.getElementById('tw-res-val').textContent = `-${twFmt(TW.bet)} 🪙`;
+    document.getElementById('tw-res-sub').textContent = `Этаж ${TW.floorNum} из ${TW.FLOORS}`;
+  }
+}
+
+// ── СТАРТ ──
+async function twStart() {
+  const bet = parseInt(document.getElementById('tower-bet-inp').value) || 0;
+  if (bet < TW.MIN_BET) { showToast(`Мин. ставка ${TW.MIN_BET}`); return; }
+  if (bet > sharedBalance) { showToast('Недостаточно средств'); return; }
+
+  document.getElementById('tower-btn-start').disabled = true;
+  document.getElementById('tower-result-bar').style.display = 'none';
+
+  try {
+    const r = await apiCall('POST', '/api/tower/start', { bet, mines: TW.mines });
+    if (!r.ok) { showToast(r.error || 'Ошибка'); document.getElementById('tower-btn-start').disabled = false; return; }
+
+    TW.playing = true;
+    TW.gameId = r.game_id;
+    TW.bet = bet;
+    TW.floorNum = 1;
+    TW.passedFloors = [];
+    TW.earnedMult = 0;
+    TW.earnedPrize = 0;
+    sharedBalance -= bet;
+    syncBalanceUI();
+    document.getElementById('tower-balance-val').textContent = twFmt(sharedBalance);
+
+    twBuildBoard();
+    twEnterPlay();
+    twUpdateInfo();
+    tg?.HapticFeedback?.impactOccurred('medium');
+  } catch(e) {
+    showToast('Ошибка соединения');
+    document.getElementById('tower-btn-start').disabled = false;
+  }
+}
+
+// ── КЛИК ──
+async function twClickCell(floor, cellIdx) {
+  if (!TW.playing || floor !== TW.floorNum) return;
+
+  // Блокируем все ячейки текущего этажа
+  const floorDiv = document.getElementById(`tw-floor-${floor}`);
+  floorDiv?.querySelectorAll('.tw-cell').forEach(c => c.classList.remove('active'));
+
+  try {
+    const r = await apiCall('POST', '/api/tower/click', { game_id: TW.gameId, cell: cellIdx });
+
+    if (!r.ok) {
+      showToast(r.error || 'Ошибка');
+      floorDiv?.querySelectorAll('.tw-cell').forEach(c => c.classList.add('active'));
+      return;
+    }
+
+    if (r.result === 'lose') {
+      // Показываем взрыв
+      twShowDeadFloor(floor, cellIdx, r.floor_cells);
+      TW.playing = false;
+      sharedBalance = r.new_balance ?? sharedBalance;
+      syncBalanceUI();
+      document.getElementById('tower-balance-val').textContent = twFmt(sharedBalance);
+      tg?.HapticFeedback?.notificationOccurred('error');
+      await sleep(400);
+      twShowResult(false, 0, 0);
+      twExitPlay();
+
+    } else if (r.result === 'win' || r.result === 'win_all') {
+      // Пройден этаж — показываем гем
+      const cellEl = floorDiv?.querySelectorAll('.tw-cell')[cellIdx];
+      if (cellEl) {
+        cellEl.classList.remove('unknown','active'); cellEl.classList.add('gem'); cellEl.textContent = '💎';
+        // Остальные ячейки — показываем
+        if (r.floor_cells) {
+          floorDiv?.querySelectorAll('.tw-cell').forEach((c, i) => {
+            if (i !== cellIdx) {
+              c.classList.remove('unknown','active'); c.classList.add('dead');
+              if (r.floor_cells[i]) { c.classList.add('bomb'); c.textContent = '💣'; }
+              else { c.classList.add('safe'); c.textContent = '🧊'; }
+            }
+          });
+        }
+      }
+
+      TW.passedFloors.push({ floorNum: floor, gemPos: cellIdx, cells: r.floor_cells });
+      TW.earnedMult = r.earned_mult;
+      TW.earnedPrize = r.earned_prize;
+      tg?.HapticFeedback?.impactOccurred('light');
+
+      if (r.result === 'win_all') {
+        // Башня покорена!
+        TW.playing = false;
+        sharedBalance = r.new_balance;
+        syncBalanceUI();
+        document.getElementById('tower-balance-val').textContent = twFmt(sharedBalance);
+        tg?.HapticFeedback?.notificationOccurred('success');
+        await sleep(350);
+        twRefreshBoard();
+        twShowResult(true, r.earned_mult, r.earned_prize);
+        twExitPlay();
+      } else {
+        // Следующий этаж
+        TW.floorNum = r.floor_num;
+        twRefreshBoard();
+        twUpdateInfo();
+      }
+
+    } else {
+      // fallback — следующий этаж (если бэк отдаёт 'next')
+      TW.passedFloors.push({ floorNum: floor, gemPos: cellIdx, cells: r.floor_cells });
+      TW.earnedMult = r.earned_mult ?? twMult(floor, TW.mines);
+      TW.earnedPrize = r.earned_prize ?? Math.round(TW.bet * TW.earnedMult);
+      TW.floorNum = r.floor_num ?? floor + 1;
+      tg?.HapticFeedback?.impactOccurred('light');
+      twRefreshBoard();
+      twUpdateInfo();
+    }
+
+  } catch(e) {
+    showToast('Ошибка соединения');
+    floorDiv?.querySelectorAll('.tw-cell').forEach(c => c.classList.add('active'));
+  }
+}
+
+// ── КЕШАУТ ──
+async function twCashout() {
+  if (!TW.playing || TW.passedFloors.length === 0) return;
+  document.getElementById('tower-btn-cashout').disabled = true;
+
+  try {
+    const r = await apiCall('POST', '/api/tower/cashout', { game_id: TW.gameId });
+    if (!r.ok) { showToast(r.error || 'Ошибка'); document.getElementById('tower-btn-cashout').disabled = false; return; }
+
+    const prize = r.prize ?? TW.earnedPrize;
+    const mult = r.mult ?? TW.earnedMult;
+    sharedBalance = r.new_balance ?? (sharedBalance + prize);
+    syncBalanceUI();
+    document.getElementById('tower-balance-val').textContent = twFmt(sharedBalance);
+    TW.playing = false;
+    tg?.HapticFeedback?.notificationOccurred('success');
+    twRefreshBoard();
+    await sleep(200);
+    twShowResult(true, mult, prize);
+    twExitPlay();
+  } catch(e) {
+    showToast('Ошибка соединения');
+    document.getElementById('tower-btn-cashout').disabled = false;
+  }
+}
+
+// ── ВОССТАНОВЛЕНИЕ АКТИВНОЙ ИГРЫ ──
+async function twCheckActiveGame() {
+  try {
+    const r = await apiCall('GET', '/api/tower/state');
+    if (r.ok && r.active) {
+      TW.playing = true;
+      TW.gameId = r.game_id;
+      TW.bet = r.bet;
+      TW.mines = r.mines;
+      TW.floorNum = r.floor_num;
+      TW.passedFloors = r.passed_floors || [];
+      TW.earnedMult = r.earned_mult || 0;
+      TW.earnedPrize = r.earned_prize || 0;
+
+      // Обновить чипы бомб
+      document.querySelectorAll('.tw-bomb-chip').forEach(c =>
+        c.classList.toggle('sel', +c.dataset.b === TW.mines)
+      );
+      twBuildBoard();
+      twEnterPlay();
+      twUpdateInfo();
+    }
+  } catch(e) { /* нет активной — ок */ }
+}
+
+// Хелперы ставки
+function twBetMod(factor) {
+  const inp = document.getElementById('tower-bet-inp');
+  let v = Math.max(TW.MIN_BET, Math.floor((parseInt(inp.value)||0) * factor));
+  v = Math.min(v, Math.floor(sharedBalance));
+  inp.value = v;
+}
+function twBetAll() {
+  document.getElementById('tower-bet-inp').value = Math.max(TW.MIN_BET, Math.floor(sharedBalance));
 }
 
 
