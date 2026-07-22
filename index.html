@@ -1780,7 +1780,7 @@ body {
 <div id="screen-wheel" class="screen">
   <div class="wheel-header">
     <div class="wheel-header-back" onclick="goGames()">←</div>
-    <div class="wheel-header-title">Колесо</div>
+    <div class="wheel-header-title">X50</div>
     <div class="wheel-header-bal">
       <span id="wheel-balance-val">—</span> 🪙
     </div>
@@ -3258,8 +3258,10 @@ async function wheelPollState() {
       return;
     }
 
-    // Обновить таймер — запускаем локальный отсчёт
-    _wheelStartCountdown(r.secs_left);
+    // Обновить таймер — только если колесо не крутится (не перебиваем анимацию)
+    if (!_wheelSpinning) {
+      _wheelStartCountdown(r.secs_left);
+    }
     _wheelLocked = r.locked;
     _updateBetButtons();
 
@@ -3408,10 +3410,15 @@ function _wheelOnRoundEnd(mult, prevBets) {
   const N = WS.segments.length;
   const sliceAngle = (2 * Math.PI) / N;
   const targetIdx  = WS.segments.indexOf(target);
-  const extra      = 4 + Math.floor(Math.random() * 2);
-  const targetCenter = targetIdx * sliceAngle + sliceAngle / 2;
-  const jitter     = (Math.random() - 0.5) * sliceAngle * 0.55;
-  const finalAngle = WS.angle - (extra * 2 * Math.PI) - (targetCenter + Math.PI / 2 + WS.angle - jitter);
+  const extraSpins = 3 + Math.floor(Math.random() * 2); // 3-4 полных оборота вперёд
+  // Указатель сверху = -π/2. Нам нужно чтобы сегмент targetIdx оказался под ним.
+  // Угол сегмента относительно текущего положения колеса:
+  const targetAngle = targetIdx * sliceAngle + sliceAngle / 2; // центр сегмента
+  const jitter = (Math.random() - 0.5) * sliceAngle * 0.5;
+  // Сколько нужно повернуть вперёд чтобы targetAngle оказался под -π/2
+  let needed = ((-Math.PI / 2) - (WS.angle + targetAngle + jitter)) % (2 * Math.PI);
+  if (needed > 0) needed -= 2 * Math.PI; // всегда делаем полный оборот вперёд
+  const finalAngle = WS.angle + needed - extraSpins * 2 * Math.PI;
 
   // Скрыть предыдущий результат
   const overlay = document.getElementById('wheel-result-overlay');
@@ -3429,12 +3436,28 @@ function _wheelOnRoundEnd(mult, prevBets) {
         const profit = myBet * mult - myBet;
         labelEl.textContent = '+' + fmt(profit) + ' 🪙';
         labelEl.style.color = target.glow;
-        showToast('×' + mult + ' · +' + fmt(profit) + ' 🪙 🎉');
+        showToast('🎉 ×' + mult + ' · +' + fmt(profit) + ' 🪙');
+        tg?.HapticFeedback?.notificationOccurred('success');
       } else {
-        labelEl.textContent = '';
+        // Поставил, но не угадал
+        const totalLost = Object.values(bets).reduce((a,b)=>a+b,0);
+        if (totalLost > 0) {
+          labelEl.textContent = '-' + fmt(totalLost) + ' 🪙';
+          labelEl.style.color = '#f87171';
+          showToast('😔 ×' + mult + ' · -' + fmt(totalLost) + ' 🪙');
+          tg?.HapticFeedback?.notificationOccurred('error');
+        } else {
+          labelEl.textContent = '';
+        }
       }
     }
     if (overlay) overlay.classList.add('visible');
+    // Скрыть результат через 2.5 сек
+    setTimeout(function() {
+      if (overlay) overlay.classList.remove('visible');
+    }, 2500);
+    // Запустить отсчёт ставок с 15 сек после остановки колеса
+    _wheelStartCountdown(15);
   });
 }
 
