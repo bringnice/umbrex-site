@@ -1010,11 +1010,193 @@ body {
 .mv-new { aspect-ratio:1;border-radius:7px;background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.13);display:flex;align-items:center;justify-content:center;font-size:11px; }
 .mv-new.gem { background:rgba(52,211,153,.14);border-color:rgba(52,211,153,.4);box-shadow:0 0 9px rgba(52,211,153,.28); }
 /* визуал хило */
-.hilo-vis-new { position:absolute;top:12px;left:50%;transform:translateX(-50%);width:60px;height:80px;background:linear-gradient(145deg,#1c1440,#120d30);border-radius:10px;border:1px solid rgba(139,92,246,.45);box-shadow:0 0 22px rgba(139,92,246,.28),0 5px 18px rgba(0,0,0,.5);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;animation:gcFlt2 4s ease-in-out infinite .6s; }
-.hilo-rank-new { font-size:26px;font-weight:900;color:#c4b5fd;text-shadow:0 0 14px rgba(167,139,250,.55);line-height:1;font-family:-apple-system,sans-serif; }
-.hilo-suit-new { font-size:14px;color:rgba(167,139,250,.6); }
+.hilo-vis-new { position:absolute;top:34px;left:50%;transform:translateX(-50%);width:62px;height:84px;background:linear-gradient(145deg,#1c1440,#120d30);border-radius:12px;border:1.5px solid rgba(139,92,246,.55);box-shadow:0 0 28px rgba(139,92,246,.35),0 6px 22px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;animation:gcFlt2 4s ease-in-out infinite .6s; }
+.hilo-rank-new { font-size:28px;font-weight:900;color:#e9d5ff;text-shadow:0 0 18px rgba(167,139,250,.7),0 0 40px rgba(139,92,246,.3);line-height:1;font-family:-apple-system,sans-serif; }
+.hilo-suit-new { font-size:18px;line-height:1; }
 @keyframes gcFlt { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
 @keyframes gcFlt2 { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(-4px)} }
+
+/* ══════════ КАРТОЧКА КОЛЕСА (Игры) ══════════ */
+.game-card-wheel-new {
+  position:relative; border-radius:22px; overflow:hidden; cursor:pointer;
+  height:140px; flex-shrink:0;
+  background:linear-gradient(145deg,#0d1a2e,#0a1220);
+  border:1px solid rgba(248,113,113,.35);
+  box-shadow:0 8px 28px rgba(0,0,0,.5),inset 0 1px 0 rgba(248,113,113,.12);
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .2s;
+  display:flex; align-items:flex-end;
+}
+.game-card-wheel-new:active { transform:scale(.94); }
+.game-card-wheel-new::after { content:'';position:absolute;inset:0;background:linear-gradient(140deg,rgba(255,255,255,.04) 0%,transparent 50%);border-radius:22px;pointer-events:none; }
+.gc-wheel-glow-el { position:absolute;top:-30px;right:-20px;width:180px;height:180px;background:radial-gradient(circle,rgba(248,113,113,.18) 0%,transparent 65%);pointer-events:none; }
+.gc-wheel-canvas-card { position:absolute;top:-10px;right:-16px;width:140px;height:140px;pointer-events:none;opacity:.85; }
+.gc-wheel-badge-card { position:absolute;top:12px;right:12px;border-radius:8px;padding:3px 9px;font-size:11px;font-weight:900;letter-spacing:.5px;background:rgba(248,113,113,.18);color:#f87171;border:1px solid rgba(248,113,113,.4); }
+.gc-wheel-info-card { position:absolute;bottom:0;left:0;right:0;padding:12px 14px 15px; }
+.gc-wheel-info-name { font-size:16px;font-weight:900;color:#fff; }
+.gc-wheel-info-desc { font-size:11px;color:var(--muted);margin-top:2px; }
+
+/* ══════════ ЭКРАН КОЛЕСА ══════════ */
+#screen-wheel { overflow:hidden; padding-bottom:0; }
+
+.wheel-header {
+  position:relative; z-index:10; padding:12px 16px 10px;
+  display:flex; align-items:center; justify-content:space-between; flex-shrink:0;
+}
+.wheel-header-back {
+  width:38px; height:38px; border-radius:12px;
+  background:var(--card); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:18px; transition:all .15s; flex-shrink:0;
+}
+.wheel-header-back:active { transform:scale(.9); background:var(--card2); }
+.wheel-header-title { font-size:17px; font-weight:800; }
+.wheel-header-bal {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:14px; padding:7px 12px;
+  font-size:13px; font-weight:800; color:var(--text);
+}
+
+/* Поле колеса */
+.wheel-arena {
+  position:relative; z-index:10; margin:8px 14px 10px;
+  border-radius:24px; overflow:hidden;
+  background:linear-gradient(160deg,#0e0b22 0%,#100820 60%,#0a0618 100%);
+  border:1px solid rgba(80,50,140,.4);
+  box-shadow:inset 0 0 40px rgba(60,20,120,.25);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; height:290px;
+}
+.wheel-arena-inner {
+  position:relative; display:flex; align-items:center; justify-content:center;
+  width:250px; height:250px;
+}
+/* Указатель сверху */
+.wheel-pointer {
+  position:absolute; top:-18px; left:50%; transform:translateX(-50%);
+  z-index:20;
+  width:0; height:0;
+  border-left:10px solid transparent;
+  border-right:10px solid transparent;
+  border-top:22px solid #f87171;
+  filter:drop-shadow(0 0 8px rgba(248,113,113,.9));
+}
+.wheel-canvas-main {
+  border-radius:50%;
+  box-shadow:
+    0 0 0 3px rgba(255,255,255,.06),
+    0 0 0 6px rgba(80,50,140,.3),
+    0 0 40px rgba(139,92,246,.35),
+    0 8px 32px rgba(0,0,0,.5);
+}
+/* Центральный хаб колеса */
+.wheel-hub {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:44px; height:44px; border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#2a2060,#0e0a1e);
+  border:3px solid rgba(139,92,246,.5);
+  box-shadow:0 0 16px rgba(139,92,246,.5),inset 0 0 10px rgba(0,0,0,.4);
+  z-index:15; pointer-events:none;
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; font-weight:900; color:rgba(167,139,250,.9);
+}
+
+/* История результатов */
+.wheel-history {
+  position:relative; z-index:10; flex-shrink:0;
+  display:flex; gap:6px; overflow-x:auto; padding:0 14px 4px;
+  scrollbar-width:none;
+}
+.wheel-history::-webkit-scrollbar { display:none; }
+.wh-item {
+  flex-shrink:0; border-radius:9px; padding:4px 10px;
+  font-size:12px; font-weight:800; border:1px solid transparent;
+}
+.wh-item.grey  { background:rgba(100,100,120,.15); border-color:rgba(100,100,120,.35); color:#9ca3af; }
+.wh-item.purple{ background:rgba(139,92,246,.15);  border-color:rgba(139,92,246,.35);  color:#a78bfa; }
+.wh-item.red   { background:rgba(248,113,113,.15); border-color:rgba(248,113,113,.35); color:#f87171; }
+.wh-item.green { background:rgba(52,211,153,.15);  border-color:rgba(52,211,153,.35);  color:#34d399; }
+.wh-item.gold  { background:rgba(251,191,36,.15);  border-color:rgba(251,191,36,.4);   color:#fbbf24; }
+
+/* Настройки ставки */
+.wheel-settings {
+  position:relative; z-index:10; margin:10px 14px 8px;
+  background:var(--card); border:1px solid var(--border); border-radius:16px; padding:14px;
+  flex-shrink:0;
+}
+.wheel-setting-row { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+.wheel-setting-row:last-child { margin-bottom:0; }
+.wheel-setting-label { font-size:10px; color:var(--muted); min-width:42px; text-transform:uppercase; letter-spacing:.6px; }
+.wheel-bet-wrap { display:flex; align-items:center; gap:4px; flex:1; }
+.wheel-bet-inp {
+  background:var(--card2); border:1px solid var(--border); border-radius:9px;
+  color:var(--text); font-size:14px; font-weight:700;
+  flex:1; width:0; padding:5px 8px; text-align:center; outline:none;
+  transition:border-color .15s;
+}
+.wheel-bet-inp:focus { border-color:var(--red); }
+.wheel-bet-mod {
+  background:var(--card2); border:1px solid var(--border); border-radius:8px;
+  color:var(--muted); font-size:11px; font-weight:700; padding:5px 8px;
+  cursor:pointer; white-space:nowrap; transition:all .12s;
+}
+.wheel-bet-mod:active { border-color:var(--red); color:var(--red); }
+
+/* Мультипликаторы */
+.wheel-mult-row {
+  position:relative; z-index:10; display:flex; gap:7px; margin:0 14px 10px; flex-shrink:0;
+}
+.wheel-mult-btn {
+  flex:1; padding:10px 0; border:none; border-radius:13px;
+  font-size:13px; font-weight:800; cursor:pointer; transition:transform .1s,box-shadow .15s;
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+}
+.wheel-mult-btn:active { transform:scale(.93); }
+.wheel-mult-btn .wm-label { font-size:9px; font-weight:600; opacity:.7; text-transform:uppercase; letter-spacing:.5px; }
+.wm-x2  { background:linear-gradient(145deg,#1c1635,#181230); color:#9ca3af; border:1px solid rgba(100,100,120,.4); }
+.wm-x3  { background:linear-gradient(145deg,#1a1030,#14092b); color:#a78bfa; border:1px solid rgba(139,92,246,.4); box-shadow:0 3px 12px rgba(139,92,246,.2); }
+.wm-x5  { background:linear-gradient(145deg,#1e0f0f,#1a0d0d); color:#f87171; border:1px solid rgba(248,113,113,.4); box-shadow:0 3px 12px rgba(248,113,113,.2); }
+.wm-x50 { background:linear-gradient(145deg,#1a1800,#131100); color:#fbbf24; border:1px solid rgba(251,191,36,.5); box-shadow:0 3px 14px rgba(251,191,36,.25); }
+
+.wm-x2.active  { background:linear-gradient(145deg,#2a2545,#201c38); border-color:rgba(100,100,120,.7); box-shadow:0 4px 14px rgba(100,100,120,.25); }
+.wm-x3.active  { background:linear-gradient(145deg,#2e1e55,#221645); border-color:rgba(139,92,246,.7); box-shadow:0 4px 16px rgba(139,92,246,.4); }
+.wm-x5.active  { background:linear-gradient(145deg,#3d1010,#2e0c0c); border-color:rgba(248,113,113,.7); box-shadow:0 4px 16px rgba(248,113,113,.4); }
+.wm-x50.active { background:linear-gradient(145deg,#2e2800,#221e00); border-color:rgba(251,191,36,.8); box-shadow:0 4px 18px rgba(251,191,36,.4); }
+
+/* Кнопка крутить */
+.wheel-btn-row { position:relative; z-index:10; padding:0 14px 14px; flex-shrink:0; }
+.wheel-spin-btn {
+  width:100%; padding:16px; border:none; border-radius:16px;
+  font-size:16px; font-weight:900; cursor:pointer; letter-spacing:.3px;
+  transition:transform .1s, box-shadow .15s, opacity .2s;
+  background:linear-gradient(135deg,#dc2626,#b91c1c);
+  color:#fff;
+  box-shadow:0 6px 24px rgba(220,38,38,.45);
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.wheel-spin-btn:active { transform:scale(.96); }
+.wheel-spin-btn:disabled { opacity:.35; cursor:default; transform:none; }
+.wheel-spin-btn.spinning { opacity:.6; cursor:default; }
+
+/* Результат поверх колеса */
+.wheel-result-overlay {
+  position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; pointer-events:none;
+  z-index:30; opacity:0; transition:opacity .3s;
+}
+.wheel-result-overlay.visible { opacity:1; }
+.wheel-result-mult {
+  font-size:54px; font-weight:900; line-height:1; letter-spacing:-2px;
+  text-shadow:0 0 30px currentColor, 0 0 60px currentColor;
+}
+.wheel-result-label { font-size:13px; font-weight:700; margin-top:4px; opacity:.8; }
+
+/* Колесо — полная ширина в сетке игр */
+#games-grid-all .game-card-wheel-new {
+  grid-column: 1 / -1;
+}
+#games-grid-all .game-card-wheel-new:hover {
+  box-shadow:0 12px 36px rgba(248,113,113,.22),0 8px 28px rgba(0,0,0,.5),inset 0 1px 0 rgba(248,113,113,.15);
+}
 </style>
 </head>
 <body>
@@ -1311,6 +1493,16 @@ body {
         </div>
       </div>
     </div>
+    <!-- Колесо — широкая карточка -->
+    <div class="game-card-wheel-new" data-name="колесо wheel x50 рулетка fortune" onclick="openWheel()">
+      <div class="gc-wheel-glow-el"></div>
+      <canvas class="gc-wheel-canvas-card" id="games-wheel-cv"></canvas>
+      <div class="gc-wheel-badge-card">x50</div>
+      <div class="gc-wheel-info-card">
+        <div class="gc-wheel-info-name">Колесо</div>
+        <div class="gc-wheel-info-desc">Испытай удачу — выиграй x50</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1582,6 +1774,69 @@ body {
   </div>
 </div>
 
+<!-- ═══ КОЛЕСО ═══ -->
+<div id="screen-wheel" class="screen">
+  <div class="wheel-header">
+    <div class="wheel-header-back" onclick="goGames()">←</div>
+    <div class="wheel-header-title">Колесо</div>
+    <div class="wheel-header-bal">
+      <span id="wheel-balance-val">—</span> 🪙
+    </div>
+  </div>
+
+  <!-- История -->
+  <div class="wheel-history" id="wheel-history"></div>
+
+  <!-- Арена -->
+  <div class="wheel-arena">
+    <div class="wheel-arena-inner">
+      <div class="wheel-pointer"></div>
+      <canvas class="wheel-canvas-main" id="wheel-canvas" width="240" height="240"></canvas>
+      <div class="wheel-hub" id="wheel-hub">🎰</div>
+      <div class="wheel-result-overlay" id="wheel-result-overlay">
+        <div class="wheel-result-mult" id="wheel-result-mult"></div>
+        <div class="wheel-result-label" id="wheel-result-label"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ставка -->
+  <div class="wheel-settings">
+    <div class="wheel-setting-row">
+      <div class="wheel-setting-label">Ставка</div>
+      <div class="wheel-bet-wrap">
+        <input class="wheel-bet-inp" id="wheel-bet-inp" type="number" min="1" value="10" inputmode="numeric">
+        <div class="wheel-bet-mod" onclick="wheelBetMod(.5)">½</div>
+        <div class="wheel-bet-mod" onclick="wheelBetMod(2)">×2</div>
+        <div class="wheel-bet-mod" onclick="wheelSetMax()">Макс</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Выбор мультипликатора -->
+  <div class="wheel-mult-row">
+    <div class="wheel-mult-btn wm-x2 active" id="wm-x2" onclick="wheelSetMode('x2')">
+      <span>×2</span><span class="wm-label">серый</span>
+    </div>
+    <div class="wheel-mult-btn wm-x3" id="wm-x3" onclick="wheelSetMode('x3')">
+      <span>×3</span><span class="wm-label">фиолет</span>
+    </div>
+    <div class="wheel-mult-btn wm-x5" id="wm-x5" onclick="wheelSetMode('x5')">
+      <span>×5</span><span class="wm-label">красный</span>
+    </div>
+    <div class="wheel-mult-btn wm-x50" id="wm-x50" onclick="wheelSetMode('x50')">
+      <span>×50</span><span class="wm-label">🔥 джекпот</span>
+    </div>
+  </div>
+
+  <!-- Кнопка -->
+  <div class="wheel-btn-row">
+    <button class="wheel-spin-btn" id="wheel-spin-btn" onclick="wheelSpin()">
+      🎡 Крутить
+    </button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1627,7 +1882,29 @@ function _afterShowScreen(id){
   const tabKey=TAB_SCREENS[id];
   if(tabKey){ tb.classList.remove('hidden'); document.querySelectorAll('.tab-item').forEach(t=>t.classList.toggle('active',t.dataset.tab===tabKey)); } else { tb.classList.add('hidden'); }
 }
-function goGames(){showScreen('screen-games');updateDrawerActive('games');}
+var _gamesCrashInited = false;
+function goGames(){
+  showScreen('screen-games');
+  updateDrawerActive('games');
+  // Canvas карточки краша мог иметь нулевые размеры при DOMContentLoaded (экран был скрыт)
+  // Переинициализируем при первом открытии
+  if(!_gamesCrashInited){
+    _gamesCrashInited = true;
+    setTimeout(function(){
+      var cv = document.getElementById('games-crash-cv');
+      if(cv){
+        var wrap = cv.parentElement;
+        var r = wrap.getBoundingClientRect();
+        if(r.width > 0 && r.height > 0){
+          cv.width = r.width * window.devicePixelRatio;
+          cv.height = r.height * window.devicePixelRatio;
+          var ctx = cv.getContext('2d');
+          ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+      }
+    }, 50);
+  }
+}
 let currentTopTab = 'balance';
 function goTop(){showScreen('screen-top');updateDrawerActive('top');currentTopTab='balance';document.querySelectorAll('.top-tab').forEach(t=>t.classList.remove('active'));const el=document.getElementById('ttab-balance');if(el)el.classList.add('active');loadLeaderboard();}
 function goBonus(){showScreen('screen-bonus');updateDrawerActive('bonus');loadBonus();}
@@ -1811,10 +2088,26 @@ function initCrash(){
   cCanvas = document.getElementById('crash-canvas');
   cCtx = cCanvas.getContext('2d');
   const wrap = cCanvas.parentElement;
-  cCanvas.width = wrap.clientWidth * window.devicePixelRatio;
-  cCanvas.height = wrap.clientHeight * window.devicePixelRatio;
-  cCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
-  cW = wrap.clientWidth; cH = wrap.clientHeight;
+  // Используем getBoundingClientRect вместо clientWidth/clientHeight — надёжнее
+  // когда экран только что стал видимым (layout может ещё не завершиться)
+  function _initCrashSize(){
+    const r = wrap.getBoundingClientRect();
+    const w = r.width || wrap.offsetWidth;
+    const h = r.height || wrap.offsetHeight;
+    if(w > 0 && h > 0){
+      cCanvas.width = w * window.devicePixelRatio;
+      cCanvas.height = h * window.devicePixelRatio;
+      cCtx = cCanvas.getContext('2d');
+      cCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      cW = w; cH = h;
+    }
+  }
+  _initCrashSize();
+  // Если размеры нулевые — повторяем после layout
+  if(!cW || !cH){
+    setTimeout(_initCrashSize, 50);
+    setTimeout(_initCrashSize, 150);
+  }
 
   // Если мини-апп был закрыт/перезапущен посреди раунда — ставка оставалась
   // "зависшей" на сервере и деньги не возвращались. Проверяем и возвращаем.
@@ -2042,7 +2335,7 @@ function multColor(m, alpha){
 }
 
 function drawCrashGraph(){
-  if(!cCtx)return;
+  if(!cCtx||!cW||!cH)return;
   cCtx.clearRect(0,0,cW,cH);
 
   const pts=CC.points;
@@ -2135,7 +2428,9 @@ function syncBalanceUI(){
   document.getElementById('menu-balance-val').textContent=fmt(sharedBalance);
   const mv=document.getElementById('mines-balance-val');if(mv)mv.textContent=fmt(sharedBalance);
   const cv=document.getElementById('crash-balance-val');if(cv)cv.textContent=fmt(sharedBalance);
+  const wv=document.getElementById('wheel-balance-val');if(wv)wv.textContent=fmt(sharedBalance);
 }
+function updateAllBalances(){ syncBalanceUI(); }
 
 let resultTimer=null;
 function clearResultToast(){clearTimeout(resultTimer);document.getElementById('result-overlay').classList.remove('show');}
@@ -2705,11 +3000,23 @@ window.addEventListener('load',()=>{
       if(!r.width||!r.height)return;
       cv.width=r.width*window.devicePixelRatio;
       cv.height=r.height*window.devicePixelRatio;
+      ctx=cv.getContext('2d');
       ctx.scale(window.devicePixelRatio,window.devicePixelRatio);
       W=r.width; H=r.height;
     }
     setTimeout(resize,100);
     window.addEventListener('resize',resize);
+    // Наблюдаем за изменением видимости экрана: когда screen-games появляется —
+    // переинициализируем canvas (он был скрыт при DOMContentLoaded, W=H=0)
+    var screen=cv.closest('.screen');
+    if(screen){
+      var obs=new MutationObserver(function(){
+        if(screen.classList.contains('active') && (!W||!H)){
+          setTimeout(resize,30);
+        }
+      });
+      obs.observe(screen,{attributes:true,attributeFilter:['class']});
+    }
     function draw(){
       if(!W||!H){requestAnimationFrame(draw);return;}
       t+=0.009; if(t>1.4)t=0;
@@ -2747,7 +3054,7 @@ window.addEventListener('load',()=>{
   function initHiloCard(rankId,suitId){
     var ranks=['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
     var suits=['♠','♥','♦','♣'];
-    var sc={'♠':'#c4b5fd','♥':'#f87171','♦':'#f87171','♣':'#c4b5fd'};
+    var sc={'♠':'#e9d5ff','♥':'#fca5a5','♦':'#fca5a5','♣':'#e9d5ff'};
     var ri=6,si=3;
     var re=document.getElementById(rankId),se=document.getElementById(suitId);
     if(!re||!se)return;
@@ -2761,10 +3068,363 @@ window.addEventListener('load',()=>{
   document.addEventListener('DOMContentLoaded',function(){
     initCrashCard('menu-crash-cv','menu-crash-mult');
     initCrashCard('games-crash-cv','games-crash-mult');
+    if(!WS.segments) WS.segments = wheelBuildSegments();
+    initWheelCardCanvas();
     initHiloCard('menu-hilo-rank','menu-hilo-suit');
     initHiloCard('games-hilo-rank','games-hilo-suit');
   });
 })();
+
+// ══════════ WHEEL GAME ══════════
+function openWheel() {
+  showScreen('screen-wheel');
+  document.getElementById('wheel-balance-val').textContent = fmt(sharedBalance);
+  wheelInitCanvas();
+  if (!WS.historyInited) { WS.historyInited = true; }
+  wheelRenderHistory();
+}
+
+const WS = {
+  mode: 'x2',
+  spinning: false,
+  angle: 0,       // текущий угол (radians)
+  historyInited: false,
+  history: [],
+  // Сегменты колеса (цвет, мультипликатор, кол-во секций)
+  // Всего 54 секции:
+  // x2 (серые)  : 24 шт  ≈44.4%
+  // x3 (фиолет) : 18 шт  ≈33.3%
+  // x5 (красные): 8 шт   ≈14.8%
+  // x50 (золото): 4 шт   ≈7.4%   (JACKPOT — реже всех но есть шанс)
+  segments: null,
+};
+
+function wheelBuildSegments() {
+  const defs = [
+    { mult: 2,  color: '#374151', glow: '#9ca3af',  label: '×2',  count: 24 },
+    { mult: 3,  color: '#5b21b6', glow: '#a78bfa',  label: '×3',  count: 18 },
+    { mult: 5,  color: '#991b1b', glow: '#f87171',  label: '×5',  count: 8  },
+    { mult: 50, color: '#92400e', glow: '#fbbf24',  label: '×50', count: 4  },
+  ];
+  const segs = [];
+  defs.forEach(d => {
+    for (let i = 0; i < d.count; i++) segs.push({ ...d });
+  });
+  // shuffle
+  for (let i = segs.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [segs[i], segs[j]] = [segs[j], segs[i]];
+  }
+  return segs;
+}
+
+let _wheelRAF = null;
+
+function wheelInitCanvas() {
+  if (!WS.segments) WS.segments = wheelBuildSegments();
+
+  const canvas = document.getElementById('wheel-canvas');
+  if (!canvas) return;
+  const SIZE = 240;
+  canvas.width = SIZE;
+  canvas.height = SIZE;
+  wheelDraw(WS.angle);
+
+  // Карточка на экране игр
+  initWheelCardCanvas();
+}
+
+function wheelDraw(angle) {
+  const canvas = document.getElementById('wheel-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const N = WS.segments.length;
+  const R = canvas.width / 2;
+  const sliceAngle = (2 * Math.PI) / N;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  WS.segments.forEach((seg, i) => {
+    const start = angle + i * sliceAngle;
+    const end   = start + sliceAngle;
+    const mid   = start + sliceAngle / 2;
+
+    // Сегмент
+    ctx.beginPath();
+    ctx.moveTo(R, R);
+    ctx.arc(R, R, R - 2, start, end);
+    ctx.closePath();
+
+    // Радиальный градиент от центра
+    const grd = ctx.createRadialGradient(R, R, R * 0.15, R, R, R - 2);
+    const baseColor = seg.color;
+    grd.addColorStop(0, lightenHex(baseColor, 22));
+    grd.addColorStop(1, baseColor);
+    ctx.fillStyle = grd;
+    ctx.fill();
+
+    // Тонкая линия-разделитель
+    ctx.strokeStyle = 'rgba(0,0,0,.35)';
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+
+    // Текст мультипликатора
+    ctx.save();
+    ctx.translate(R, R);
+    ctx.rotate(mid);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = seg.glow;
+    ctx.shadowColor = seg.glow;
+    ctx.shadowBlur = 6;
+
+    const fontSize = seg.mult === 50 ? 11 : 10;
+    ctx.font = `900 ${fontSize}px -apple-system,sans-serif`;
+    ctx.fillText(seg.label, R - 8, 4);
+    ctx.shadowBlur = 0;
+    ctx.restore();
+  });
+
+  // Внешнее кольцо (рамка)
+  ctx.beginPath();
+  ctx.arc(R, R, R - 1, 0, 2 * Math.PI);
+  ctx.strokeStyle = 'rgba(139,92,246,.45)';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Внутреннее свечение
+  ctx.beginPath();
+  ctx.arc(R, R, R * 0.18, 0, 2 * Math.PI);
+  const inner = ctx.createRadialGradient(R, R, 0, R, R, R * 0.18);
+  inner.addColorStop(0, 'rgba(139,92,246,.15)');
+  inner.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = inner;
+  ctx.fill();
+}
+
+function lightenHex(hex, amount) {
+  const num = parseInt(hex.replace('#', ''), 16);
+  const r = Math.min(255, (num >> 16) + amount);
+  const g = Math.min(255, ((num >> 8) & 0xff) + amount);
+  const b = Math.min(255, (num & 0xff) + amount);
+  return `rgb(${r},${g},${b})`;
+}
+
+// Определяем что под указателем (верхняя точка = угол -π/2 от центра)
+function wheelGetResult() {
+  const N = WS.segments.length;
+  const sliceAngle = (2 * Math.PI) / N;
+  // pointer at top = -π/2, but our angle offset makes effective pointer direction:
+  // segment i spans [angle + i*slice, angle + (i+1)*slice]
+  // top of canvas = -π/2 in standard coords
+  // normalise angle mod 2π
+  let a = ((-Math.PI / 2) - WS.angle) % (2 * Math.PI);
+  if (a < 0) a += 2 * Math.PI;
+  const idx = Math.floor(a / sliceAngle) % N;
+  return WS.segments[idx];
+}
+
+function wheelSpin() {
+  if (WS.spinning) return;
+
+  const betVal = parseInt(document.getElementById('wheel-bet-inp').value) || 0;
+  if (betVal <= 0) { showToast('Введи ставку!'); return; }
+  if (betVal > sharedBalance) { showToast('Недостаточно монет'); return; }
+
+  WS.spinning = true;
+  const btn = document.getElementById('wheel-spin-btn');
+  btn.disabled = true;
+  btn.classList.add('spinning');
+  btn.textContent = '⏳ Крутится...';
+
+  // Скрыть предыдущий результат
+  const overlay = document.getElementById('wheel-result-overlay');
+  overlay.classList.remove('visible');
+  const hub = document.getElementById('wheel-hub');
+  hub.textContent = '🎰';
+
+  // Выбор победного сегмента по режиму
+  // Режим задаёт что ты "ставишь на" — выпадет любой, но шанс на выигрыш зависит от колеса
+  // При win: ставка * мульт
+  // Здесь упрощённо: реально случайный результат с отображением
+  const result = wheelPickResult();
+
+  // Сколько оборотов + попасть в нужный сегмент
+  const N = WS.segments.length;
+  const sliceAngle = (2 * Math.PI) / N;
+  const targetIdx = WS.segments.indexOf(result);
+
+  // Текущий эффективный угол сегмента под указателем
+  // pointer = -π/2 - angle → нужный сегмент должен оказаться там
+  // target_angle_of_segment_center = targetIdx * sliceAngle + sliceAngle/2
+  // pointer = -π/2 → angle = -(target_center + π/2) mod 2π
+  // Мы добавляем несколько оборотов
+  const extra = 4 + Math.floor(Math.random() * 3); // 4-6 полных оборотов
+  const targetCenter = targetIdx * sliceAngle + sliceAngle / 2;
+  // Добавить небольшую рандомизацию внутри сегмента
+  const jitter = (Math.random() - 0.5) * sliceAngle * 0.55;
+  const finalAngle = WS.angle - (extra * 2 * Math.PI) - (targetCenter + Math.PI / 2 + WS.angle - jitter);
+
+  animateWheel(WS.angle, finalAngle, 4500, function() {
+    WS.spinning = false;
+    btn.disabled = false;
+    btn.classList.remove('spinning');
+    btn.innerHTML = '🎡 Крутить';
+
+    const actual = wheelGetResult();
+    wheelShowResult(actual, betVal);
+  });
+}
+
+function wheelPickResult() {
+  // Реальный шанс (независимо от режима):
+  // x2: 44.4%, x3: 33.3%, x5: 14.8%, x50: 7.4%
+  const r = Math.random() * 100;
+  let cumul = 0;
+  const chances = [{mult:2,pct:44.4},{mult:3,pct:33.3},{mult:5,pct:14.8},{mult:50,pct:7.5}];
+  let targetMult = 2;
+  for (const c of chances) {
+    cumul += c.pct;
+    if (r < cumul) { targetMult = c.mult; break; }
+  }
+  // найти случайный сегмент с нужным мультом
+  const pool = WS.segments.filter(s => s.mult === targetMult);
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function animateWheel(startAngle, endAngle, duration, onDone) {
+  const start = performance.now();
+  if (_wheelRAF) cancelAnimationFrame(_wheelRAF);
+
+  function easeOut(t) {
+    // Кубическая ease-out с небольшим рывком вначале
+    return 1 - Math.pow(1 - t, 3.5);
+  }
+
+  function step(now) {
+    const elapsed = now - start;
+    const t = Math.min(elapsed / duration, 1);
+    const angle = startAngle + (endAngle - startAngle) * easeOut(t);
+    WS.angle = angle;
+    wheelDraw(angle);
+
+    if (t < 1) {
+      _wheelRAF = requestAnimationFrame(step);
+    } else {
+      WS.angle = endAngle;
+      wheelDraw(endAngle);
+      if (onDone) onDone();
+    }
+  }
+  _wheelRAF = requestAnimationFrame(step);
+}
+
+function wheelShowResult(seg, betVal) {
+  const win = Math.round(betVal * seg.mult);
+  const profit = win - betVal;
+
+  // Обновить баланс
+  sharedBalance = sharedBalance - betVal + win;
+  updateAllBalances();
+
+  // Оверлей
+  const overlay = document.getElementById('wheel-result-overlay');
+  const multEl  = document.getElementById('wheel-result-mult');
+  const labelEl = document.getElementById('wheel-result-label');
+  const hub     = document.getElementById('wheel-hub');
+
+  multEl.textContent  = seg.label;
+  multEl.style.color  = seg.glow;
+  labelEl.textContent = `+${fmt(profit)} 🪙`;
+  labelEl.style.color = seg.glow;
+  hub.textContent = seg.mult === 50 ? '🏆' : seg.mult >= 5 ? '🔥' : '✨';
+
+  overlay.classList.add('visible');
+
+  // В историю
+  let cls = 'grey';
+  if (seg.mult === 3)  cls = 'purple';
+  if (seg.mult === 5)  cls = 'red';
+  if (seg.mult === 50) cls = 'gold';
+  WS.history.unshift({ label: seg.label, cls });
+  if (WS.history.length > 18) WS.history.pop();
+  wheelRenderHistory();
+
+  // Убрать оверлей через 2.2 сек
+  setTimeout(() => {
+    overlay.classList.remove('visible');
+  }, 2200);
+
+  // Тост
+  if (seg.mult >= 50) {
+    showToast('🏆 ДЖЕКПОТ! +' + fmt(profit) + ' 🪙');
+  } else if (seg.mult >= 5) {
+    showToast('🔥 +' + fmt(profit) + ' 🪙');
+  } else {
+    showToast('+' + fmt(profit) + ' 🪙');
+  }
+}
+
+function wheelRenderHistory() {
+  const el = document.getElementById('wheel-history');
+  if (!el) return;
+  if (WS.history.length === 0) { el.innerHTML = ''; return; }
+  el.innerHTML = WS.history.map(h =>
+    `<div class="wh-item ${h.cls}">${h.label}</div>`
+  ).join('');
+}
+
+function wheelSetMode(mode) {
+  WS.mode = mode;
+  ['x2','x3','x5','x50'].forEach(m => {
+    document.getElementById('wm-' + m)?.classList.toggle('active', m === mode);
+  });
+}
+
+function wheelBetMod(factor) {
+  const inp = document.getElementById('wheel-bet-inp');
+  let v = Math.max(1, Math.round((parseInt(inp.value) || 0) * factor));
+  v = Math.min(v, sharedBalance);
+  inp.value = v;
+}
+
+function wheelSetMax() {
+  const inp = document.getElementById('wheel-bet-inp');
+  inp.value = Math.max(1, sharedBalance);
+}
+
+// ── Мини-колесо на карточке в разделе Игры ──
+function initWheelCardCanvas() {
+  const cv = document.getElementById('games-wheel-cv');
+  if (!cv) return;
+  const SIZE = 140;
+  cv.width = SIZE; cv.height = SIZE;
+  let angle = 0;
+  const segs = WS.segments || wheelBuildSegments();
+  const N = segs.length;
+  const slice = (2 * Math.PI) / N;
+  const R = SIZE / 2;
+
+  function drawCard(a) {
+    const ctx = cv.getContext('2d');
+    ctx.clearRect(0,0,SIZE,SIZE);
+    segs.forEach((seg,i) => {
+      const s = a + i*slice, e = s+slice;
+      ctx.beginPath(); ctx.moveTo(R,R); ctx.arc(R,R,R-1,s,e); ctx.closePath();
+      const grd = ctx.createRadialGradient(R,R,R*0.1,R,R,R-1);
+      grd.addColorStop(0, lightenHex(seg.color,18)); grd.addColorStop(1, seg.color);
+      ctx.fillStyle=grd; ctx.fill();
+      ctx.strokeStyle='rgba(0,0,0,.3)'; ctx.lineWidth=0.5; ctx.stroke();
+    });
+    ctx.beginPath(); ctx.arc(R,R,R-1,0,2*Math.PI);
+    ctx.strokeStyle='rgba(139,92,246,.35)'; ctx.lineWidth=2; ctx.stroke();
+  }
+
+  function loop() {
+    angle += 0.004;
+    drawCard(angle);
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
 </script>
-</body>
-</html>
