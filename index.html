@@ -3268,11 +3268,18 @@ async function wheelPollState() {
     if (r.round_id !== _wheelRoundId) {
       if (_wheelRoundId >= 0 && r.history.length > 0) {
         const last = r.history[0];
-        _wheelOnRoundEnd(last.mult);
+        // Сохраняем ставки до очистки — нужны для отображения выигрыша
+        const prevBets = Object.assign({}, _wheelMyBets);
+        _wheelMyBets = {};
+        _renderMyBets();
+        _wheelSpinning = false; // сброс на случай застрявшей анимации
+        _wheelOnRoundEnd(last.mult, prevBets);
+      } else {
+        _wheelMyBets = {};
+        _renderMyBets();
+        _wheelSpinning = false;
       }
       _wheelRoundId = r.round_id;
-      _wheelMyBets  = {};
-      _renderMyBets();
     }
 
     // История
@@ -3339,9 +3346,10 @@ function _renderHistory(history) {
   wheelRenderHistory();
 }
 
-function _wheelOnRoundEnd(mult) {
+function _wheelOnRoundEnd(mult, prevBets) {
   // Анимировать колесо на результат
   if (_wheelSpinning) return;
+  const bets = prevBets || _wheelMyBets;
   const seg = WS.segments.filter(s => s.mult === mult);
   if (!seg.length) return;
   const target = seg[Math.floor(Math.random() * seg.length)];
@@ -3364,7 +3372,7 @@ function _wheelOnRoundEnd(mult) {
     // Показать результат
     const multEl  = document.getElementById('wheel-result-mult');
     const labelEl = document.getElementById('wheel-result-label');
-    const myBet   = _wheelMyBets[mult];
+    const myBet   = bets[mult];
     if (multEl)  { multEl.textContent = '×' + mult; multEl.style.color = target.glow; }
     if (labelEl) {
       if (myBet) {
@@ -3415,14 +3423,14 @@ function wheelPickResultLocal() {
 
 function wheelBetMod(factor) {
   const inp = document.getElementById('wheel-bet-inp');
-  let v = Math.max(1, Math.round((parseInt(inp.value)||0) * factor));
-  v = Math.min(v, sharedBalance);
+  let v = Math.max(1, Math.floor((parseInt(inp.value)||0) * factor));
+  v = Math.min(v, Math.floor(sharedBalance));
   inp.value = v;
 }
 
 function wheelSetMax() {
   const inp = document.getElementById('wheel-bet-inp');
-  inp.value = Math.max(1, sharedBalance);
+  inp.value = Math.max(1, Math.floor(sharedBalance));
 }
 
 
