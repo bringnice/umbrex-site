@@ -738,39 +738,77 @@ body {
     radial-gradient(ellipse 70% 50% at 50% 0%, rgba(99,40,200,.45) 0%, transparent 60%),
     radial-gradient(ellipse 80% 60% at 20% 80%, rgba(60,20,120,.35) 0%, transparent 55%),
     var(--bg);
+  overflow: hidden;
 }
+
+/* ── Обёртка поля — занимает всё свободное место ── */
 .tower-wrap {
   position: relative; z-index: 10;
-  margin: 0 14px 14px;
-  display: flex; flex-direction: column; gap: 0;
-  flex-shrink: 0;
+  margin: 0 14px 12px;
+  flex: 1 1 0; min-height: 0;
+  background: linear-gradient(145deg, rgba(18,14,38,.95), rgba(14,10,30,.98));
+  border: 1px solid rgba(60,48,100,.6);
+  border-radius: 22px;
+  padding: 14px 14px 14px 10px;
+  display: flex; align-items: stretch;
+  box-shadow: 0 0 60px rgba(80,30,180,.12),
+              inset 0 1px 0 rgba(255,255,255,.04),
+              inset 0 0 40px rgba(30,15,70,.3);
+  overflow: hidden;
 }
-/* Контейнер этажей — растёт снизу вверх */
+
+/* Колонка с номерами этажей */
+.tower-row-nums {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 6px;
+  width: 22px; flex-shrink: 0;
+  margin-right: 8px;
+}
+.tower-row-num {
+  flex: 1;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: var(--muted);
+  letter-spacing: .3px; min-height: 0;
+}
+.tower-row-num.num-passed { color: var(--green); }
+.tower-row-num.num-current { color: var(--purple-light); font-weight: 900; }
+
+/* Скроллируемая область этажей */
+.tower-scroll {
+  flex: 1; min-width: 0;
+  overflow-y: auto; overflow-x: hidden;
+  scrollbar-width: none;
+}
+.tower-scroll::-webkit-scrollbar { display: none; }
+
+/* Контейнер этажей — снизу вверх */
 .tower-floors {
   display: flex;
   flex-direction: column-reverse;
-  gap: 5px;
+  gap: 6px;
+  min-height: 100%;
 }
+
 .tower-floor {
   display: flex;
-  gap: 5px;
-  padding: 0;
-  position: relative;
+  gap: 6px;
+  flex-shrink: 0;
 }
-/* Метка этажа слева */
-.tower-floor-num {
-  width: 22px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 10px; font-weight: 700; color: var(--muted);
-  letter-spacing: .3px;
-}
+
+/* Старый .tower-floor-num скрыт — нумерация теперь в отдельной колонке */
+.tower-floor-num { display: none; }
+
 .tower-cells {
-  display: flex; gap: 5px; flex: 1;
+  display: flex; gap: 6px; flex: 1;
 }
-/* Ячейка башни */
+
+/* Ячейка башни — ПРЯМОУГОЛЬНАЯ */
 .tw-cell {
-  flex: 1; aspect-ratio: 1;
+  flex: 1;
+  height: 46px;
   border-radius: 12px;
+border-radius: 12px;
   background: linear-gradient(145deg, #1c1635, #16112b);
   border: 1px solid rgba(55,42,100,.7);
   display: flex; align-items: center; justify-content: center;
@@ -822,44 +860,37 @@ body {
   box-shadow: 0 0 12px rgba(139,92,246,.2), inset 0 1px 0 rgba(255,255,255,.06);
 }
 /* Пройденный этаж */
-.tower-floor.passed .tw-cell {
-  cursor: default; pointer-events: none;
-}
-.tower-floor.future .tw-cell {
-  opacity: .35; cursor: default; pointer-events: none;
-}
-.tower-floor.future .tw-cell.unknown {
-  font-size: 0; /* скрываем ? на будущих */
-}
-/* Линия прогресса */
+.tower-floor.passed .tw-cell { cursor: default; pointer-events: none; }
+.tower-floor.future .tw-cell { opacity: .35; cursor: default; pointer-events: none; }
+.tower-floor.future .tw-cell.unknown { font-size: 0; }
+/* Прогресс нумерации — теперь в .tower-row-num */
 .tower-floor.passed .tower-floor-num { color: var(--green); }
 .tower-floor.current .tower-floor-num { color: var(--purple-light); font-weight: 900; }
 
-/* Панель ставки и бомб */
+/* ── Панель настроек ── */
 .tower-settings {
   position: relative; z-index: 10;
-  margin: 0 14px 14px;
+  margin: 0 14px 10px;
   background: linear-gradient(145deg, rgba(18,14,38,.97), rgba(13,10,28,.99));
   border: 1px solid rgba(55,42,100,.6);
   border-radius: 16px;
-  padding: 14px 16px;
+  padding: 12px 14px;
   flex-shrink: 0;
 }
-.tower-setting-row {
-  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
-}
+.tower-setting-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 .tower-setting-row:last-child { margin-bottom: 0; }
-.tower-setting-label { font-size: 12px; font-weight: 700; color: var(--muted); min-width: 52px; text-transform: uppercase; letter-spacing: .6px; }
-.tower-bet-wrap { display: flex; gap: 6px; flex: 1; }
-.tower-bet-mod { background: rgba(55,42,100,.6); border: 1px solid rgba(55,42,100,.8); border-radius: 9px; color: var(--text); font-size: 12px; font-weight: 800; padding: 6px 10px; cursor: pointer; transition: background .1s; }
+.tower-setting-label { font-size: 10px; font-weight: 700; color: var(--muted); min-width: 48px; text-transform: uppercase; letter-spacing: .6px; }
+.tower-bet-wrap { display: flex; gap: 5px; flex: 1; }
+.tower-bet-mod { background: rgba(55,42,100,.6); border: 1px solid rgba(55,42,100,.8); border-radius: 9px; color: var(--text); font-size: 12px; font-weight: 800; padding: 5px 10px; cursor: pointer; transition: background .1s; }
 .tower-bet-mod:active { background: rgba(139,92,246,.25); }
-.tower-bet-inp { flex: 1; background: rgba(55,42,100,.3); border: 1px solid rgba(55,42,100,.7); border-radius: 9px; color: var(--text); font-size: 14px; font-weight: 800; padding: 6px 10px; text-align: center; outline: none; min-width: 0; }
-.tower-bombs-opts { display: flex; gap: 6px; flex: 1; }
+.tower-bet-inp { flex: 1; background: rgba(55,42,100,.3); border: 1px solid rgba(55,42,100,.7); border-radius: 9px; color: var(--text); font-size: 14px; font-weight: 800; padding: 5px 8px; text-align: center; outline: none; min-width: 0; }
+.tower-bombs-opts { display: flex; gap: 5px; flex: 1; }
 .tw-bomb-chip {
-  flex: 1; padding: 6px 4px; border-radius: 9px; text-align: center;
+  flex: 1; padding: 5px 4px; border-radius: 9px; text-align: center;
   font-size: 12px; font-weight: 800; cursor: pointer;
   background: rgba(55,42,100,.4); border: 1px solid rgba(55,42,100,.7);
   color: var(--muted); transition: all .15s;
+  display: flex; align-items: center; justify-content: center; gap: 3px;
 }
 .tw-bomb-chip.sel {
   background: rgba(139,92,246,.25); border-color: var(--purple);
@@ -867,49 +898,97 @@ body {
   box-shadow: 0 0 8px rgba(139,92,246,.25);
 }
 
-/* Множители инфо-строка */
+/* ── Инфо-строка: множитель + выигрыш ── */
 .tower-info-row {
   position: relative; z-index: 10;
-  margin: 0 14px 14px;
+  margin: 0 14px 10px;
   background: linear-gradient(145deg, rgba(18,14,38,.97), rgba(13,10,28,.99));
   border: 1px solid rgba(55,42,100,.6);
   border-radius: 16px;
-  padding: 12px 16px;
+  overflow: hidden;
   display: none; flex-shrink: 0;
 }
-.tower-info-item { flex: 1; text-align: center; position: relative; }
-.tower-info-item + .tower-info-item::before { content:''; position:absolute; left:0; top:15%; bottom:15%; width:1px; background:var(--border); }
-.tower-info-val { font-size: 18px; font-weight: 900; color: var(--purple-light); text-shadow: 0 0 14px rgba(167,139,250,.6); }
-.tower-info-val.green { color: var(--green); text-shadow: 0 0 14px rgba(52,211,153,.6); }
-.tower-info-lbl { font-size: 9px; color: var(--muted); margin-top: 3px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+.tower-info-inner { display: flex; width: 100%; }
+.tower-info-mult-side {
+  display: flex; align-items: center; justify-content: center;
+  padding: 14px 20px;
+  border-right: 1px solid rgba(55,42,100,.6);
+  flex-shrink: 0;
+}
+.tower-info-mult-val {
+  font-size: 30px; font-weight: 900; color: var(--green);
+  text-shadow: 0 0 20px rgba(52,211,153,.7), 0 0 40px rgba(52,211,153,.3);
+  letter-spacing: -0.5px;
+}
+.tower-info-prize-side {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 10px 14px; position: relative;
+}
+.tower-info-prize-lbl { font-size: 9px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+.tower-info-prize-val { font-size: 20px; font-weight: 900; color: var(--green); text-shadow: 0 0 14px rgba(52,211,153,.5); }
+/* молния-декор */
+.tower-info-prize-side::after {
+  content: '';
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  width: 48px; height: 36px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 36'%3E%3Cpath d='M36 3 L18 20 L27 20 L10 34 L32 16 L22 16 Z' fill='none' stroke='rgba(139,92,246,0.3)' stroke-width='1.5'/%3E%3C/svg%3E") center/contain no-repeat;
+  pointer-events: none;
+}
 
-/* Кнопки действий башни */
+/* ── Кнопки ── */
 .tower-btn-row {
   position: relative; z-index: 10;
   margin: 0 14px 14px;
   display: flex; gap: 10px; flex-shrink: 0;
 }
-.tower-btn { flex: 1; padding: 14px; border-radius: 14px; border: none; font-size: 15px; font-weight: 900; cursor: pointer; letter-spacing: .3px; transition: transform .1s, box-shadow .15s; }
+.tower-btn {
+  flex: 1; padding: 15px; border-radius: 16px; border: none;
+  font-size: 15px; font-weight: 900; cursor: pointer;
+  letter-spacing: .3px; transition: transform .1s, box-shadow .15s;
+  position: relative; overflow: hidden;
+}
 .tower-btn:active { transform: scale(.95); }
-.tower-btn-start { background: linear-gradient(135deg, #7c3aed, #5b21b6); color: #fff; box-shadow: 0 6px 24px rgba(124,58,237,.4); }
+.tower-btn-start {
+  background: linear-gradient(135deg, #7c3aed, #5b21b6);
+  color: #fff; box-shadow: 0 6px 24px rgba(124,58,237,.4);
+}
+.tower-btn-start::after {
+  content: '';
+  position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+  width: 50px; height: 28px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 28'%3E%3Cpath d='M38 2 L18 16 L28 16 L8 26 L33 12 L21 12 Z' fill='none' stroke='rgba(255,255,255,0.2)' stroke-width='1.5'/%3E%3C/svg%3E") center/contain no-repeat;
+  pointer-events: none;
+}
 .tower-btn-start:disabled { opacity: .45; cursor: default; }
-.tower-btn-cashout { background: linear-gradient(135deg, #059669, #047857); color: #fff; box-shadow: 0 6px 24px rgba(5,150,105,.35); display: none; }
+.tower-btn-cashout {
+  background: linear-gradient(135deg, #7c3aed, #5b21b6);
+  color: #fff; box-shadow: 0 6px 24px rgba(124,58,237,.4);
+  display: none;
+}
+.tower-btn-cashout::after {
+  content: '';
+  position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+  width: 50px; height: 28px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 28'%3E%3Cpath d='M38 2 L18 16 L28 16 L8 26 L33 12 L21 12 Z' fill='none' stroke='rgba(255,255,255,0.2)' stroke-width='1.5'/%3E%3C/svg%3E") center/contain no-repeat;
+  pointer-events: none;
+}
 
-/* Финальный оверлей башни */
+/* ── Финальный результат ── */
 .tower-result-bar {
   position: relative; z-index: 10;
-  margin: 0 14px 14px;
+  margin: 0 14px 10px;
   border-radius: 16px;
-  padding: 16px 20px;
+  padding: 14px 20px;
   text-align: center;
   display: none; flex-shrink: 0;
 }
 .tower-result-bar.win { background: linear-gradient(135deg, rgba(5,150,105,.2), rgba(4,120,87,.12)); border: 1px solid rgba(52,211,153,.4); }
 .tower-result-bar.lose { background: linear-gradient(135deg, rgba(239,68,68,.15), rgba(220,38,38,.08)); border: 1px solid rgba(248,113,113,.35); }
-.tower-result-emoji { font-size: 32px; margin-bottom: 6px; }
-.tower-result-title { font-size: 17px; font-weight: 900; margin-bottom: 4px; }
-.tower-result-sub { font-size: 13px; color: var(--muted); }
-.tower-result-val { font-size: 22px; font-weight: 900; margin-top: 6px; }
+.tower-result-emoji { font-size: 28px; margin-bottom: 4px; }
+.tower-result-title { font-size: 16px; font-weight: 900; margin-bottom: 3px; }
+.tower-result-sub { font-size: 12px; color: var(--muted); }
+.tower-result-val { font-size: 20px; font-weight: 900; margin-top: 4px; }
 .tower-result-val.plus { color: var(--green); }
 .tower-result-val.minus { color: var(--red); }
 
@@ -1725,24 +1804,11 @@ body {
     </div>
   </div>
 
-  <!-- Поле башни -->
+  <!-- Поле башни с нумерацией слева -->
   <div class="tower-wrap">
-    <div class="tower-floors" id="tower-floors"></div>
-  </div>
-
-  <!-- Инфо-строка (множитель / приз) -->
-  <div class="tower-info-row" id="tower-info-row" style="display:none">
-    <div class="tower-info-item">
-      <div class="tower-info-val" id="tw-info-floor">1</div>
-      <div class="tower-info-lbl">Этаж</div>
-    </div>
-    <div class="tower-info-item">
-      <div class="tower-info-val green" id="tw-info-mult">×1.21</div>
-      <div class="tower-info-lbl">Множитель</div>
-    </div>
-    <div class="tower-info-item">
-      <div class="tower-info-val" id="tw-info-prize">0</div>
-      <div class="tower-info-lbl">Выигрыш 🪙</div>
+    <div class="tower-row-nums" id="tower-row-nums"></div>
+    <div class="tower-scroll">
+      <div class="tower-floors" id="tower-floors"></div>
     </div>
   </div>
 
@@ -1759,10 +1825,9 @@ body {
     <div class="tower-setting-row">
       <span class="tower-setting-label">Ставка</span>
       <div class="tower-bet-wrap">
-        <button class="tower-bet-mod" onclick="twBetMod(.5)">½</button>
+        <button class="tower-bet-mod" onclick="twBetMod(.5)">1/2</button>
         <button class="tower-bet-mod" onclick="twBetMod(2)">×2</button>
         <input id="tower-bet-inp" class="tower-bet-inp" type="number" value="500" min="50" step="50" inputmode="numeric">
-        <button class="tower-bet-mod" onclick="twBetAll()">MAX</button>
       </div>
     </div>
     <div class="tower-setting-row">
@@ -1771,10 +1836,23 @@ body {
     </div>
   </div>
 
+  <!-- Инфо-строка: множитель + выигрыш (во время игры) -->
+  <div class="tower-info-row" id="tower-info-row" style="display:none">
+    <div class="tower-info-inner">
+      <div class="tower-info-mult-side">
+        <div class="tower-info-mult-val" id="tw-info-mult">1.21x</div>
+      </div>
+      <div class="tower-info-prize-side">
+        <div class="tower-info-prize-lbl">ВЫИГРЫШ</div>
+        <div class="tower-info-prize-val" id="tw-info-prize">0 🪙</div>
+      </div>
+    </div>
+  </div>
+
   <!-- Кнопки -->
   <div class="tower-btn-row">
-    <button class="tower-btn tower-btn-start" id="tower-btn-start" onclick="twStart()">🚀 Начать</button>
-    <button class="tower-btn tower-btn-cashout" id="tower-btn-cashout" onclick="twCashout()">💰 Забрать</button>
+    <button class="tower-btn tower-btn-start" id="tower-btn-start" onclick="twStart()">Играть</button>
+    <button class="tower-btn tower-btn-cashout" id="tower-btn-cashout" onclick="twCashout()">ЗАБРАТЬ</button>
   </div>
 </div>
 
@@ -3357,6 +3435,8 @@ function openTower() {
   twBuildBombChips();
   twBuildBoard();
   twCheckActiveGame();
+  // Инициализировать нумерацию строк
+  twUpdateRowNums();
 }
 
 const WS = {
@@ -3960,17 +4040,35 @@ function twUpdateInfo() {
   if (!TW.playing) return;
   const nextMult = twMult(TW.floorNum, TW.mines);
   const nextPrize = Math.round(TW.bet * nextMult);
-  document.getElementById('tw-info-floor').textContent = TW.floorNum;
-  document.getElementById('tw-info-mult').textContent = `×${nextMult.toFixed(2).replace(/\.?0+$/,'')}`;
-  document.getElementById('tw-info-prize').textContent = twFmt(nextPrize);
+  document.getElementById('tw-info-mult').textContent = `${nextMult.toFixed(2).replace(/\.?0+$/,'')}x`;
+  document.getElementById('tw-info-prize').textContent = `${twFmt(nextPrize)} 🪙`;
 
   // Кешаут — показываем если есть заработанное
   const cashBtn = document.getElementById('tower-btn-cashout');
   if (TW.passedFloors.length > 0) {
     cashBtn.style.display = 'block';
-    cashBtn.textContent = `💰 Забрать (${twFmt(TW.earnedPrize)})`;
+    cashBtn.textContent = 'ЗАБРАТЬ';
   } else {
     cashBtn.style.display = 'none';
+  }
+  twUpdateRowNums();
+}
+
+// Обновляем нумерацию этажей в левой колонке
+function twUpdateRowNums() {
+  const numsEl = document.getElementById('tower-row-nums');
+  if (!numsEl) return;
+  const total = TW.FLOORS;
+  numsEl.innerHTML = '';
+  for (let i = total; i >= 1; i--) {
+    const d = document.createElement('div');
+    d.className = 'tower-row-num';
+    const isPassed = TW.passedFloors && TW.passedFloors.some(f => f.floor === i);
+    const isCurrent = TW.playing && TW.floorNum === i;
+    if (isPassed) d.className += ' num-passed';
+    else if (isCurrent) d.className += ' num-current';
+    d.textContent = i;
+    numsEl.appendChild(d);
   }
 }
 
@@ -3980,6 +4078,7 @@ function twEnterPlay() {
   document.getElementById('tower-result-bar').style.display = 'none';
   document.getElementById('tower-btn-start').style.display = 'none';
   document.getElementById('tower-btn-cashout').style.display = 'none';
+  twUpdateRowNums();
 }
 
 function twExitPlay() {
@@ -3988,6 +4087,11 @@ function twExitPlay() {
   document.getElementById('tower-btn-start').style.display = 'block';
   document.getElementById('tower-btn-start').disabled = false;
   document.getElementById('tower-btn-cashout').style.display = 'none';
+  // Reset row nums to grey
+  const numsEl = document.getElementById('tower-row-nums');
+  if (numsEl) numsEl.querySelectorAll('.tower-row-num').forEach(n => {
+    n.classList.remove('num-passed','num-current');
+  });
 }
 
 function twShowResult(win, mult, prize) {
