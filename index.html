@@ -3346,6 +3346,30 @@ function _renderHistory(history) {
   wheelRenderHistory();
 }
 
+function animateWheel(fromAngle, toAngle, duration, onDone) {
+  if (_wheelRAF) { cancelAnimationFrame(_wheelRAF); _wheelRAF = null; }
+  const start = performance.now();
+  const delta = toAngle - fromAngle;
+
+  function easeOut(t) {
+    return 1 - Math.pow(1 - t, 4);
+  }
+
+  function step(now) {
+    const elapsed = now - start;
+    const t = Math.min(elapsed / duration, 1);
+    WS.angle = fromAngle + delta * easeOut(t);
+    wheelDraw(WS.angle);
+    if (t < 1) {
+      _wheelRAF = requestAnimationFrame(step);
+    } else {
+      _wheelRAF = null;
+      if (onDone) onDone();
+    }
+  }
+  _wheelRAF = requestAnimationFrame(step);
+}
+
 function _wheelOnRoundEnd(mult, prevBets) {
   // Анимировать колесо на результат
   if (_wheelSpinning) return;
