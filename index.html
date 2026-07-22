@@ -386,6 +386,13 @@ body {
   pointer-events:none;
 }
 .global-topbar > * { pointer-events:all; }
+.topbar-balance {
+  display:flex; align-items:center; gap:4px;
+  background:var(--card); border:1px solid var(--border);
+  border-radius:12px; padding:5px 10px;
+  font-size:13px; font-weight:800; color:var(--text);
+  white-space:nowrap;
+}
 .global-topbar-divider {
   position:fixed; top:62px; left:50%; transform:translateX(-50%);
   width:100%; max-width:480px; z-index:699;
@@ -713,9 +720,6 @@ body {
 }
 
 .topbar-logo-text {
-  position:absolute;
-  left:50%;
-  transform:translateX(-50%);
   white-space:nowrap;
   font-family:'SF Pro Display',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   font-size:22px;
@@ -760,7 +764,7 @@ body {
 /* Колонка с номерами этажей */
 .tower-row-nums {
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   gap: 6px;
   width: 22px; flex-shrink: 0;
   margin-right: 8px;
@@ -783,10 +787,10 @@ body {
 }
 .tower-scroll::-webkit-scrollbar { display: none; }
 
-/* Контейнер этажей — снизу вверх, делит высоту поровну между этажами */
+/* Контейнер этажей — этаж 9 сверху, этаж 1 снизу, начинаем снизу */
 .tower-floors {
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   gap: 5px;
   height: 100%; width: 100%;
 }
@@ -869,7 +873,9 @@ body {
   margin: 0 14px 10px;
   display: flex; gap: 5px; overflow-x: auto;
   scrollbar-width: none; -ms-overflow-style: none;
-  flex-shrink: 0; padding: 2px 0;
+  flex-shrink: 0; padding: 2px 4px;
+  box-sizing: border-box;
+  max-width: calc(100% - 28px);
 }
 .tw-mults-strip::-webkit-scrollbar { display: none; }
 .tw-mult-chip {
@@ -1637,7 +1643,7 @@ body {
 <div class="global-topbar">
   <div class="menu-hamburger" onclick="openDrawer()"><span></span><span></span><span></span></div>
   <span onclick="goMenu()" class="topbar-logo-text">umbrex</span>
-  <div class="menu-topbar-placeholder"></div>
+  <div class="topbar-balance"><span id="topbar-balance-val">—</span> 🪙</div>
 </div>
 <div class="global-topbar-divider"></div>
 
@@ -1829,10 +1835,7 @@ body {
   <div class="header">
     <div class="header-back" onclick="goMenu()">←</div>
     <div class="header-title"><h1>Башня</h1><p>Umbrex</p></div>
-    <div class="balance-card">
-      <div class="balance-label">Баланс</div>
-      <div class="balance-amount"><span id="tower-balance-val">—</span> 🪙</div>
-    </div>
+    <div style="width:38px"></div>
   </div>
 
   <!-- Поле башни с нумерацией слева -->
@@ -1861,6 +1864,7 @@ body {
       <div class="tower-bet-wrap">
         <button class="tower-bet-mod" onclick="twBetMod(.5)">1/2</button>
         <button class="tower-bet-mod" onclick="twBetMod(2)">×2</button>
+        <button class="tower-bet-mod" onclick="twBetAll()">Макс</button>
         <input id="tower-bet-inp" class="tower-bet-inp" type="number" value="500" min="50" step="50" inputmode="numeric">
       </div>
     </div>
@@ -1895,10 +1899,7 @@ body {
   <div class="header">
     <div class="header-back" onclick="goMenu()">←</div>
     <div class="header-title"><h1>Мины</h1><p>Umbrex</p></div>
-    <div class="balance-card">
-      <div class="balance-label">Баланс</div>
-      <div class="balance-amount"><span id="mines-balance-val">—</span> 🪙</div>
-    </div>
+    <div style="width:38px"></div>
   </div>
   <div class="grid-wrap"><div class="grid" id="grid"></div></div>
   <div class="info-row" id="info-row" style="display:none">
@@ -1935,7 +1936,7 @@ body {
   <div class="crash-header">
     <div class="crash-header-back" onclick="goMenu()">←</div>
     <div class="crash-header-title">🚀 Краш</div>
-    <div class="crash-header-bal"><span id="crash-balance-val">—</span> 🪙</div>
+    <div style="width:38px"></div>
   </div>
 
   <!-- история -->
@@ -2083,10 +2084,7 @@ body {
   <div class="header">
     <div class="header-back" onclick="goMenu()">←</div>
     <div class="header-title"><h1>🃏 HiLo</h1><p>Umbrex</p></div>
-    <div class="balance-card">
-      <div class="balance-label">Баланс</div>
-      <div class="balance-amount"><span id="hilo-balance-val">—</span> 🪙</div>
-    </div>
+    <div style="width:38px"></div>
   </div>
 
   <!-- Карта -->
@@ -2164,9 +2162,7 @@ body {
   <div class="wheel-header">
     <div class="wheel-header-back" onclick="goGames()">←</div>
     <div class="wheel-header-title">X50</div>
-    <div class="wheel-header-bal">
-      <span id="wheel-balance-val">—</span> 🪙
-    </div>
+    <div style="width:38px"></div>
   </div>
 
   <!-- История -->
@@ -2299,7 +2295,7 @@ document.addEventListener('click', function(e){
 function goMenu(){showScreen('screen-menu');updateDrawerActive('menu');}
 function openHilo(){
   showScreen('screen-hilo');
-  document.getElementById('hilo-balance-val').textContent=fmt(sharedBalance);
+  document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);
   checkActiveHiloGame();
 }
 
@@ -2322,8 +2318,8 @@ async function checkActiveHiloGame(){
     }
   }catch(e){ hiloReset(); }
 }
-function openMines(){showScreen('screen-mines');document.getElementById('mines-balance-val').textContent=fmt(sharedBalance);buildGrid();buildMineOpts();setupMinesInput();checkActiveGame();}
-function openCrash(){showScreen('screen-crash');document.getElementById('crash-balance-val').textContent=fmt(sharedBalance);initCrash();}
+function openMines(){showScreen('screen-mines');document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);buildGrid();buildMineOpts();setupMinesInput();checkActiveGame();}
+function openCrash(){showScreen('screen-crash');document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);initCrash();}
 
 // ── API ──
 async function apiCall(method,path,body){
@@ -2493,7 +2489,7 @@ function initCrash(){
   apiCall('GET','/api/crash/state').then(r=>{
     if(r.ok && r.refunded){
       sharedBalance = r.new_balance; syncBalanceUI();
-      document.getElementById('crash-balance-val').textContent=fmt(sharedBalance);
+      document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);
       showToast('Незавершённая ставка '+fmt(r.refund_amount)+' 🪙 возвращена');
       CC.betPlaced=false; CC.cashedOut=false; CC.gameId=null;
       updateCrashBtn();
@@ -2805,10 +2801,7 @@ function crashBetAll(){document.getElementById('crash-bet-input').value=Math.flo
 // ── ОБЩЕЕ ──
 function syncBalanceUI(){
   document.getElementById('menu-balance-val').textContent=fmt(sharedBalance);
-  const mv=document.getElementById('mines-balance-val');if(mv)mv.textContent=fmt(sharedBalance);
-  const cv=document.getElementById('crash-balance-val');if(cv)cv.textContent=fmt(sharedBalance);
-  const wv=document.getElementById('wheel-balance-val');if(wv)wv.textContent=fmt(sharedBalance);
-  const tv=document.getElementById('tower-balance-val');if(tv)tv.textContent=twFmt(sharedBalance);
+  const tb=document.getElementById('topbar-balance-val');if(tb)tb.textContent=fmt(sharedBalance);
 }
 function updateAllBalances(){ syncBalanceUI(); }
 
@@ -3244,7 +3237,7 @@ async function hiloStart(){
     HS.bet = bet;
     sharedBalance = r.new_balance;
     syncBalanceUI();
-    document.getElementById('hilo-balance-val').textContent = fmt(sharedBalance);
+    document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);
     hiloUpdateCard(r.current_val, r.current_suit);
     // show play UI
     document.getElementById('hilo-settings').style.display='none';
@@ -3276,7 +3269,7 @@ async function hiloMove(direction){
       document.getElementById('hilo-cashout-btn').style.display='none';
       sharedBalance = r.new_balance;
       syncBalanceUI();
-      document.getElementById('hilo-balance-val').textContent = fmt(sharedBalance);
+      document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);
       tg?.HapticFeedback?.notificationOccurred('error');
       showResult(false, HS.bet, 0);
       setTimeout(()=>hiloReset(), 400);
@@ -3293,7 +3286,7 @@ async function hiloCashout(){
     if(!r.ok){ showToast(r.error||'Ошибка'); return; }
     sharedBalance = r.new_balance;
     syncBalanceUI();
-    document.getElementById('hilo-balance-val').textContent = fmt(sharedBalance);
+    document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);
     tg?.HapticFeedback?.notificationOccurred('success');
     showResult(true, r.payout - HS.bet, r.mult);
     setTimeout(()=>hiloReset(), 2800);
@@ -3458,14 +3451,14 @@ window.addEventListener('load',()=>{
 // ══════════ WHEEL GAME ══════════
 function openWheel() {
   showScreen('screen-wheel');
-  document.getElementById('wheel-balance-val').textContent = fmt(sharedBalance);
+  document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);
   wheelInitCanvas();
   wheelStartPoll();
 }
 
 function openTower() {
   showScreen('screen-tower');
-  document.getElementById('tower-balance-val').textContent = twFmt(sharedBalance);
+  document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);
   twBuildBombChips();
   twBuildBoard();
   twCheckActiveGame();
@@ -3664,7 +3657,7 @@ async function wheelPollState() {
     if (r.balance !== undefined) {
       sharedBalance = r.balance;
       syncBalanceUI();
-      const bv = document.getElementById('wheel-balance-val');
+      const bv = document.getElementById('topbar-balance-val');
       if (bv) bv.textContent = fmt(sharedBalance);
     }
 
@@ -3886,7 +3879,7 @@ async function wheelPlaceBet(mult) {
     if (!r.ok) { showToast(r.error || 'Ошибка'); return; }
     sharedBalance = r.new_balance;
     syncBalanceUI();
-    const bv = document.getElementById('wheel-balance-val');
+    const bv = document.getElementById('topbar-balance-val');
     if (bv) bv.textContent = fmt(sharedBalance);
     // Обновить ставки локально
     _wheelMyBets = {};
@@ -4119,8 +4112,11 @@ function twUpdateMultsStrip() {
     const floorN = i + 1;
     const chip = document.createElement('div');
     const isPassed = TW.passedFloors && TW.passedFloors.some(f => f.floorNum === floorN);
-    const isCurrent = TW.playing && TW.floorNum === floorN;
-    chip.className = 'tw-mult-chip' + (isCurrent ? ' active-floor' : '') + (isPassed ? ' passed-floor' : '');
+    // active-floor = последний пройденный этаж (то, что уже заработано)
+    const lastPassed = TW.passedFloors && TW.passedFloors.length > 0
+      ? TW.passedFloors[TW.passedFloors.length - 1].floorNum : null;
+    const isCurrent = TW.playing && lastPassed !== null && lastPassed === floorN;
+    chip.className = 'tw-mult-chip' + (isCurrent ? ' active-floor' : '') + (isPassed && !isCurrent ? ' passed-floor' : '');
     const val = mults[i];
     const valStr = val >= 100 ? val.toFixed(0) : val.toFixed(2).replace(/\.?0+$/, '');
     chip.innerHTML = `<div class="tw-mult-chip-val">x${valStr}</div><div class="tw-mult-chip-floor">${floorN}</div>`;
@@ -4155,21 +4151,25 @@ function twExitPlay() {
 }
 
 function twShowResult(win, mult, prize) {
-  const bar = document.getElementById('tower-result-bar');
-  bar.className = 'tower-result-bar ' + (win ? 'win' : 'lose');
-  bar.style.display = 'block';
-  document.getElementById('tw-res-emoji').textContent = win ? '✅' : '💥';
-  document.getElementById('tw-res-title').textContent = win ? 'Победа!' : 'Проигрыш!';
-  if (win) {
-    const profit = prize - TW.bet;
-    document.getElementById('tw-res-val').className = 'tower-result-val plus';
-    document.getElementById('tw-res-val').textContent = `+${twFmt(profit)} 🪙`;
-    document.getElementById('tw-res-sub').textContent = `×${mult.toFixed(2).replace(/\.?0+$/,'')} · Получено: ${twFmt(prize)} 🪙`;
-  } else {
-    document.getElementById('tw-res-val').className = 'tower-result-val minus';
-    document.getElementById('tw-res-val').textContent = `-${twFmt(TW.bet)} 🪙`;
-    document.getElementById('tw-res-sub').textContent = `Этаж ${TW.floorNum} из ${TW.FLOORS}`;
+  if (!win) {
+    // Проигрыш — лёгкий toast, не блокирует UI, исчезает через 3 сек
+    const msg = `💥 Проигрыш! −${twFmt(TW.bet)} 🪙 · этаж ${TW.floorNum} из ${TW.FLOORS}`;
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+    return;
   }
+  // Победа / кешаут — стационарная полоска с деталями
+  const bar = document.getElementById('tower-result-bar');
+  bar.className = 'tower-result-bar win';
+  bar.style.display = 'block';
+  document.getElementById('tw-res-emoji').textContent = '✅';
+  document.getElementById('tw-res-title').textContent = 'Победа!';
+  const profit = prize - TW.bet;
+  document.getElementById('tw-res-val').className = 'tower-result-val plus';
+  document.getElementById('tw-res-val').textContent = `+${twFmt(profit)} 🪙`;
+  document.getElementById('tw-res-sub').textContent = `×${mult.toFixed(2).replace(/\.?0+$/,'')} · Получено: ${twFmt(prize)} 🪙`;
 }
 
 // ── СТАРТ ──
@@ -4194,7 +4194,7 @@ async function twStart() {
     TW.earnedPrize = 0;
     sharedBalance -= bet;
     syncBalanceUI();
-    document.getElementById('tower-balance-val').textContent = twFmt(sharedBalance);
+    document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);
 
     twBuildBoard();
     twEnterPlay();
@@ -4229,7 +4229,7 @@ async function twClickCell(floor, cellIdx) {
       TW.playing = false;
       sharedBalance = r.new_balance ?? sharedBalance;
       syncBalanceUI();
-      document.getElementById('tower-balance-val').textContent = twFmt(sharedBalance);
+      document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);
       tg?.HapticFeedback?.notificationOccurred('error');
       await sleep(400);
       twShowResult(false, 0, 0);
@@ -4262,7 +4262,7 @@ async function twClickCell(floor, cellIdx) {
         TW.playing = false;
         sharedBalance = r.new_balance;
         syncBalanceUI();
-        document.getElementById('tower-balance-val').textContent = twFmt(sharedBalance);
+        document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);
         tg?.HapticFeedback?.notificationOccurred('success');
         await sleep(350);
         twRefreshBoard();
@@ -4305,7 +4305,7 @@ async function twCashout() {
     const mult = r.mult ?? TW.earnedMult;
     sharedBalance = r.new_balance ?? (sharedBalance + prize);
     syncBalanceUI();
-    document.getElementById('tower-balance-val').textContent = twFmt(sharedBalance);
+    document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);
     TW.playing = false;
     tg?.HapticFeedback?.notificationOccurred('success');
     twRefreshBoard();
@@ -4339,6 +4339,11 @@ async function twCheckActiveGame() {
       twBuildBoard();
       twEnterPlay();
       twUpdateInfo();
+      // Явно показать кнопку кешаут если есть пройденные этажи
+      if (TW.passedFloors.length > 0) {
+        const cashBtn = document.getElementById('tower-btn-cashout');
+        if (cashBtn) { cashBtn.style.display = 'block'; cashBtn.disabled = false; }
+      }
     }
   } catch(e) { /* нет активной — ок */ }
 }
