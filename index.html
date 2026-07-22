@@ -774,26 +774,27 @@ body {
 .tower-row-num.num-passed { color: var(--green); }
 .tower-row-num.num-current { color: var(--purple-light); font-weight: 900; }
 
-/* Скроллируемая область этажей */
+/* Область этажей — без скролла, всё влезает целиком */
 .tower-scroll {
-  flex: 1; min-width: 0;
-  overflow-y: auto; overflow-x: hidden;
+  flex: 1; min-width: 0; height: 100%;
+  overflow: hidden;
   scrollbar-width: none;
+  display: flex;
 }
 .tower-scroll::-webkit-scrollbar { display: none; }
 
-/* Контейнер этажей — снизу вверх */
+/* Контейнер этажей — снизу вверх, делит высоту поровну между этажами */
 .tower-floors {
   display: flex;
   flex-direction: column-reverse;
-  gap: 6px;
-  min-height: 100%;
+  gap: 5px;
+  height: 100%; width: 100%;
 }
 
 .tower-floor {
   display: flex;
   gap: 6px;
-  flex-shrink: 0;
+  flex: 1; min-height: 0;
 }
 
 /* Старый .tower-floor-num скрыт — нумерация теперь в отдельной колонке */
@@ -803,35 +804,37 @@ body {
   display: flex; gap: 6px; flex: 1;
 }
 
-/* Ячейка башни — ПРЯМОУГОЛЬНАЯ */
+/* Ячейка башни — ФИОЛЕТОВЫЙ СТИЛЬ */
 .tw-cell {
   flex: 1;
-  height: 46px;
-  border-radius: 12px;
-border-radius: 12px;
-  background: linear-gradient(145deg, #1c1635, #16112b);
-  border: 1px solid rgba(55,42,100,.7);
+  height: 100%;
+  border-radius: 14px;
+  background: linear-gradient(160deg, #2a1a4e 0%, #1d1038 50%, #16102e 100%);
+  border: 1.5px solid rgba(100,70,200,.5);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer;
   font-size: 18px;
-  transition: transform .12s, background .15s, border-color .15s, box-shadow .15s;
+  transition: transform .12s, background .15s, border-color .2s, box-shadow .2s;
   user-select: none; -webkit-user-select: none;
   position: relative; overflow: hidden;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), inset 0 -1px 0 rgba(0,0,0,.3), 0 2px 6px rgba(0,0,0,.4);
+  box-shadow: inset 0 1px 0 rgba(160,120,255,.12), inset 0 -1px 0 rgba(0,0,0,.4), 0 3px 10px rgba(0,0,0,.5);
 }
 .tw-cell::before {
-  content:''; position:absolute; top:0; left:0; right:0; height:45%;
-  background: linear-gradient(180deg, rgba(255,255,255,.07) 0%, transparent 100%);
-  border-radius: 12px 12px 0 0; pointer-events: none;
+  content:''; position:absolute; top:0; left:0; right:0; height:42%;
+  background: linear-gradient(180deg, rgba(180,130,255,.1) 0%, transparent 100%);
+  border-radius: 14px 14px 0 0; pointer-events: none;
 }
-.tw-cell.active:active { transform: scale(.87); }
-.tw-cell.active:hover { border-color: rgba(139,92,246,.6); }
+.tw-cell.active:active { transform: scale(.85); }
+.tw-cell.active:hover {
+  border-color: rgba(139,92,246,.8);
+  box-shadow: 0 0 14px rgba(139,92,246,.35), inset 0 1px 0 rgba(180,130,255,.15);
+}
 /* Состояния ячейки */
-.tw-cell.unknown { color: rgba(100,85,160,.7); font-size: 14px; font-weight: 800; }
+.tw-cell.unknown { color: #a78bfa; font-size: 20px; font-weight: 900; letter-spacing: 0; text-shadow: 0 0 8px rgba(139,92,246,.4); }
 .tw-cell.gem {
-  background: linear-gradient(145deg, #0c3025, #0f3d2e);
-  border: 1.5px solid var(--green);
-  box-shadow: 0 0 18px rgba(52,211,153,.5), 0 0 36px rgba(52,211,153,.15), inset 0 1px 0 rgba(52,211,153,.2);
+  background: linear-gradient(145deg, #1b1040, #241554);
+  border: 1.5px solid rgba(160,100,255,.9);
+  box-shadow: 0 0 20px rgba(139,92,246,.6), 0 0 40px rgba(139,92,246,.2), inset 0 1px 0 rgba(200,160,255,.25);
   animation: twPop .28s cubic-bezier(.36,.07,.19,.97);
 }
 .tw-cell.bomb {
@@ -847,17 +850,56 @@ border-radius: 12px;
 }
 .tw-cell.safe {
   background: linear-gradient(145deg, #1c1635, #16112b);
-  border-color: rgba(55,42,100,.4);
-  opacity: .55;
+  border-color: rgba(55,42,100,.3);
+  opacity: .5;
 }
 .tw-cell.dead { cursor: default; pointer-events: none; }
 @keyframes twPop { 0%{transform:scale(.65);opacity:.4} 65%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
 @keyframes twBoom { 0%{transform:scale(1.2) rotate(-4deg)} 30%{transform:scale(.85) rotate(3deg)} 65%{transform:scale(1.05) rotate(-1deg)} 100%{transform:scale(1) rotate(0)} }
 
-/* Подсветка активного этажа */
+/* Подсветка активного этажа — яркое фиолетовое свечение */
 .tower-floor.current .tw-cell.unknown {
-  border-color: rgba(139,92,246,.5);
-  box-shadow: 0 0 12px rgba(139,92,246,.2), inset 0 1px 0 rgba(255,255,255,.06);
+  border-color: rgba(139,92,246,.75);
+  box-shadow: 0 0 16px rgba(139,92,246,.3), 0 0 4px rgba(139,92,246,.5), inset 0 1px 0 rgba(180,130,255,.15);
+}
+
+/* Полоска иксов под башней */
+.tw-mults-strip {
+  position: relative; z-index: 10;
+  margin: 0 14px 10px;
+  display: flex; gap: 5px; overflow-x: auto;
+  scrollbar-width: none; -ms-overflow-style: none;
+  flex-shrink: 0; padding: 2px 0;
+}
+.tw-mults-strip::-webkit-scrollbar { display: none; }
+.tw-mult-chip {
+  flex-shrink: 0;
+  background: rgba(30,20,60,.9);
+  border: 1.5px solid rgba(80,50,160,.6);
+  border-radius: 10px;
+  padding: 5px 8px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 1px; cursor: default;
+  transition: border-color .15s, box-shadow .15s;
+  min-width: 46px;
+}
+.tw-mult-chip.active-floor {
+  border-color: rgba(139,92,246,.9);
+  box-shadow: 0 0 10px rgba(139,92,246,.35);
+  background: rgba(60,30,120,.6);
+}
+.tw-mult-chip.passed-floor {
+  border-color: rgba(52,211,153,.5);
+  box-shadow: 0 0 8px rgba(52,211,153,.2);
+}
+.tw-mult-chip-val {
+  font-size: 11px; font-weight: 900; color: var(--purple-light);
+  letter-spacing: -.3px;
+}
+.tw-mult-chip.active-floor .tw-mult-chip-val { color: #c4b5fd; }
+.tw-mult-chip.passed-floor .tw-mult-chip-val { color: var(--green); }
+.tw-mult-chip-floor {
+  font-size: 9px; font-weight: 700; color: var(--muted);
 }
 /* Пройденный этаж */
 .tower-floor.passed .tw-cell { cursor: default; pointer-events: none; }
@@ -1677,18 +1719,7 @@ border-radius: 12px;
         </div>
       </div>
     </div>
-    <!-- Башня — широкая карточка -->
-    <div class="game-card-crash-new" style="background:linear-gradient(145deg,#1a0a2e,#100920);border-color:rgba(139,92,246,.4);box-shadow:0 8px 28px rgba(0,0,0,.5),inset 0 1px 0 rgba(139,92,246,.15)" onclick="openTower()">
-      <div class="gc-crash-glow-el" style="background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(139,92,246,.4) 0%,transparent 70%)"></div>
-      <div style="position:absolute;right:16px;bottom:54px;font-size:52px;line-height:1;filter:drop-shadow(0 0 12px rgba(139,92,246,.6))">🗼</div>
-      <div class="gc-live-badge" style="background:rgba(139,92,246,.3);border-color:rgba(139,92,246,.5);color:var(--purple-light)">9 ЭТАЖЕЙ</div>
-      <div class="gc-crash-info">
-        <div class="gc-crash-info-name" style="color:var(--purple-light)">Башня</div>
-        <div class="gc-crash-info-desc">Поднимайся выше, забери больше</div>
-      </div>
-    </div>
   </div>
-  <!-- ПОСЛЕДНИЕ ИГРЫ -->
   <div class="recent-games">
     <div class="recent-games-head">
       <div class="recent-games-title">Последние игры</div>
@@ -1819,6 +1850,9 @@ border-radius: 12px;
     <div class="tower-result-val" id="tw-res-val"></div>
     <div class="tower-result-sub" id="tw-res-sub"></div>
   </div>
+
+  <!-- Полоска иксов (под башней) -->
+  <div class="tw-mults-strip" id="tw-mults-strip"></div>
 
   <!-- Настройки ставки -->
   <div class="tower-settings" id="tower-settings">
@@ -3435,8 +3469,9 @@ function openTower() {
   twBuildBombChips();
   twBuildBoard();
   twCheckActiveGame();
-  // Инициализировать нумерацию строк
+  // Инициализировать нумерацию строк и полоску иксов
   twUpdateRowNums();
+  twUpdateMultsStrip();
 }
 
 const WS = {
@@ -3926,6 +3961,7 @@ function twBuildBombChips() {
     d.onclick = () => {
       TW.mines = b;
       document.querySelectorAll('.tw-bomb-chip').forEach(c => c.classList.toggle('sel', +c.dataset.b === b));
+      twUpdateMultsStrip();
     };
     wrap.appendChild(d);
   }
@@ -3953,7 +3989,7 @@ function twBuildBoard() {
     for (let c = 0; c < TW.CELLS; c++) {
       const cell = document.createElement('div');
       cell.className = 'tw-cell unknown active';
-      cell.textContent = '❓';
+      cell.textContent = '?';
       cell.dataset.floor = f;
       cell.dataset.cell = c;
       cell.onclick = () => twClickCell(f, c);
@@ -4005,13 +4041,13 @@ function twRefreshBoard() {
       cells.forEach(cell => {
         cell.classList.remove('dead','gem','bomb','safe','exploded');
         cell.classList.add('unknown','active');
-        cell.textContent = '❓';
+        cell.textContent = '?';
       });
     } else if (isFuture || (!active && !isPassed)) {
       cells.forEach(cell => {
         cell.classList.remove('dead','active','gem','bomb','safe','exploded');
         cell.classList.add('unknown','future');
-        cell.textContent = '❓';
+        cell.textContent = '?';
         if (isFuture) { cell.style.opacity = ''; }
       });
     }
@@ -4043,7 +4079,7 @@ function twUpdateInfo() {
   document.getElementById('tw-info-mult').textContent = `${nextMult.toFixed(2).replace(/\.?0+$/,'')}x`;
   document.getElementById('tw-info-prize').textContent = `${twFmt(nextPrize)} 🪙`;
 
-  // Кешаут — показываем если есть заработанное
+  // Кешаут — показываем если есть заработанное (БЕЗ иkса в тексте)
   const cashBtn = document.getElementById('tower-btn-cashout');
   if (TW.passedFloors.length > 0) {
     cashBtn.style.display = 'block';
@@ -4052,6 +4088,7 @@ function twUpdateInfo() {
     cashBtn.style.display = 'none';
   }
   twUpdateRowNums();
+  twUpdateMultsStrip();
 }
 
 // Обновляем нумерацию этажей в левой колонке
@@ -4063,7 +4100,7 @@ function twUpdateRowNums() {
   for (let i = total; i >= 1; i--) {
     const d = document.createElement('div');
     d.className = 'tower-row-num';
-    const isPassed = TW.passedFloors && TW.passedFloors.some(f => f.floor === i);
+    const isPassed = TW.passedFloors && TW.passedFloors.some(f => f.floorNum === i);
     const isCurrent = TW.playing && TW.floorNum === i;
     if (isPassed) d.className += ' num-passed';
     else if (isCurrent) d.className += ' num-current';
@@ -4072,17 +4109,39 @@ function twUpdateRowNums() {
   }
 }
 
+// Полоска иксов: x1.21 x1.46 ... для текущего кол-ва бомб
+function twUpdateMultsStrip() {
+  const strip = document.getElementById('tw-mults-strip');
+  if (!strip) return;
+  const mults = TW.MULTIPLIERS[TW.mines] || TW.MULTIPLIERS[1];
+  strip.innerHTML = '';
+  for (let i = 0; i < mults.length; i++) {
+    const floorN = i + 1;
+    const chip = document.createElement('div');
+    const isPassed = TW.passedFloors && TW.passedFloors.some(f => f.floorNum === floorN);
+    const isCurrent = TW.playing && TW.floorNum === floorN;
+    chip.className = 'tw-mult-chip' + (isCurrent ? ' active-floor' : '') + (isPassed ? ' passed-floor' : '');
+    const val = mults[i];
+    const valStr = val >= 100 ? val.toFixed(0) : val.toFixed(2).replace(/\.?0+$/, '');
+    chip.innerHTML = `<div class="tw-mult-chip-val">x${valStr}</div><div class="tw-mult-chip-floor">${floorN}</div>`;
+    strip.appendChild(chip);
+  }
+}
+
 function twEnterPlay() {
   document.getElementById('tower-settings').style.display = 'none';
+  document.getElementById('tw-mults-strip').style.display = 'flex';
   document.getElementById('tower-info-row').style.display = 'flex';
   document.getElementById('tower-result-bar').style.display = 'none';
   document.getElementById('tower-btn-start').style.display = 'none';
   document.getElementById('tower-btn-cashout').style.display = 'none';
   twUpdateRowNums();
+  twUpdateMultsStrip();
 }
 
 function twExitPlay() {
   document.getElementById('tower-settings').style.display = 'block';
+  document.getElementById('tw-mults-strip').style.display = 'flex';
   document.getElementById('tower-info-row').style.display = 'none';
   document.getElementById('tower-btn-start').style.display = 'block';
   document.getElementById('tower-btn-start').disabled = false;
@@ -4092,6 +4151,7 @@ function twExitPlay() {
   if (numsEl) numsEl.querySelectorAll('.tower-row-num').forEach(n => {
     n.classList.remove('num-passed','num-current');
   });
+  twUpdateMultsStrip();
 }
 
 function twShowResult(win, mult, prize) {
