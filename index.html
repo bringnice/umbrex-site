@@ -1324,6 +1324,240 @@ body {
 @keyframes gcFlt { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
 @keyframes gcFlt2 { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(-4px)} }
 
+/* ══════════ КАРТОЧКА БАШНИ ══════════ */
+.gc-tower-card {
+  position:relative; border-radius:22px; overflow:hidden; cursor:pointer;
+  height:165px; flex-shrink:0;
+  background:linear-gradient(160deg,#0d0820 0%,#130a2a 45%,#0a0618 100%);
+  border:1px solid rgba(139,92,246,.32);
+  box-shadow:0 8px 32px rgba(0,0,0,.65), inset 0 1px 0 rgba(167,139,250,.12);
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .25s;
+}
+.gc-tower-card:active { transform:scale(.97); }
+/* фоновые вертикальные линии — архитектурный ритм */
+.gc-tw-grid {
+  position:absolute; inset:0; pointer-events:none;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(139,92,246,.06) 0px, rgba(139,92,246,.06) 1px, transparent 1px, transparent 28px),
+    repeating-linear-gradient(0deg, rgba(139,92,246,.04) 0px, rgba(139,92,246,.04) 1px, transparent 1px, transparent 22px);
+}
+/* туман снизу — скрывает нижний срез башни */
+.gc-tw-fog {
+  position:absolute; bottom:0; left:0; right:0; height:72px; pointer-events:none;
+  background:linear-gradient(transparent, rgba(13,8,32,.98));
+  z-index:3;
+}
+/* вертикальный луч-лифт снизу вверх */
+.gc-tw-beam {
+  position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+  width:36px; height:100%; pointer-events:none; z-index:2;
+  background:linear-gradient(to top, rgba(167,139,250,.22) 0%, rgba(167,139,250,.06) 55%, transparent 100%);
+  animation:gcTwBeam 3s ease-in-out infinite;
+}
+@keyframes gcTwBeam {
+  0%,100%{ opacity:.6; transform:translateX(-50%) scaleX(1); }
+  50%{ opacity:1; transform:translateX(-50%) scaleX(1.4); }
+}
+/* сама башня — стек этажей */
+.gc-tw-tower {
+  position:absolute; right:16px; top:10px;
+  display:flex; flex-direction:column; gap:3px;
+  z-index:4;
+  animation:gcTwFloat 4s ease-in-out infinite;
+}
+@keyframes gcTwFloat {
+  0%,100%{ transform:translateY(0); }
+  50%{ transform:translateY(-5px); }
+}
+.gc-tw-floor {
+  display:flex; gap:3px; align-items:center;
+}
+.gc-tw-cell {
+  width:18px; height:14px; border-radius:4px;
+  background:rgba(139,92,246,.08);
+  border:1px solid rgba(139,92,246,.15);
+  display:flex; align-items:center; justify-content:center;
+  transition:all .3s;
+}
+/* пройденные этажи — светятся */
+.gc-tw-floor.lit .gc-tw-cell {
+  background:rgba(139,92,246,.18);
+  border-color:rgba(167,139,250,.45);
+  box-shadow:0 0 6px rgba(139,92,246,.35);
+}
+/* ячейки с гемом */
+.gc-tw-cell.gem {
+  background:rgba(139,92,246,.28);
+  border-color:rgba(167,139,250,.7);
+  box-shadow:0 0 10px rgba(139,92,246,.55), inset 0 1px 0 rgba(255,255,255,.15);
+}
+.gc-tw-cell.gem::after {
+  content:'◆';
+  font-size:7px;
+  color:rgba(196,181,253,.95);
+  text-shadow:0 0 6px rgba(139,92,246,.9);
+  line-height:1;
+}
+/* анимация пульса на геме — offset каждого этажа */
+.gc-tw-floor.f1 .gc-tw-cell.gem { animation:gcTwGem 2.4s ease-in-out infinite 0s; }
+.gc-tw-floor.f2 .gc-tw-cell.gem { animation:gcTwGem 2.4s ease-in-out infinite .3s; }
+.gc-tw-floor.f3 .gc-tw-cell.gem { animation:gcTwGem 2.4s ease-in-out infinite .6s; }
+@keyframes gcTwGem {
+  0%,100%{ box-shadow:0 0 8px rgba(139,92,246,.5), inset 0 1px 0 rgba(255,255,255,.12); }
+  50%{ box-shadow:0 0 16px rgba(167,139,250,.85), 0 0 28px rgba(139,92,246,.35), inset 0 1px 0 rgba(255,255,255,.2); }
+}
+/* текущий этаж (4й) — активный с золотой рамкой */
+.gc-tw-floor.f4 .gc-tw-cell {
+  background:rgba(251,191,36,.08);
+  border-color:rgba(251,191,36,.35);
+  box-shadow:0 0 8px rgba(251,191,36,.2);
+  animation:gcTwActive 1.6s ease-in-out infinite;
+}
+@keyframes gcTwActive {
+  0%,100%{ border-color:rgba(251,191,36,.35); box-shadow:0 0 6px rgba(251,191,36,.2); }
+  50%{ border-color:rgba(251,191,36,.7); box-shadow:0 0 14px rgba(251,191,36,.45); }
+}
+/* верхние этажи — тёмные/далёкие */
+.gc-tw-floor.f5 .gc-tw-cell,
+.gc-tw-floor.f6 .gc-tw-cell,
+.gc-tw-floor.f7 .gc-tw-cell,
+.gc-tw-floor.f8 .gc-tw-cell,
+.gc-tw-floor.f9 .gc-tw-cell { opacity:.38; }
+.gc-tw-floor.f6 .gc-tw-cell { opacity:.28; }
+.gc-tw-floor.f7 .gc-tw-cell { opacity:.2; }
+.gc-tw-floor.f8 .gc-tw-cell { opacity:.13; }
+.gc-tw-floor.f9 .gc-tw-cell { opacity:.08; }
+/* бейдж */
+.gc-tw-badge {
+  position:absolute; top:14px; left:14px; z-index:5;
+  background:linear-gradient(135deg,rgba(251,191,36,.22),rgba(245,158,11,.12));
+  border:1px solid rgba(251,191,36,.55);
+  border-radius:8px; padding:3px 10px;
+  font-size:11px; font-weight:900; letter-spacing:.5px;
+  color:#fbbf24;
+  box-shadow:0 0 12px rgba(251,191,36,.2);
+}
+/* инфо */
+.gc-tw-info {
+  position:absolute; bottom:0; left:0; right:0;
+  padding:12px 14px 15px; z-index:5;
+}
+.gc-tw-name { font-size:20px; font-weight:900; color:#fff; font-family:-apple-system,sans-serif; }
+.gc-tw-desc { font-size:11px; color:rgba(255,255,255,.38); margin-top:2px; font-family:-apple-system,sans-serif; }
+
+/* башня в 2-колонке */
+.games-grid-row .gc-tower-card .gc-tw-tower { right:8px; top:-6px; gap:3px; }
+.games-grid-row .gc-tower-card .gc-tw-floor { gap:3px; }
+.games-grid-row .gc-tower-card .gc-tw-cell { width:20px; height:15px; border-radius:4px; }
+.games-grid-row .gc-tower-card .gc-tw-cell.gem::after { font-size:7px; }
+.games-grid-row .gc-tw-name { font-size:17px; }
+
+/* ══════════ КАРТОЧКА БЛЭКДЖЕКА (SOON) ══════════ */
+.gc-bj-card {
+  position:relative; border-radius:22px; overflow:hidden; cursor:default;
+  height:165px; flex-shrink:0;
+  background:linear-gradient(155deg,#0e0b00 0%,#1a1200 55%,#0e0b00 100%);
+  border:1px solid rgba(251,191,36,.28);
+  box-shadow:0 10px 28px rgba(0,0,0,.55),inset 0 1px 0 rgba(251,191,36,.1);
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1);
+}
+.gc-bj-card::after { content:'';position:absolute;inset:0;background:linear-gradient(140deg,rgba(255,255,255,.05) 0%,transparent 50%);border-radius:22px;pointer-events:none; }
+.gc-bj-card:active { transform:scale(.97); }
+/* глубокая затемнённость для SOON */
+.gc-bj-overlay {
+  position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:6;
+}
+/* glow жёлтый */
+.gc-bj-glow { position:absolute;top:-20px;right:-20px;width:120px;height:120px;background:radial-gradient(circle,rgba(251,191,36,.22) 0%,transparent 65%);pointer-events:none; }
+/* иллюстрация: 3 карты веером */
+.gc-bj-cards {
+  position:absolute; top:28px; left:50%; transform:translateX(-50%);
+  width:110px; height:80px; z-index:2;
+  animation:gcBjFloat 4s ease-in-out infinite;
+}
+@keyframes gcBjFloat {
+  0%,100%{ transform:translateX(-50%) translateY(0); }
+  50%{ transform:translateX(-50%) translateY(-4px); }
+}
+/* базовый стиль карты */
+.gc-bj-c {
+  position:absolute;
+  width:44px; height:62px; border-radius:7px;
+  display:flex; align-items:center; justify-content:center;
+  flex-direction:column; gap:1px;
+}
+/* левая карта */
+.gc-bj-c.left {
+  left:0; top:10px;
+  transform:rotate(-18deg);
+  background:linear-gradient(145deg,#181100,#241900);
+  border:1.5px solid rgba(251,191,36,.3);
+  box-shadow:0 4px 14px rgba(0,0,0,.6);
+  z-index:1;
+}
+/* правая карта */
+.gc-bj-c.right {
+  right:0; top:10px;
+  transform:rotate(18deg);
+  background:linear-gradient(145deg,#181100,#241900);
+  border:1.5px solid rgba(251,191,36,.3);
+  box-shadow:0 4px 14px rgba(0,0,0,.6);
+  z-index:1;
+}
+/* центральная карта */
+.gc-bj-c.center {
+  left:50%; top:0;
+  transform:translateX(-50%) rotate(0deg);
+  background:linear-gradient(145deg,#1e1500,#2e2000);
+  border:1.5px solid rgba(251,191,36,.65);
+  box-shadow:0 0 22px rgba(251,191,36,.35),0 6px 18px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.1);
+  z-index:3;
+  animation:gcBjCard 2.8s ease-in-out infinite;
+}
+@keyframes gcBjCard {
+  0%,100%{ box-shadow:0 0 16px rgba(251,191,36,.25),0 6px 18px rgba(0,0,0,.6); }
+  50%{ box-shadow:0 0 30px rgba(251,191,36,.6),0 6px 18px rgba(0,0,0,.6); }
+}
+.gc-bj-card-val {
+  font-size:20px; font-weight:900; color:#fbbf24;
+  text-shadow:0 0 14px rgba(251,191,36,.8),0 0 28px rgba(245,158,11,.4);
+  font-family:-apple-system,sans-serif; line-height:1;
+}
+.gc-bj-card-suit { font-size:12px; line-height:1; }
+.gc-bj-c.left .gc-bj-card-val,
+.gc-bj-c.right .gc-bj-card-val { font-size:16px; color:rgba(251,191,36,.55); text-shadow:none; }
+.gc-bj-c.left .gc-bj-card-suit,
+.gc-bj-c.right .gc-bj-card-suit { font-size:10px; opacity:.5; }
+.gc-bj-c.center .gc-bj-card-suit { color:#fbbf24; }
+/* красные масти */
+.gc-bj-suit-red { color:#f87171 !important; }
+/* надпись 21 */
+.gc-bj-21 {
+  position:absolute; top:6px; left:50%; transform:translateX(-50%);
+  font-size:11px; font-weight:900; letter-spacing:1px;
+  color:#fbbf24; z-index:5; white-space:nowrap;
+  text-shadow:0 0 10px rgba(251,191,36,.7);
+  font-family:-apple-system,sans-serif;
+}
+.gc-bj-fade { position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(transparent,rgba(14,11,0,.96));pointer-events:none;border-radius:0 0 22px 22px; }
+/* бейдж SOON */
+.gc-bj-badge {
+  position:absolute; top:12px; right:12px; z-index:7;
+  border-radius:8px; padding:3px 9px;
+  font-size:10px; font-weight:900; text-transform:uppercase; letter-spacing:.8px;
+  background:rgba(251,191,36,.2); color:#fbbf24;
+  border:1px solid rgba(251,191,36,.5);
+  box-shadow:0 0 10px rgba(251,191,36,.25);
+  animation:gcBjSoon 2s ease-in-out infinite;
+}
+@keyframes gcBjSoon {
+  0%,100%{ opacity:.85; box-shadow:0 0 8px rgba(251,191,36,.2); }
+  50%{ opacity:1; box-shadow:0 0 16px rgba(251,191,36,.5); }
+}
+.gc-bj-bottom { position:absolute;bottom:0;left:0;right:0;padding:12px 14px 15px;z-index:7; }
+.gc-bj-name { font-size:17px;font-weight:900;color:#fff;margin-bottom:2px;font-family:-apple-system,sans-serif; }
+.gc-bj-desc { font-size:11px;color:rgba(255,255,255,.35);font-family:-apple-system,sans-serif; }
+
 /* ══════════ КАРТОЧКА КОЛЕСА (Игры) ══════════ */
 .game-card-wheel-new {
   position:relative; border-radius:22px; overflow:hidden; cursor:pointer;
@@ -1807,14 +2041,60 @@ body {
         </div>
       </div>
     </div>
-    <!-- Башня — широкая карточка -->
-    <div class="game-card-crash-new" data-name="башня tower этажи" style="background:linear-gradient(145deg,#1a0a2e,#100920);border-color:rgba(139,92,246,.4);box-shadow:0 8px 28px rgba(0,0,0,.5),inset 0 1px 0 rgba(139,92,246,.15)" onclick="openTower()">
-      <div class="gc-crash-glow-el" style="background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(139,92,246,.4) 0%,transparent 70%)"></div>
-      <div style="position:absolute;right:16px;bottom:54px;font-size:52px;line-height:1;filter:drop-shadow(0 0 12px rgba(139,92,246,.6))">🗼</div>
-      <div class="gc-live-badge" style="background:rgba(139,92,246,.3);border-color:rgba(139,92,246,.5);color:var(--purple-light)">9 ЭТАЖЕЙ</div>
-      <div class="gc-crash-info">
-        <div class="gc-crash-info-name" style="color:var(--purple-light)">Башня</div>
-        <div class="gc-crash-info-desc">Поднимайся выше, забери больше</div>
+    <!-- Башня + Блэкджек в 2 колонки -->
+    <div class="games-grid-row">
+      <div class="gc-tower-card" data-name="башня tower этажи" onclick="openTower()">
+        <!-- фоновая сетка -->
+        <div class="gc-tw-grid"></div>
+        <!-- туман снизу -->
+        <div class="gc-tw-fog"></div>
+        <!-- анимированная башня -->
+        <div class="gc-tw-tower" id="gc-tw-tower-vis">
+          <div class="gc-tw-floor f9"><span class="gc-tw-cell"></span><span class="gc-tw-cell"></span><span class="gc-tw-cell"></span></div>
+          <div class="gc-tw-floor f8"><span class="gc-tw-cell"></span><span class="gc-tw-cell"></span><span class="gc-tw-cell"></span></div>
+          <div class="gc-tw-floor f7"><span class="gc-tw-cell"></span><span class="gc-tw-cell"></span><span class="gc-tw-cell"></span></div>
+          <div class="gc-tw-floor f6"><span class="gc-tw-cell"></span><span class="gc-tw-cell"></span><span class="gc-tw-cell"></span></div>
+          <div class="gc-tw-floor f5"><span class="gc-tw-cell"></span><span class="gc-tw-cell"></span><span class="gc-tw-cell"></span></div>
+          <div class="gc-tw-floor f4"><span class="gc-tw-cell"></span><span class="gc-tw-cell"></span><span class="gc-tw-cell"></span></div>
+          <div class="gc-tw-floor f3 lit"><span class="gc-tw-cell gem"></span><span class="gc-tw-cell"></span><span class="gc-tw-cell gem"></span></div>
+          <div class="gc-tw-floor f2 lit"><span class="gc-tw-cell"></span><span class="gc-tw-cell gem"></span><span class="gc-tw-cell"></span></div>
+          <div class="gc-tw-floor f1 lit"><span class="gc-tw-cell gem"></span><span class="gc-tw-cell gem"></span><span class="gc-tw-cell"></span></div>
+        </div>
+        <!-- луч снизу -->
+        <div class="gc-tw-beam"></div>
+        <!-- инфо -->
+        <div class="gc-tw-info">
+          <div class="gc-tw-name">Башня</div>
+          <div class="gc-tw-desc">Поднимайся выше</div>
+        </div>
+      </div>
+      <!-- Блэкджек — SOON -->
+      <div class="gc-bj-card">
+        <div class="gc-bj-glow"></div>
+        <div class="gc-bj-overlay"></div>
+        <!-- 3 карты веером -->
+        <div class="gc-bj-cards">
+          <div class="gc-bj-c left">
+            <div class="gc-bj-card-val">K</div>
+            <div class="gc-bj-card-suit">♠</div>
+          </div>
+          <div class="gc-bj-c right">
+            <div class="gc-bj-card-val">10</div>
+            <div class="gc-bj-card-suit gc-bj-suit-red">♥</div>
+          </div>
+          <div class="gc-bj-c center">
+            <div class="gc-bj-card-val">A</div>
+            <div class="gc-bj-card-suit gc-bj-suit-red">♦</div>
+          </div>
+        </div>
+        <div class="gc-bj-fade"></div>
+        <!-- бейдж SOON -->
+        <div class="gc-bj-badge">Soon</div>
+        <!-- инфо -->
+        <div class="gc-bj-bottom">
+          <div class="gc-bj-name">Блэкджек</div>
+          <div class="gc-bj-desc">21 или ничего</div>
+        </div>
       </div>
     </div>
     <!-- Колесо — широкая карточка -->
@@ -4068,15 +4348,28 @@ function twShowDeadFloor(floorNum, deadIdx, cells) {
 // Инфо-строка
 function twUpdateInfo() {
   if (!TW.playing) return;
-  const nextMult = twMult(TW.floorNum, TW.mines);
-  const nextPrize = Math.round(TW.bet * nextMult);
-  document.getElementById('tw-info-mult').textContent = `${nextMult.toFixed(2).replace(/\.?0+$/,'')}x`;
-  document.getElementById('tw-info-prize').textContent = `${twFmt(nextPrize)} 🪙`;
 
-  // Кешаут — показываем если есть заработанное (БЕЗ иkса в тексте)
+  // Левая сторона — ЗАРАБОТАННЫЙ множитель (уже пройденные этажи)
+  // Правая сторона — ТЕКУЩИЙ выигрыш (если забрать сейчас)
+  if (TW.passedFloors.length > 0) {
+    const eMultStr = TW.earnedMult.toFixed(2).replace(/\.?0+$/, '');
+    document.getElementById('tw-info-mult').textContent = `${eMultStr}x`;
+    document.getElementById('tw-info-prize').textContent = `${twFmt(TW.earnedPrize)} 🪙`;
+    // Обновляем лейбл
+    const lbl = document.querySelector('.tower-info-prize-lbl');
+    if (lbl) lbl.textContent = 'ВЫИГРЫШ';
+  } else {
+    // Ещё не пройден ни один этаж — показываем множитель первого
+    const nextMult = twMult(TW.floorNum, TW.mines);
+    document.getElementById('tw-info-mult').textContent = `${nextMult.toFixed(2).replace(/\.?0+$/, '')}x`;
+    document.getElementById('tw-info-prize').textContent = `0 🪙`;
+  }
+
+  // Кешаут — показываем если есть заработанное
   const cashBtn = document.getElementById('tower-btn-cashout');
   if (TW.passedFloors.length > 0) {
     cashBtn.style.display = 'block';
+    cashBtn.disabled = false;
     cashBtn.textContent = 'ЗАБРАТЬ';
   } else {
     cashBtn.style.display = 'none';
@@ -4121,17 +4414,16 @@ function twUpdateMultsStrip() {
   const strip = document.getElementById('tw-mults-strip');
   if (!strip) return;
   const mults = TW.MULTIPLIERS[TW.mines] || TW.MULTIPLIERS[1];
-  const lastPassed = TW.passedFloors && TW.passedFloors.length > 0
-    ? TW.passedFloors[TW.passedFloors.length - 1].floorNum : null;
+  // active-floor = ТЕКУЩИЙ этаж (тот, который нужно пройти), пройденные = зелёные
+  const getChipClass = (floorN) => {
+    const isPassed = TW.playing && floorN < TW.floorNum;  // уже пройден
+    const isCurrent = TW.playing && floorN === TW.floorNum; // текущий активный
+    return 'tw-mult-chip' + (isCurrent ? ' active-floor' : '') + (isPassed ? ' passed-floor' : '');
+  };
   // Если кол-во бомб не изменилось и чипы уже есть — только обновляем классы
   const chips = strip.querySelectorAll('.tw-mult-chip');
   if (_twLastMinesForStrip === TW.mines && chips.length === mults.length) {
-    chips.forEach((chip, i) => {
-      const floorN = i + 1;
-      const isPassed = TW.passedFloors && TW.passedFloors.some(f => f.floorNum === floorN);
-      const isCurrent = TW.playing && lastPassed !== null && lastPassed === floorN;
-      chip.className = 'tw-mult-chip' + (isCurrent ? ' active-floor' : '') + (isPassed && !isCurrent ? ' passed-floor' : '');
-    });
+    chips.forEach((chip, i) => { chip.className = getChipClass(i + 1); });
     return;
   }
   // Полная перестройка (при смене бомб или первый раз)
@@ -4140,9 +4432,7 @@ function twUpdateMultsStrip() {
   for (let i = 0; i < mults.length; i++) {
     const floorN = i + 1;
     const chip = document.createElement('div');
-    const isPassed = TW.passedFloors && TW.passedFloors.some(f => f.floorNum === floorN);
-    const isCurrent = TW.playing && lastPassed !== null && lastPassed === floorN;
-    chip.className = 'tw-mult-chip' + (isCurrent ? ' active-floor' : '') + (isPassed && !isCurrent ? ' passed-floor' : '');
+    chip.className = getChipClass(floorN);
     const val = mults[i];
     const valStr = val >= 100 ? val.toFixed(0) : val.toFixed(2).replace(/\.?0+$/, '');
     chip.innerHTML = `<div class="tw-mult-chip-val">x${valStr}</div><div class="tw-mult-chip-floor">${floorN}</div>`;
@@ -4371,11 +4661,7 @@ async function twCheckActiveGame() {
       twBuildBoard();
       twEnterPlay();
       twUpdateInfo();
-      // Явно показать кнопку кешаут если есть пройденные этажи
-      if (TW.passedFloors.length > 0) {
-        const cashBtn = document.getElementById('tower-btn-cashout');
-        if (cashBtn) { cashBtn.style.display = 'block'; cashBtn.disabled = false; }
-      }
+      // twUpdateInfo уже показывает/скрывает кнопку и сбрасывает disabled
     }
   } catch(e) { /* нет активной — ок */ }
 }
