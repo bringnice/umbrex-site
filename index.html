@@ -2707,6 +2707,44 @@ setInterval(loadLiveBets, 8000);
 // ── МИНЫ ──
 const CELLS=25;
 let MS={playing:false,gameId:null,bet:500,mineCount:3,gemsFound:0,revealed:[],mult:1,nextMult:1};
+let _minesPollTimer=null;
+function startMinesPoll(){
+  if(_minesPollTimer)return;
+  _minesPollTimer=setInterval(async()=>{
+    if(!MS.playing||!MS.gameId)return;
+    try{
+      const r=await apiCall('GET','/api/mines/poll?game_id='+MS.gameId);
+      if(!r.ok)return;
+      if(r.status==='active'){
+        // Подтягиваем клетки нажатые в боте
+        const newRevealed=r.revealed.filter(i=>!MS.revealed.includes(i));
+        if(newRevealed.length>0){
+          newRevealed.forEach(i=>{setCell(i,'gem');MS.revealed.push(i);});
+          MS.gemsFound=r.gems_found;MS.mult=r.mult;MS.nextMult=r.next_mult;
+          updateMinesInfo();
+        }
+      } else if(r.status==='lose'){
+        // Проигрыш случился в боте — обновляем сайт
+        stopMinesPoll();
+        r.revealed.forEach(i=>setCell(i,'gem'));
+        r.mines.forEach(m=>{if(!r.revealed.includes(m))setCell(m,'mine');});
+        MS.playing=false;
+        showResult(false,MS.bet,r.mult);
+        exitPlayMode();
+      } else if(r.status==='win'||r.status==='cashout'){
+        // Выигрыш/кешаут в боте
+        stopMinesPoll();
+        r.revealed.forEach(i=>setCell(i,'gem'));
+        MS.playing=false;
+        // Обновляем баланс с сервера
+        try{const rb=await apiCall('GET','/api/balance');if(rb.ok){sharedBalance=rb.balance;syncBalanceUI();}}catch(e){}
+        showResult(true,Math.round(MS.bet*r.mult)-MS.bet,r.mult);
+        exitPlayMode();
+      }
+    }catch(e){}
+  },2000);
+}
+function stopMinesPoll(){clearInterval(_minesPollTimer);_minesPollTimer=null;}
 function syncMinesUI(n){const i=document.getElementById('mines-input');if(i)i.value=n;document.querySelectorAll('#mines-opts .chip').forEach(b=>b.classList.toggle('active',+b.dataset.n===n));}
 function setupMinesInput(){const i=document.getElementById('mines-input');if(!i)return;i.value=MS.mineCount;const a=()=>{let v=parseInt(i.value);if(isNaN(v))v=MS.mineCount;v=Math.max(1,Math.min(24,v));MS.mineCount=v;syncMinesUI(v);};i.addEventListener('input',a);i.addEventListener('blur',a);}
 function svgUse(id){return`<svg class="cell-inner" viewBox="0 0 100 100"><use href="#${id}"/></svg>`;}
@@ -2716,8 +2754,8 @@ async function checkActiveGame(){try{const r=await apiCall('GET','/api/mines/sta
 async function startGame(){const bet=parseFloat(document.getElementById('bet-input').value);if(!bet||bet<100){showToast('Мин. ставка 100');return;}if(bet>sharedBalance){showToast('Недостаточно средств');return;}document.getElementById('btn-start').disabled=true;clearResultToast();try{const r=await apiCall('POST','/api/mines/start',{bet,mine_count:MS.mineCount});if(!r.ok){showToast(r.error);document.getElementById('btn-start').disabled=false;return;}MS.playing=true;MS.gameId=r.game_id;MS.bet=r.bet;MS.mineCount=r.mine_count;MS.gemsFound=0;MS.revealed=[];MS.mult=1;MS.nextMult=r.next_mult;sharedBalance-=bet;syncBalanceUI();buildGrid();enterPlayMode();updateMinesInfo();tg?.HapticFeedback?.impactOccurred('medium');}catch(e){showToast('Ошибка соединения');document.getElementById('btn-start').disabled=false;}}
 async function clickCell(idx){if(!MS.playing||MS.revealed.includes(idx))return;setGridDisabled(true);try{const r=await apiCall('POST','/api/mines/click',{game_id:MS.gameId,cell:idx});if(!r.ok){showToast(r.error);setGridDisabled(false);return;}if(r.result==='lose'){setCell(idx,'exploded');r.mines.forEach(m=>{if(m!==idx)setCell(m,'mine');});MS.playing=false;tg?.HapticFeedback?.notificationOccurred('error');await sleep(700);showResult(false,MS.bet,r.mult);exitPlayMode();}else if(r.result==='win_all'){setCell(idx,'gem');MS.gemsFound=r.gems_found;MS.mult=r.mult;sharedBalance=r.new_balance;syncBalanceUI();MS.playing=false;updateMinesInfo();tg?.HapticFeedback?.notificationOccurred('success');await sleep(400);showResult(true,r.payout-MS.bet,r.mult);exitPlayMode();}else{setCell(idx,'gem');MS.revealed.push(idx);MS.gemsFound=r.gems_found;MS.mult=r.mult;MS.nextMult=r.next_mult;updateMinesInfo();setGridDisabled(false);tg?.HapticFeedback?.impactOccurred('light');}}catch(e){showToast('Ошибка');setGridDisabled(false);}}
 async function cashout(){if(!MS.playing||MS.gemsFound===0)return;document.getElementById('btn-cashout').disabled=true;setGridDisabled(true);try{const r=await apiCall('POST','/api/mines/cashout',{game_id:MS.gameId});if(!r.ok){showToast(r.error);document.getElementById('btn-cashout').disabled=false;setGridDisabled(false);return;}r.mines.forEach(m=>setCell(m,'mine'));sharedBalance=r.new_balance;syncBalanceUI();MS.playing=false;tg?.HapticFeedback?.notificationOccurred('success');await sleep(400);showResult(true,r.payout-MS.bet,r.mult);exitPlayMode();}catch(e){showToast('Ошибка');document.getElementById('btn-cashout').disabled=false;setGridDisabled(false);}}
-function enterPlayMode(){document.getElementById('settings-panel').style.display='none';document.getElementById('info-row').style.display='flex';document.getElementById('btn-start').style.display='none';document.getElementById('btn-cashout').style.display='block';document.getElementById('btn-cashout').disabled=true;}
-function exitPlayMode(){document.getElementById('settings-panel').style.display='block';document.getElementById('info-row').style.display='none';document.getElementById('btn-start').style.display='block';document.getElementById('btn-start').disabled=false;document.getElementById('btn-cashout').style.display='none';}
+function enterPlayMode(){document.getElementById('settings-panel').style.display='none';document.getElementById('info-row').style.display='flex';document.getElementById('btn-start').style.display='none';document.getElementById('btn-cashout').style.display='block';document.getElementById('btn-cashout').disabled=true;startMinesPoll();}
+function exitPlayMode(){stopMinesPoll();document.getElementById('settings-panel').style.display='block';document.getElementById('info-row').style.display='none';document.getElementById('btn-start').style.display='block';document.getElementById('btn-start').disabled=false;document.getElementById('btn-cashout').style.display='none';}
 function updateMinesInfo(){const p=Math.round(MS.bet*MS.mult);document.getElementById('info-mult').textContent=`×${MS.mult.toFixed(2)}`;document.getElementById('info-next').textContent=`×${MS.nextMult.toFixed(2)}`;document.getElementById('info-payout').textContent=fmt(p);if(MS.gemsFound>0){const cb=document.getElementById('btn-cashout');cb.disabled=false;cb.innerHTML=`💰 Забрать (${fmt(p)})`;}}
 function setCell(idx,type){const c=document.getElementById(`cell-${idx}`);if(!c)return;c.classList.remove('hidden','gem','mine','exploded');c.classList.add(type,'disabled');if(type==='gem')c.innerHTML=svgUse('ico-gem');else if(type==='mine')c.innerHTML=svgUse('ico-mine');else if(type==='exploded')c.innerHTML=svgUse('ico-boom');}
 function setGridDisabled(v){document.querySelectorAll('.cell.hidden').forEach(c=>{c.style.pointerEvents=v?'none':'';});}
