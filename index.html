@@ -1746,6 +1746,10 @@ body {
 #games-grid-all .game-card-wheel-new:hover {
   box-shadow:0 12px 36px rgba(248,113,113,.22),0 8px 28px rgba(0,0,0,.5),inset 0 1px 0 rgba(248,113,113,.15);
 }
+
+.umb-coin { width:18px;height:18px;border-radius:50%;object-fit:cover;flex-shrink:0; }
+.umb-coin-sm { width:16px;height:16px;border-radius:50%;object-fit:cover;flex-shrink:0;vertical-align:middle; }
+.umb-coin-lg { width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0; }
 </style>
 </head>
 <body>
@@ -1877,7 +1881,7 @@ body {
 <div class="global-topbar">
   <div class="menu-hamburger" onclick="openDrawer()"><span></span><span></span><span></span></div>
   <span onclick="goMenu()" class="topbar-logo-text">umbrex</span>
-  <div class="topbar-balance"><span id="topbar-balance-val">—</span> 🪙</div>
+  <div class="topbar-balance"><span id="topbar-balance-val">—</span> <img class="umb-coin" id="topbar-coin-img" src="" alt=""></div>
 </div>
 <div class="global-topbar-divider"></div>
 
@@ -1890,7 +1894,7 @@ body {
   <div class="menu-balance-big" style="margin-top:4px">
     <div>
       <div class="lbl">Баланс</div>
-      <div class="val"><span id="menu-balance-val">—</span> <span style="font-size:26px">🪙</span></div>
+      <div class="val"><span id="menu-balance-val">—</span> <img class="umb-coin-lg" id="menu-coin-img" src="" alt=""></div>
     </div>
     <button class="menu-balance-btn" onclick="if(tg){tg.openTelegramLink('https://t.me/umbrex_gamebot?start=donate');}else{window.open('https://t.me/umbrex_gamebot?start=donate','_blank');}">Пополнить</button>
   </div>
@@ -2494,6 +2498,17 @@ body {
 <div class="toast" id="toast"></div>
 
 <script>
+const COIN_SRC = "data:image/png;base64,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";
+
+// Инициализация иконки монеты
+(function(){
+  function setCoinIcons(){
+    document.querySelectorAll('[id$="-coin-img"]').forEach(el=>{ el.src=COIN_SRC; });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setCoinIcons);
+  else setCoinIcons();
+})();
+
 const tg = window.Telegram?.WebApp;
 if(tg){tg.ready();tg.expand();}
 const API = "https://bot-1782901267-5094-bringnice.bothost.tech";
@@ -2608,7 +2623,7 @@ async function apiCall(method,path,body){
   const res=await fetch(API+path,opts);return res.json();
 }
 async function loadBalance(){
-  try{const r=await apiCall('GET','/api/balance');if(r.ok){sharedBalance=r.balance;document.getElementById('menu-balance-val').textContent=fmt(sharedBalance);}}catch(e){}
+  try{const r=await apiCall('GET','/api/balance');if(r.ok){sharedBalance=r.balance;syncBalanceUI();}}catch(e){}
 }
 
 // ── POLLING БАЛАНСА каждые 5 сек ──
@@ -2617,7 +2632,7 @@ setInterval(async()=>{
     const r=await apiCall('GET','/api/balance');
     if(r.ok && r.balance !== sharedBalance){
       sharedBalance=r.balance;
-      document.getElementById('menu-balance-val').textContent=fmt(sharedBalance);
+      syncBalanceUI();
     }
   }catch(e){}
 }, 5000);
