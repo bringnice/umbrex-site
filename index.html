@@ -1859,6 +1859,16 @@ body {
     font-size: 16px; font-weight: 800; color: #fff;
     background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
     border-radius: 10px; padding: 7px 18px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .desk-coin-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border: 2px solid #fbbf24;
+    box-shadow: 0 0 8px rgba(251,191,36,.5);
+    font-size: 12px; flex-shrink: 0;
+    color: #78350f; font-weight: 900;
   }
   .desk-topup-btn {
     background: linear-gradient(135deg,#7c3aed,#a855f7);
@@ -2009,12 +2019,14 @@ body {
   #screen-crash .crash-header   { display: none; }
   #screen-crash .crash-history-bar {
     grid-column: 1 / -1; grid-row: 1;
-    margin: 0 !important; padding: 0;
+    margin: 0 !important; padding: 6px 0;
   }
   #screen-crash .crash-field {
     grid-column: 1; grid-row: 2 / 4;
     margin: 0 !important;
-    min-height: 420px; height: 100%;
+    min-height: 420px;
+    height: calc(100vh - 62px - 48px - 44px - 16px - 16px);
+    max-height: 620px;
   }
   #screen-crash .crash-payout-bar {
     grid-column: 1; grid-row: 4;
@@ -2308,7 +2320,7 @@ body {
     </button>
   </nav>
   <div class="desk-topbar-balance">
-    <div class="desk-bal-val"><span id="desk-balance-val">—</span> 🪙</div>
+    <div class="desk-bal-val"><span id="desk-balance-val">—</span> <span class="desk-coin-icon">U</span></div>
     <button class="desk-topup-btn" onclick="goDeposit()">Пополнить</button>
   </div>
 </div>
@@ -3311,6 +3323,8 @@ let CC = {
 let cCanvas, cCtx, cW, cH;
 
 function initCrash(){
+  // Останавливаем предыдущую анимацию, если была
+  if(CC.animId){ cancelAnimationFrame(CC.animId); CC.animId=null; }
   cCanvas = document.getElementById('crash-canvas');
   cCtx = cCanvas.getContext('2d');
   const wrap = cCanvas.parentElement;
@@ -3326,13 +3340,21 @@ function initCrash(){
       cCtx = cCanvas.getContext('2d');
       cCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
       cW = w; cH = h;
+      drawCrashGraph(); // сразу рисуем сетку как только получили размеры
     }
   }
   _initCrashSize();
-  // Если размеры нулевые — повторяем после layout
+  // Если размеры нулевые — повторяем после layout (десктоп: grid может не завершить рендер)
   if(!cW || !cH){
     setTimeout(_initCrashSize, 50);
     setTimeout(_initCrashSize, 150);
+    setTimeout(_initCrashSize, 400);
+    setTimeout(_initCrashSize, 800);
+  }
+  // Переинициализируем при изменении размера окна
+  if(!window._crashResizeHandler){
+    window._crashResizeHandler = ()=>{ _initCrashSize(); drawCrashGraph(); };
+    window.addEventListener('resize', window._crashResizeHandler);
   }
 
   // Если мини-апп был закрыт/перезапущен посреди раунда — ставка оставалась
@@ -3455,7 +3477,7 @@ function doCrash(){
     showResult(false,CC.bet,CC.mult);
   }
   CC.history.unshift(+CC.mult.toFixed(2));
-  if(CC.history.length>15)CC.history.pop();
+  if(CC.history.length>25)CC.history.pop();
   setBigVal('crashed','×'+CC.mult.toFixed(2));
   drawCrashGraph();
   document.getElementById('crash-rocket').style.display='none';
@@ -3565,21 +3587,18 @@ function drawCrashGraph(){
   cCtx.clearRect(0,0,cW,cH);
 
   const pts=CC.points;
-  if(pts.length<2){return;}
-
   const crashed=CC.phase==='crashed';
-  const curM=CC.mult;
-  // После краша всегда красный
+  const curM=CC.mult||1;
   const lineCol=crashed?'#f87171':multColor(curM);
   const lineGlow=crashed?'rgba(248,113,113,.7)':multColor(curM,0.6);
 
-  const maxT=Math.max(pts[pts.length-1][0],3);
-  const maxM=Math.max(pts[pts.length-1][1],2);
+  const maxT=Math.max(pts.length?pts[pts.length-1][0]:3,3);
+  const maxM=Math.max(pts.length?pts[pts.length-1][1]:2,2);
   const pL=38, pR=14, pT=18, pB=28;
   const toX=t=>pL+(t/maxT)*(cW-pL-pR);
   const toY=m=>cH-pB-((m-1)/(maxM-1+0.001))*(cH-pT-pB);
 
-  // сетка
+  // сетка — рисуем всегда (в том числе при ожидании раунда)
   cCtx.strokeStyle='rgba(80,50,140,0.18)'; cCtx.lineWidth=1;
   for(let i=1;i<=4;i++){
     const y=pT+(i/4)*(cH-pT-pB);
@@ -3588,6 +3607,8 @@ function drawCrashGraph(){
     cCtx.fillStyle='rgba(120,90,200,0.45)';cCtx.font='10px system-ui';
     cCtx.fillText('×'+mv.toFixed(2),2,y+4);
   }
+
+  if(pts.length<2){return;}
 
   // заливка под кривой
   const fillGrad=cCtx.createLinearGradient(0,pT,0,cH);
@@ -4785,7 +4806,7 @@ function _renderMyBets() {
 }
 
 function _renderHistory(history) {
-  WS.history = history.map(h => {
+  WS.history = history.slice(0, 25).map(h => {
     let cls = 'grey';
     if (h.mult === 3)  cls = 'purple';
     if (h.mult === 5)  cls = 'red';
