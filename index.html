@@ -1601,47 +1601,46 @@ body {
 /* Поле колеса */
 .wheel-arena {
   position:relative; z-index:10; margin:8px 14px 10px;
-  border-radius:24px; overflow:hidden;
+  border-radius:24px; overflow:visible;
   background:linear-gradient(160deg,#0e0b22 0%,#100820 60%,#0a0618 100%);
   border:1px solid rgba(80,50,140,.4);
-  box-shadow:inset 0 0 40px rgba(60,20,120,.25);
+  box-shadow:inset 0 0 60px rgba(60,20,120,.3), 0 0 40px rgba(100,50,200,.15);
   display:flex; align-items:center; justify-content:center;
-  flex-shrink:0; height:330px;
+  flex-shrink:0; height:360px;
 }
 .wheel-arena-inner {
   position:relative; display:flex; align-items:center; justify-content:center;
-  width:300px; height:300px;
+  width:320px; height:320px;
 }
-/* Указатель сверху */
+/* Указатель сверху — алмаз */
 .wheel-pointer {
-  position:absolute; top:-18px; left:50%; transform:translateX(-50%);
+  position:absolute; top:-14px; left:50%; transform:translateX(-50%);
   z-index:20;
-  width:0; height:0;
-  border-left:10px solid transparent;
-  border-right:10px solid transparent;
-  border-top:22px solid #f87171;
-  filter:drop-shadow(0 0 8px rgba(248,113,113,.9));
+  width:22px; height:22px;
+  background:linear-gradient(135deg,#e9d5ff 0%,#a855f7 40%,#7c3aed 100%);
+  clip-path:polygon(50% 100%, 0% 30%, 15% 0%, 85% 0%, 100% 30%);
+  filter:drop-shadow(0 0 8px rgba(168,85,247,.95)) drop-shadow(0 2px 4px rgba(0,0,0,.6));
 }
 .wheel-canvas-main {
   border-radius:50%;
   box-shadow:
-    0 0 0 5px rgba(255,255,255,.08),
-    0 0 0 10px rgba(80,50,140,.4),
-    0 0 50px rgba(139,92,246,.4),
-    0 8px 32px rgba(0,0,0,.5);
+    0 0 0 4px rgba(20,10,40,.8),
+    0 0 0 7px rgba(139,92,246,.35),
+    0 0 60px rgba(139,92,246,.5),
+    0 0 100px rgba(139,92,246,.2),
+    0 8px 40px rgba(0,0,0,.7);
 }
 /* Центральный хаб — таймер */
 .wheel-hub {
   position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
   transition: opacity .3s;
-  width:64px; height:64px; border-radius:50%;
-  background:radial-gradient(circle at 35% 35%,#2a2060,#0e0a1e);
-  border:3px solid rgba(139,92,246,.5);
-  box-shadow:0 0 16px rgba(139,92,246,.5),inset 0 0 10px rgba(0,0,0,.4);
+  width:72px; height:72px; border-radius:50%;
+  background:transparent;
   z-index:15; pointer-events:none;
   display:flex; align-items:center; justify-content:center;
-  font-size:20px; font-weight:900; color:rgba(167,139,250,.95);
+  font-size:22px; font-weight:900; color:rgba(167,139,250,.95);
   flex-direction:column; gap:0; line-height:1;
+  text-shadow: 0 0 12px rgba(139,92,246,.8);
 }
 
 /* История результатов */
@@ -2452,7 +2451,7 @@ body {
   <div class="wheel-arena">
     <div class="wheel-arena-inner">
       <div class="wheel-pointer"></div>
-      <canvas class="wheel-canvas-main" id="wheel-canvas" width="300" height="300"></canvas>
+      <canvas class="wheel-canvas-main" id="wheel-canvas" width="320" height="320"></canvas>
       <div class="wheel-hub" id="wheel-hub"><span id="wheel-hub-timer">15</span></div>
       <div class="wheel-result-overlay" id="wheel-result-overlay">
         <div class="wheel-result-mult" id="wheel-result-mult"></div>
@@ -3826,7 +3825,7 @@ function wheelInitCanvas() {
 
   const canvas = document.getElementById('wheel-canvas');
   if (!canvas) return;
-  const SIZE = 240;
+  const SIZE = 320;
   canvas.width = SIZE;
   canvas.height = SIZE;
   wheelDraw(WS.angle);
@@ -3840,65 +3839,114 @@ function wheelDraw(angle) {
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const N = WS.segments.length;
-  const R = canvas.width / 2;
+  const S = canvas.width;
+  const R = S / 2;
   const sliceAngle = (2 * Math.PI) / N;
+  const OUTER = R - 2;
+  const INNER = R * 0.22; // радиус центрального хаба
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, S, S);
+
+  // Цвета сегментов — тёмный фон + яркий цветной акцент на внешнем крае
+  const segColors = {
+    2:  { bg: '#1a1830', edge: '#4b5563', text: '#9ca3af' },
+    3:  { bg: '#1e1040', edge: '#7c3aed', text: '#c4b5fd' },
+    5:  { bg: '#2d0f0f', edge: '#dc2626', text: '#f87171' },
+    50: { bg: '#0a2818', edge: '#059669', text: '#34d399' },
+  };
 
   WS.segments.forEach((seg, i) => {
     const start = angle + i * sliceAngle;
     const end   = start + sliceAngle;
     const mid   = start + sliceAngle / 2;
+    const sc    = segColors[seg.mult] || segColors[2];
 
-    // Сегмент
+    // Основной сегмент — тёмный с цветным краем только снаружи
     ctx.beginPath();
     ctx.moveTo(R, R);
-    ctx.arc(R, R, R - 2, start, end);
+    ctx.arc(R, R, OUTER, start, end);
     ctx.closePath();
-
-    // Радиальный градиент от центра
-    const grd = ctx.createRadialGradient(R, R, R * 0.15, R, R, R - 2);
-    const baseColor = seg.color;
-    grd.addColorStop(0, lightenHex(baseColor, 22));
-    grd.addColorStop(1, baseColor);
+    const grd = ctx.createRadialGradient(R, R, INNER * 1.2, R, R, OUTER);
+    grd.addColorStop(0,    '#11101e');
+    grd.addColorStop(0.5,  '#11101e');
+    grd.addColorStop(0.72, sc.edge + '44');
+    grd.addColorStop(0.85, sc.edge + 'aa');
+    grd.addColorStop(1,    sc.edge);
     ctx.fillStyle = grd;
     ctx.fill();
 
-    // Тонкая линия-разделитель
-    ctx.strokeStyle = 'rgba(0,0,0,.35)';
-    ctx.lineWidth = 0.8;
+    // Разделитель
+    ctx.beginPath();
+    ctx.moveTo(R, R);
+    ctx.arc(R, R, OUTER, start, end);
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(0,0,0,.5)';
+    ctx.lineWidth = 1.2;
     ctx.stroke();
 
-    // Текст мультипликатора
+    // Текст — ближе к краю
     ctx.save();
     ctx.translate(R, R);
     ctx.rotate(mid);
     ctx.textAlign = 'right';
-    ctx.fillStyle = seg.glow;
-    ctx.shadowColor = seg.glow;
-    ctx.shadowBlur = 6;
-
-    const fontSize = seg.mult === 50 ? 11 : 10;
-    ctx.font = `900 ${fontSize}px -apple-system,sans-serif`;
-    ctx.fillText(seg.label, R - 8, 4);
+    const fontSize = seg.mult === 50 ? 12 : 10;
+    ctx.font = `900 ${fontSize}px -apple-system,BlinkMacSystemFont,sans-serif`;
+    ctx.fillStyle = sc.text;
+    ctx.shadowColor = sc.edge;
+    ctx.shadowBlur = seg.mult === 50 ? 10 : 5;
+    ctx.fillText(seg.label, OUTER - 7, fontSize / 2 - 1);
     ctx.shadowBlur = 0;
     ctx.restore();
   });
 
-  // Внешнее кольцо (рамка)
+  // Внешнее кольцо — толстое тёмное
   ctx.beginPath();
-  ctx.arc(R, R, R - 1, 0, 2 * Math.PI);
-  ctx.strokeStyle = 'rgba(139,92,246,.45)';
-  ctx.lineWidth = 2.5;
+  ctx.arc(R, R, OUTER, 0, 2 * Math.PI);
+  ctx.strokeStyle = '#0d0b1a';
+  ctx.lineWidth = 6;
   ctx.stroke();
 
-  // Внутреннее свечение
+  // Внешнее кольцо — фиолетовый глоу
   ctx.beginPath();
-  ctx.arc(R, R, R * 0.18, 0, 2 * Math.PI);
-  const inner = ctx.createRadialGradient(R, R, 0, R, R, R * 0.18);
-  inner.addColorStop(0, 'rgba(139,92,246,.15)');
-  inner.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = inner;
+  ctx.arc(R, R, OUTER + 2, 0, 2 * Math.PI);
+  ctx.strokeStyle = 'rgba(139,92,246,.7)';
+  ctx.lineWidth = 3;
+  ctx.shadowColor = 'rgba(139,92,246,.9)';
+  ctx.shadowBlur = 18;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // Второй контур кольца — светлее
+  ctx.beginPath();
+  ctx.arc(R, R, OUTER - 3, 0, 2 * Math.PI);
+  ctx.strokeStyle = 'rgba(167,139,250,.25)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Центральный круг — хаб (поверх сегментов)
+  const hubGrd = ctx.createRadialGradient(R - INNER*0.25, R - INNER*0.25, 0, R, R, INNER);
+  hubGrd.addColorStop(0,   '#4c3494');
+  hubGrd.addColorStop(0.4, '#2d1f6e');
+  hubGrd.addColorStop(0.75,'#1a1248');
+  hubGrd.addColorStop(1,   '#100c30');
+  ctx.beginPath();
+  ctx.arc(R, R, INNER, 0, 2 * Math.PI);
+  ctx.fillStyle = hubGrd;
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(139,92,246,.6)';
+  ctx.lineWidth = 2.5;
+  ctx.shadowColor = 'rgba(139,92,246,.6)';
+  ctx.shadowBlur = 10;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // Блик на хабе
+  ctx.beginPath();
+  ctx.arc(R - INNER*0.3, R - INNER*0.3, INNER*0.35, 0, 2 * Math.PI);
+  const glint = ctx.createRadialGradient(R - INNER*0.3, R - INNER*0.3, 0, R - INNER*0.3, R - INNER*0.3, INNER*0.35);
+  glint.addColorStop(0, 'rgba(255,255,255,.12)');
+  glint.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = glint;
   ctx.fill();
 }
 
@@ -3932,6 +3980,7 @@ let _wheelSecsLeft       = 0;
 let _wheelMyBets         = {};
 let _wheelLocked         = false;
 let _wheelSpinning       = false;
+let _pendingHistory      = null;
 
 // Локальный отсчёт — обновляет хаб каждые 100мс
 function _wheelStartCountdown(secs) {
@@ -4004,8 +4053,12 @@ async function wheelPollState() {
       }
     }
 
-    // История
-    _renderHistory(r.history);
+    // История — только если не крутится (иначе показываем после анимации)
+    if (!_wheelSpinning) {
+      _renderHistory(r.history);
+    } else {
+      _pendingHistory = r.history;
+    }
 
   } catch(e) { showToast('Wheel poll err: ' + e.message); }
 }
@@ -4132,9 +4185,11 @@ function _wheelOnRoundEnd(mult, prevBets) {
 
   const hub = document.getElementById('wheel-hub');
   if (hub) hub.style.opacity = '0';
-  animateWheel(WS.angle, finalAngle, 4000, function() {
+  animateWheel(WS.angle, finalAngle, 4500, function() {
     _wheelSpinning = false;
     if (hub) hub.style.opacity = '1';
+    // Показываем историю только сейчас — после конца анимации
+    if (_pendingHistory) { _renderHistory(_pendingHistory); _pendingHistory = null; }
     // Показать результат
     const multEl  = document.getElementById('wheel-result-mult');
     const labelEl = document.getElementById('wheel-result-label');
