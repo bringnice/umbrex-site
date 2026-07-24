@@ -1961,62 +1961,142 @@ body {
   .game-card-name { font-size: 18px; }
   .game-card-icon { font-size: 54px; }
 
-  /* === ИГРОВЫЕ ЭКРАНЫ (Майнс, Хило, Башня и т.д.) === */
+  /* ════════════════════════════════════════
+     ИГРОВЫЕ ЭКРАНЫ — ДЕСКТОП ЛЕЙАУТ
+     Каждая игра: CSS grid, 2 колонки
+     Левая — игровое поле, правая — панель
+  ════════════════════════════════════════ */
+
+  /* Общий сброс (перекрывается ниже для каждой) */
   #screen-mines,
   #screen-hilo,
   #screen-tower,
   #screen-crash,
-  #screen-wheel,
-  #screen-roulette {
-    display: none;
-    flex-direction: row !important;
-    align-items: flex-start;
-    gap: 0;
-    padding: 32px !important;
-  }
-  #screen-mines.active,
-  #screen-hilo.active,
-  #screen-tower.active,
-  #screen-crash.active,
-  #screen-wheel.active,
-  #screen-roulette.active { display: flex !important; }
+  #screen-wheel { display: none !important; }
 
-  /* Игровая зона — по центру, фиксированная ширина */
-  #screen-mines .grid-wrap,
-  #screen-hilo .grid-wrap,
-  #screen-tower .grid-wrap {
-    width: 460px; flex-shrink: 0;
+  /* ── МАЙНС ── */
+  #screen-mines.active {
+    display: grid !important;
+    grid-template-columns: 460px 1fr;
+    grid-template-rows: auto auto auto;
+    padding: 28px !important;
+    gap: 20px;
+    overflow: hidden;
+    align-items: start;
+  }
+  #screen-mines .header     { display: none; }
+  #screen-mines .grid-wrap  {
+    grid-column: 1; grid-row: 1 / 4;
+    margin: 0 !important; padding: 18px !important;
+    align-self: start;
+  }
+  #screen-mines .info-row   { grid-column: 2; grid-row: 1; margin: 0 !important; }
+  #screen-mines .settings   { grid-column: 2; grid-row: 2; margin: 0 !important; }
+  #screen-mines .btn-row    { grid-column: 2; grid-row: 3; margin: 0 !important; }
+
+  .grid { display: grid; gap: 11px; }
+
+  /* ── КРАШ ── */
+  #screen-crash.active {
+    display: grid !important;
+    grid-template-columns: 1fr 320px;
+    grid-template-rows: auto 1fr auto;
+    padding: 24px !important;
+    gap: 16px;
+    overflow: hidden;
+    align-items: start;
+  }
+  #screen-crash .crash-header   { display: none; }
+  #screen-crash .crash-history-bar {
+    grid-column: 1 / -1; grid-row: 1;
+    margin: 0 !important; padding: 0;
+  }
+  #screen-crash .crash-field {
+    grid-column: 1; grid-row: 2 / 4;
+    margin: 0 !important;
+    min-height: 420px; height: 100%;
+  }
+  #screen-crash .crash-payout-bar {
+    grid-column: 1; grid-row: 4;
     margin: 0 !important;
   }
-
-  /* Панель управления — справа */
-  #screen-mines .btn-row,
-  #screen-mines .settings,
-  #screen-mines .info-row,
-  #screen-hilo .btn-row,
-  #screen-hilo .settings,
-  #screen-hilo .info-row,
-  #screen-tower .btn-row,
-  #screen-tower .settings,
-  #screen-tower .info-row {
-    margin: 0 0 12px !important;
-  }
-
-  /* Обёртка для правой панели */
-  .desk-game-panel {
-    flex: 1; padding-left: 32px;
-    display: flex; flex-direction: column; gap: 14px;
-    max-width: 400px;
-  }
-
-  /* Майнс — сетка нормального размера */
-  .grid {
-    display: grid;
-    gap: 11px;
-  }
-  .grid-wrap {
+  #screen-crash .crash-panel {
+    grid-column: 2; grid-row: 2 / 5;
     margin: 0 !important;
-    padding: 20px !important;
+    align-self: start;
+  }
+
+  /* ── БАШНЯ ── */
+  #screen-tower.active {
+    display: grid !important;
+    grid-template-columns: 1fr 300px;
+    grid-template-rows: 1fr auto auto;
+    padding: 24px !important;
+    gap: 16px;
+    overflow: hidden;
+    height: 100%;
+  }
+  #screen-tower .header            { display: none; }
+  #screen-tower .tower-wrap        {
+    grid-column: 1; grid-row: 1 / 4;
+    margin: 0 !important;
+    height: calc(100vh - 62px - 48px);
+    max-height: 600px;
+  }
+  #screen-tower .tw-mults-strip    { grid-column: 1; grid-row: 4; margin: 0 !important; }
+  #screen-tower .tower-result-bar  { grid-column: 1; grid-row: 5; margin: 0 !important; }
+  #screen-tower .tower-settings    { grid-column: 2; grid-row: 1; margin: 0 !important; align-self: start; }
+  #screen-tower .tower-info-row    { grid-column: 2; grid-row: 2; margin: 0 !important; align-self: start; }
+  #screen-tower .tower-btn-row     { grid-column: 2; grid-row: 3; margin: 0 !important; align-self: start; }
+
+  /* ── ХИЛО ── */
+  #screen-hilo.active {
+    display: grid !important;
+    grid-template-columns: 1fr 300px;
+    grid-template-rows: 1fr auto auto auto;
+    padding: 24px !important;
+    gap: 16px;
+    overflow: hidden;
+    align-items: start;
+  }
+  #screen-hilo .header          { display: none; }
+  #screen-hilo .hilo-card-wrap  {
+    grid-column: 1; grid-row: 1;
+    margin: 0 !important;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 320px;
+  }
+  #screen-hilo .hilo-info       { grid-column: 1; grid-row: 2; margin: 0 !important; }
+  #screen-hilo .hilo-btns       { grid-column: 1; grid-row: 3; margin: 0 !important; }
+  #screen-hilo .hilo-cashout-btn{ grid-column: 1; grid-row: 4; margin: 0 !important; }
+  #screen-hilo .hilo-settings   { grid-column: 2; grid-row: 1; margin: 0 !important; align-self: start; }
+  #screen-hilo .btn-row         { grid-column: 2; grid-row: 2; margin: 0 !important; align-self: start; }
+
+  /* ── КОЛЕСО ── */
+  #screen-wheel.active {
+    display: grid !important;
+    grid-template-columns: 1fr 300px;
+    grid-template-rows: auto 1fr auto;
+    padding: 24px !important;
+    gap: 16px;
+    overflow: hidden;
+    align-items: start;
+  }
+  #screen-wheel .wheel-header    { display: none; }
+  #screen-wheel .wheel-history   {
+    grid-column: 1 / -1; grid-row: 1;
+    margin: 0 !important;
+  }
+  #screen-wheel .wheel-arena     {
+    grid-column: 1; grid-row: 2 / 4;
+    margin: 0 !important;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #screen-wheel .wheel-settings  { grid-column: 2; grid-row: 2; margin: 0 !important; align-self: start; }
+  #screen-wheel .wheel-mult-row  {
+    grid-column: 2; grid-row: 3;
+    margin: 0 !important; align-self: start;
+    flex-direction: column; gap: 8px;
   }
 
   /* === ТОП === */
