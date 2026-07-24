@@ -526,6 +526,33 @@ body {
 
 /* ══════════ БОНУС ══════════ */
 .bonus-card { position:relative;z-index:10;margin:28px 16px 0;background:linear-gradient(145deg,rgba(20,16,44,.96),rgba(13,10,28,.98));border:1px solid rgba(60,48,100,.6);border-radius:24px;padding:42px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.04);flex-shrink:0; }
+/* ── Реферальная секция ── */
+.ref-section { margin:18px 16px 24px;background:linear-gradient(145deg,rgba(20,16,44,.96),rgba(13,10,28,.98));border:1px solid rgba(60,48,100,.6);border-radius:24px;padding:20px;box-shadow:0 8px 32px rgba(0,0,0,.3); }
+.ref-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:18px; }
+.ref-title { font-size:15px;font-weight:800;color:#fff;margin-bottom:3px; }
+.ref-subtitle { font-size:11px;color:var(--muted); }
+.ref-copy-btn { display:flex;align-items:center;gap:6px;background:rgba(139,92,246,.18);border:1px solid rgba(139,92,246,.35);color:#c4b5fd;font-size:12px;font-weight:700;padding:8px 14px;border-radius:12px;cursor:pointer;transition:all .2s;white-space:nowrap; }
+.ref-copy-btn:active { background:rgba(139,92,246,.32);transform:scale(.97); }
+.ref-stats-row { display:flex;align-items:stretch;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:16px;overflow:hidden;margin-bottom:16px; }
+.ref-stat-box { flex:1;padding:14px 10px;text-align:center; }
+.ref-stat-val { font-size:20px;font-weight:900;color:#a78bfa;margin-bottom:4px; }
+.ref-stat-lbl { font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px; }
+.ref-stat-sep { width:1px;background:rgba(255,255,255,.07);margin:10px 0; }
+.ref-friends-title { font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px; }
+.ref-friend-row { display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.05); }
+.ref-friend-row:last-child { border-bottom:none; }
+.ref-friend-avatar { width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0; }
+.ref-friend-name { flex:1;font-size:14px;font-weight:600;color:#fff; }
+.ref-friend-date { font-size:11px;color:var(--muted); }
+.ref-friend-reward { font-size:13px;font-weight:800;color:var(--green); }
+.ref-empty { text-align:center;padding:20px 0;color:var(--muted);font-size:13px; }
+/* ── Модалка канала ── */
+.modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px); }
+.modal-box { background:linear-gradient(145deg,#1a1232,#0e0a20);border:1px solid rgba(139,92,246,.4);border-radius:24px;padding:32px 24px;width:100%;max-width:340px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6); }
+.modal-icon { font-size:52px;margin-bottom:14px; }
+.modal-title { font-size:18px;font-weight:900;color:#fff;margin-bottom:8px; }
+.modal-text { font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:20px; }
+.btn-secondary { background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#fff;font-size:14px;font-weight:700;padding:14px;border-radius:14px;cursor:pointer; }
 .bonus-icon { font-size:62px;line-height:1;margin-bottom:16px;filter:drop-shadow(0 0 20px rgba(139,92,246,.35)); }
 .bonus-icon.pulse { animation:bonusPulse 1.4s ease-in-out infinite; }
 @keyframes bonusPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
@@ -2390,11 +2417,59 @@ body {
   <div class="header" style="justify-content:center">
     <div class="header-title"><h1>Бонус</h1><p>Ежедневная награда</p></div>
   </div>
+
+  <!-- Карточка бонуса -->
   <div class="bonus-card" id="bonus-card">
     <div class="bonus-icon pulse" id="bonus-icon">🎁</div>
     <div class="bonus-status" id="bonus-status">Проверяем…</div>
     <div class="bonus-amount" id="bonus-amount"></div>
     <div class="bonus-sub" id="bonus-sub"></div>
+    <button class="btn btn-primary bonus-claim-btn" id="bonus-claim-btn" style="display:none;margin-top:20px;width:100%;max-width:260px" onclick="claimBonus()">🎁 Забрать бонус</button>
+  </div>
+
+  <!-- Реферальная система -->
+  <div class="ref-section" id="ref-section">
+    <div class="ref-header">
+      <div>
+        <div class="ref-title">Реферальная система</div>
+        <div class="ref-subtitle">Приглашай друзей и получай бонусы</div>
+      </div>
+      <button class="ref-copy-btn" id="ref-copy-btn" onclick="copyRefLink()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Поделиться
+      </button>
+    </div>
+
+    <div class="ref-stats-row">
+      <div class="ref-stat-box">
+        <div class="ref-stat-val" id="ref-total">—</div>
+        <div class="ref-stat-lbl">Приглашено</div>
+      </div>
+      <div class="ref-stat-sep"></div>
+      <div class="ref-stat-box">
+        <div class="ref-stat-val" id="ref-earned">—</div>
+        <div class="ref-stat-lbl">Заработано</div>
+      </div>
+      <div class="ref-stat-sep"></div>
+      <div class="ref-stat-box">
+        <div class="ref-stat-val" id="ref-reward-val">—</div>
+        <div class="ref-stat-lbl">За друга</div>
+      </div>
+    </div>
+
+    <div class="ref-friends-title" id="ref-friends-title" style="display:none">Твои друзья</div>
+    <div class="ref-friends-list" id="ref-friends-list"></div>
+  </div>
+</div>
+
+<!-- Модалка: не подписан на канал -->
+<div id="channel-modal" class="modal-overlay" style="display:none" onclick="closeChannelModal(event)">
+  <div class="modal-box">
+    <div class="modal-icon">📢</div>
+    <div class="modal-title">Подпишись на канал</div>
+    <div class="modal-text">Чтобы забрать бонус, нужно быть подписанным на наш канал</div>
+    <a class="btn btn-primary" href="https://t.me/umbrexchannel" target="_blank" style="display:block;text-align:center;margin-bottom:10px;text-decoration:none">Перейти в канал</a>
+    <button class="btn btn-secondary" onclick="recheckChannel()" style="width:100%">🔄 Я подписался — проверить</button>
   </div>
 </div>
 
@@ -3291,34 +3366,146 @@ async function loadBonus(){
   const status=document.getElementById('bonus-status');
   const amount=document.getElementById('bonus-amount');
   const sub=document.getElementById('bonus-sub');
+  const btn=document.getElementById('bonus-claim-btn');
   icon.className='bonus-icon pulse'; icon.textContent='🎁';
-  status.textContent='Проверяем бонус…'; amount.textContent=''; sub.textContent='';
+  status.textContent='Проверяем…'; amount.textContent=''; sub.textContent=''; btn.style.display='none';
   try{
-    const r=await apiCall('POST','/api/bonus/claim');
-    if(r.ok && r.claimed){
-      icon.className='bonus-icon pop'; icon.textContent='💎';
-      status.textContent='Бонус зачислен!';
-      amount.textContent='+'+fmt(r.reward)+' 🪙';
-      sub.textContent='Заходи завтра за новым бонусом';
-      sharedBalance=r.new_balance; syncBalanceUI();
-      hideBonusDot();
-      tg?.HapticFeedback?.notificationOccurred('success');
-    } else if(r.ok && !r.claimed){
+    const r=await apiCall('GET','/api/bonus/status');
+    if(r.ok && r.available){
+      icon.className='bonus-icon pulse'; icon.textContent='🎁';
+      status.textContent='Бонус доступен!';
+      amount.textContent='2 000 – 10 000 🪙';
+      sub.textContent='Нажми кнопку чтобы забрать';
+      btn.style.display='block';
+    } else if(r.ok && !r.available){
       icon.className='bonus-icon'; icon.textContent='⏳';
       status.textContent='Бонус уже получен';
       amount.textContent='';
       sub.textContent='Следующий бонус через '+(r.wait||'скоро');
+      btn.style.display='none';
       hideBonusDot();
     } else {
       icon.className='bonus-icon'; icon.textContent='⚠️';
-      status.textContent='Не удалось получить бонус';
-      sub.textContent=r.error||'Попробуй ещё раз позже';
+      status.textContent='Ошибка'; sub.textContent=r.error||'Попробуй позже';
     }
   }catch(e){
     icon.className='bonus-icon'; icon.textContent='⚠️';
     status.textContent='Ошибка соединения'; sub.textContent='';
   }
+  loadReferral();
 }
+
+async function claimBonus(){
+  const btn=document.getElementById('bonus-claim-btn');
+  // Сначала проверяем подписку на канал
+  try{
+    const ch=await apiCall('GET','/api/bonus/channel_check');
+    if(ch.ok && !ch.subscribed){
+      document.getElementById('channel-modal').style.display='flex';
+      return;
+    }
+  }catch(e){}
+  // Забираем бонус
+  btn.disabled=true; btn.textContent='Получаем…';
+  try{
+    const r=await apiCall('POST','/api/bonus/claim');
+    if(r.ok && r.claimed){
+      const icon=document.getElementById('bonus-icon');
+      const status=document.getElementById('bonus-status');
+      const amount=document.getElementById('bonus-amount');
+      const sub=document.getElementById('bonus-sub');
+      icon.className='bonus-icon pop'; icon.textContent='💎';
+      status.textContent='Бонус зачислен!';
+      amount.textContent='+'+fmt(r.reward)+' 🪙';
+      sub.textContent='Заходи завтра за новым бонусом';
+      btn.style.display='none';
+      sharedBalance=r.new_balance; syncBalanceUI();
+      hideBonusDot();
+      tg?.HapticFeedback?.notificationOccurred('success');
+    } else {
+      btn.disabled=false; btn.textContent='🎁 Забрать бонус';
+    }
+  }catch(e){
+    btn.disabled=false; btn.textContent='🎁 Забрать бонус';
+  }
+}
+
+async function recheckChannel(){
+  try{
+    const ch=await apiCall('GET','/api/bonus/channel_check');
+    if(ch.ok && ch.subscribed){
+      closeChannelModal();
+      claimBonus();
+    } else {
+      tg?.HapticFeedback?.notificationOccurred('error');
+    }
+  }catch(e){}
+}
+
+function closeChannelModal(e){
+  if(!e||e.target===document.getElementById('channel-modal'))
+    document.getElementById('channel-modal').style.display='none';
+}
+
+async function loadReferral(){
+  try{
+    const r=await apiCall('GET','/api/referral');
+    if(!r.ok) return;
+    document.getElementById('ref-total').textContent=r.registered??0;
+    document.getElementById('ref-earned').textContent=fmt(r.earned??0)+' 🪙';
+    document.getElementById('ref-reward-val').textContent=fmt(r.ref_reward??5000)+' 🪙';
+    window._refLink=r.ref_link;
+    const list=document.getElementById('ref-friends-list');
+    const title=document.getElementById('ref-friends-title');
+    const friends=r.friends||[];
+    if(friends.length){
+      title.style.display='block';
+      list.innerHTML=friends.map(f=>{
+        const letter=(f.name||'?')[0].toUpperCase();
+        const date=f.date?formatRefDate(f.date):'';
+        return `<div class="ref-friend-row">
+          <div class="ref-friend-avatar">${letter}</div>
+          <div class="ref-friend-name">${esc(f.name)}</div>
+          <div class="ref-friend-date">${date}</div>
+          <div class="ref-friend-reward">+${fmt(r.ref_reward)} 🪙</div>
+        </div>`;
+      }).join('');
+    } else {
+      title.style.display='none';
+      list.innerHTML='<div class="ref-empty">Пока никого нет<br>Поделись ссылкой с друзьями!</div>';
+    }
+  }catch(e){}
+}
+
+function copyRefLink(){
+  const link=window._refLink||'';
+  if(!link) return;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(link).then(()=>{
+      const btn=document.getElementById('ref-copy-btn');
+      const orig=btn.innerHTML;
+      btn.innerHTML='✅ Скопировано';
+      setTimeout(()=>btn.innerHTML=orig,1800);
+    });
+  } else {
+    tg?.openLink?.(link);
+  }
+  tg?.HapticFeedback?.impactOccurred('light');
+}
+
+function formatRefDate(d){
+  try{
+    const dt=new Date(d);
+    const now=new Date();
+    const diff=Math.floor((now-dt)/86400000);
+    if(diff===0) return 'Сегодня';
+    if(diff===1) return 'Вчера';
+    return diff+' дн. назад';
+  }catch(e){return d;}
+}
+
+function esc(s){ const d=document.createElement('div');d.textContent=s;return d.innerHTML; }
+
 async function checkBonusDot(){
   try{
     const r=await apiCall('GET','/api/bonus/status');
