@@ -1824,16 +1824,16 @@ body {
   .desk-topbar {
     display: flex !important;
     position: fixed; top: 0; left: 0; right: 0; z-index: 800;
-    height: 56px;
+    height: 62px;
     background: rgba(10,8,24,.95);
     border-bottom: 1px solid rgba(139,92,246,.25);
     backdrop-filter: blur(20px);
     align-items: center;
-    padding: 0 24px;
+    padding: 0 32px;
     gap: 20px;
   }
   .desk-topbar-logo {
-    font-size: 22px; font-weight: 900; letter-spacing: -1px;
+    font-size: 24px; font-weight: 900; letter-spacing: -1px;
     background: linear-gradient(135deg,#e9d5ff,#a855f7,#7c3aed);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     cursor: pointer; flex-shrink: 0;
@@ -1843,8 +1843,8 @@ body {
   }
   .desk-nav-btn {
     display: flex; align-items: center; gap: 7px;
-    padding: 7px 14px; border-radius: 10px;
-    font-size: 13px; font-weight: 600; color: rgba(255,255,255,.55);
+    padding: 8px 18px; border-radius: 10px;
+    font-size: 14px; font-weight: 600; color: rgba(255,255,255,.55);
     cursor: pointer; transition: all .18s; border: none; background: none;
     white-space: nowrap;
   }
@@ -1856,14 +1856,14 @@ body {
     margin-left: auto; flex-shrink: 0;
   }
   .desk-bal-val {
-    font-size: 15px; font-weight: 800; color: #fff;
+    font-size: 16px; font-weight: 800; color: #fff;
     background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
-    border-radius: 10px; padding: 6px 14px;
+    border-radius: 10px; padding: 7px 18px;
   }
   .desk-topup-btn {
     background: linear-gradient(135deg,#7c3aed,#a855f7);
-    color: #fff; font-size: 13px; font-weight: 700;
-    padding: 7px 16px; border-radius: 10px; cursor: pointer;
+    color: #fff; font-size: 14px; font-weight: 700;
+    padding: 8px 20px; border-radius: 10px; cursor: pointer;
     border: none; transition: opacity .15s;
   }
   .desk-topup-btn:hover { opacity: .85; }
@@ -1871,7 +1871,7 @@ body {
   /* === ОСНОВНОЙ ЛЕЙАУТ === */
   .desk-layout {
     display: flex !important;
-    position: fixed; top: 56px; left: 0; right: 0; bottom: 0;
+    position: fixed; top: 62px; left: 0; right: 0; bottom: 0;
     overflow: hidden;
   }
 
@@ -1921,41 +1921,45 @@ body {
   .screen.has-tabbar { padding-bottom: 24px; }
 
   /* === КОНТЕНТ ВНУТРИ ЭКРАНОВ — ЛИМИТ ШИРИНЫ === */
-  .screen > * { max-width: 1200px; margin-left: auto; margin-right: auto; }
+  .screen > * { max-width: 1400px; margin-left: auto; margin-right: auto; width: 100%; box-sizing: border-box; }
 
   /* Хедер экрана скрыть — навигация уже в сайдбаре */
   .screen > .header { display: none; }
 
   /* === МЕНЮ — ДЕСКТОП === */
   .menu-balance-big {
-    margin: 24px 24px 20px;
-    padding: 24px 28px;
-    border-radius: 20px;
-    max-width: 1200px;
+    margin: 28px 32px 24px;
+    padding: 28px 36px;
+    border-radius: 22px;
+    max-width: 1400px;
   }
-  .menu-balance-big .val { font-size: 42px; }
-  .menu-balance-btn { font-size: 15px; padding: 13px 26px; border-radius: 14px; }
+  .menu-balance-big .val { font-size: 48px; }
+  .menu-balance-btn { font-size: 16px; padding: 14px 30px; border-radius: 14px; }
 
-  .menu-section-title { padding: 0 24px 14px; font-size: 11px; }
-  .games-section-head { padding: 0 24px 14px; }
+  .menu-section-title { padding: 0 32px 16px; font-size: 12px; }
+  .games-section-head { padding: 0 32px 16px; }
 
   /* Live лента */
-  .live-strip-wrap { margin: 0 24px 20px; }
+  .live-strip-wrap { margin: 0 32px 24px; }
 
   /* Сетка игр */
   .games-grid {
     grid-template-columns: repeat(4, 1fr);
-    grid-auto-rows: 160px;
-    gap: 14px;
-    margin: 0 24px;
+    grid-auto-rows: 180px;
+    gap: 16px;
+    margin: 0 32px;
   }
   #games-grid-all {
     grid-template-columns: repeat(4, 1fr);
-    grid-auto-rows: 160px;
-    gap: 14px;
-    margin: 0 24px 24px;
+    grid-auto-rows: 180px;
+    gap: 16px;
+    margin: 0 32px 32px;
   }
   #games-grid-all .game-card-wheel-new { grid-column: 1 / -1; }
+
+  /* Карточки игр — крупнее на ПК */
+  .game-card-name { font-size: 18px; }
+  .game-card-icon { font-size: 54px; }
 
   /* === ИГРОВЫЕ ЭКРАНЫ (Майнс, Хило, Башня и т.д.) === */
   #screen-mines,
@@ -1968,7 +1972,7 @@ body {
     flex-direction: row !important;
     align-items: flex-start;
     gap: 0;
-    padding: 24px !important;
+    padding: 32px !important;
   }
   #screen-mines.active,
   #screen-hilo.active,
@@ -1981,7 +1985,7 @@ body {
   #screen-mines .grid-wrap,
   #screen-hilo .grid-wrap,
   #screen-tower .grid-wrap {
-    width: 400px; flex-shrink: 0;
+    width: 460px; flex-shrink: 0;
     margin: 0 !important;
   }
 
@@ -2000,33 +2004,61 @@ body {
 
   /* Обёртка для правой панели */
   .desk-game-panel {
-    flex: 1; padding-left: 24px;
-    display: flex; flex-direction: column; gap: 12px;
-    max-width: 340px;
+    flex: 1; padding-left: 32px;
+    display: flex; flex-direction: column; gap: 14px;
+    max-width: 400px;
   }
 
   /* Майнс — сетка нормального размера */
   .grid {
     display: grid;
-    gap: 10px;
+    gap: 11px;
   }
   .grid-wrap {
     margin: 0 !important;
-    padding: 16px !important;
+    padding: 20px !important;
   }
 
   /* === ТОП === */
+  #screen-top .top-tabs { margin: 20px 32px 16px; }
+  #screen-top .top-you-card { margin: 0 32px 12px; }
+  #screen-top .top-list { margin: 0 32px 32px; }
   #screen-top .leaderboard-wrap,
-  #screen-top .lb-section { margin: 0 24px; }
+  #screen-top .lb-section { margin: 0 32px; }
+
+  /* Топ-лист — двухколоночный на ПК */
+  #screen-top .top-list {
+    display: grid !important;
+    flex-direction: unset;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    align-items: start;
+  }
+  /* Первые три места — во всю ширину */
+  #screen-top .top-list > *:nth-child(-n+3) {
+    grid-column: 1 / -1;
+  }
 
   /* === БОНУС === */
-  .bonus-card { margin: 24px 24px 20px; }
-  .ref-section { margin: 0 24px 24px; }
+  .bonus-card { margin: 32px 32px 24px; padding: 52px 40px; border-radius: 28px; }
+  .ref-section { margin: 0 32px 32px; padding: 28px 32px; border-radius: 28px; }
+
+  /* Реферальная секция — горизонтальный layout */
+  .ref-header { margin-bottom: 24px; }
+  .ref-stats-row { gap: 0; }
 
   /* === ПРОФИЛЬ === */
-  .profile-card { margin: 24px auto 20px; }
-  .profile-stats { margin: 0 24px; }
-  .profile-history { margin: 20px 24px 0; }
+  .profile-card { margin: 32px auto 24px; max-width: 480px; padding: 36px 32px; border-radius: 28px; }
+  .profile-stats {
+    margin: 0 32px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+  .profile-history { margin: 24px 32px 0; }
+
+  /* Профиль — аватар и имя крупнее */
+  .profile-avatar { width: 90px; height: 90px; font-size: 36px; border-radius: 26px; }
+  .profile-name { font-size: 24px; margin-top: 14px; }
 
   /* === СКРОЛЛБАР === */
   .screen::-webkit-scrollbar { width: 5px; }
@@ -2035,6 +2067,11 @@ body {
 
   /* === DRAWER СКРЫТЬ === */
   .drawer, .drawer-overlay { display: none !important; }
+
+  /* === САЙДБАР — ШИРЕ === */
+  .desk-sidebar { width: 240px; padding: 20px 14px; }
+  .desk-sidebar-item { font-size: 14px; padding: 11px 14px; border-radius: 12px; }
+  .desk-sidebar-section { font-size: 11px; padding: 14px 12px 8px; }
 }
 </style>
 </head>
