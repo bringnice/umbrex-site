@@ -2642,7 +2642,7 @@ body {
         <button class="tower-bet-mod" onclick="twBetMod(.5)">1/2</button>
         <button class="tower-bet-mod" onclick="twBetMod(2)">×2</button>
         <button class="tower-bet-mod" onclick="twBetAll()">Макс</button>
-        <input id="tower-bet-inp" class="tower-bet-inp" type="number" value="500" min="50" step="50" inputmode="numeric">
+        <input id="tower-bet-inp" class="tower-bet-inp" type="number" value="500" min="100" step="100" inputmode="numeric">
       </div>
     </div>
     <div class="tower-setting-row">
@@ -2962,7 +2962,7 @@ body {
       <div class="bet-input-wrap">
         <button class="bet-mod" onclick="hiloMultBet(.5)">½</button>
         <button class="bet-mod" onclick="hiloMultBet(2)">×2</button>
-        <input id="hilo-bet-input" class="bet-inp" type="number" value="500" min="50" step="50">
+        <input id="hilo-bet-input" class="bet-inp" type="number" value="500" min="100" step="100">
         <button class="bet-mod" onclick="document.getElementById('hilo-bet-input').value=Math.floor(sharedBalance)">MAX</button>
       </div>
     </div>
@@ -3011,7 +3011,7 @@ body {
     <div class="wheel-setting-row">
       <div class="wheel-setting-label">Ставка</div>
       <div class="wheel-bet-wrap">
-        <input class="wheel-bet-inp" id="wheel-bet-inp" type="number" min="1" value="10" inputmode="numeric">
+        <input class="wheel-bet-inp" id="wheel-bet-inp" type="number" min="100" value="100" inputmode="numeric">
         <div class="wheel-bet-mod" onclick="wheelBetMod(.5)">½</div>
         <div class="wheel-bet-mod" onclick="wheelBetMod(2)">×2</div>
         <div class="wheel-bet-mod" onclick="wheelSetMax()">Макс</div>
@@ -4134,7 +4134,38 @@ async function loadMiniLeaderboard(){
 // ── ХИЛО ──
 let HS = { playing:false, bet:500, cumulative:1, streak:0 };
 
+
+// ── HiLo polling (синхронизация с ботом каждые 2 сек) ──
+let _hiloPollTimer = null;
+function startHiloPoll() {
+  if (_hiloPollTimer) return;
+  _hiloPollTimer = setInterval(async () => {
+    if (!HS.playing || !HS.gameId) return;
+    try {
+      const r = await apiCall('GET', '/api/hilo/poll?game_id=' + HS.gameId);
+      if (!r.ok) return;
+      if (r.status === 'lose') {
+        stopHiloPoll();
+        sharedBalance = r.new_balance ?? sharedBalance;
+        syncBalanceUI();
+        document.getElementById('topbar-balance-val').textContent = fmt(sharedBalance);
+        showResult(false, HS.bet, 0);
+        setTimeout(() => hiloReset(), 400);
+      } else if (r.status === 'cashout' || r.status === 'win') {
+        stopHiloPoll();
+        sharedBalance = r.new_balance ?? sharedBalance;
+        syncBalanceUI();
+        document.getElementById('topbar-balance-val').textContent = fmt(sharedBalance);
+        showResult(true, r.payout - HS.bet, r.cumulative);
+        setTimeout(() => hiloReset(), 2800);
+      }
+    } catch(e) {}
+  }, 2000);
+}
+function stopHiloPoll() { clearInterval(_hiloPollTimer); _hiloPollTimer = null; }
+
 function hiloReset(){
+  stopHiloPoll();
   HS = { playing:false, bet:500, cumulative:1, streak:0 };
   document.getElementById('hilo-settings').style.display='block';
   document.getElementById('hilo-start-row').style.display='flex';
@@ -4151,7 +4182,7 @@ function hiloReset(){
 
 function hiloMultBet(f){
   const i=document.getElementById('hilo-bet-input');
-  i.value=Math.max(50,Math.round(parseFloat(i.value||500)*f));
+  i.value=Math.max(100,Math.round(parseFloat(i.value||500)*f));
 }
 
 function hiloUpdateCard(val, suit){
@@ -4212,13 +4243,14 @@ function hiloUpdateInfo(data){
 
 async function hiloStart(){
   const bet = parseFloat(document.getElementById('hilo-bet-input').value);
-  if(!bet || bet < 50){ showToast('Мин. ставка 50'); return; }
+  if(!bet || bet < 100){ showToast('Мин. ставка 100'); return; }
   if(bet > sharedBalance){ showToast('Недостаточно средств'); return; }
   document.getElementById('hilo-start-btn').disabled = true;
   try{
     const r = await apiCall('POST','/api/hilo/start',{bet});
     if(!r.ok){ showToast(r.error||'Ошибка'); document.getElementById('hilo-start-btn').disabled=false; return; }
     HS.playing = true;
+    HS.gameId = r.game_id;
     HS.bet = bet;
     sharedBalance = r.new_balance;
     syncBalanceUI();
@@ -4230,6 +4262,7 @@ async function hiloStart(){
     document.getElementById('hilo-info').style.display='flex';
     document.getElementById('hilo-action-btns').style.display='flex';
     hiloUpdateInfo(r);
+    startHiloPoll();
     document.getElementById('hilo-card').className = 'hilo-card';
   }catch(e){ showToast('Ошибка соединения'); document.getElementById('hilo-start-btn').disabled=false; }
 }
@@ -4469,10 +4502,10 @@ const WS = {
 
 function wheelBuildSegments() {
   const defs = [
-    { mult: 2,  color: '#374151', glow: '#9ca3af',  label: '×2',  count: 24 },
-    { mult: 3,  color: '#5b21b6', glow: '#a78bfa',  label: '×3',  count: 18 },
-    { mult: 5,  color: '#991b1b', glow: '#f87171',  label: '×5',  count: 8  },
-    { mult: 50, color: '#064e2e', glow: '#34d399',  label: '×50', count: 4  },
+    { mult: 2,  color: '#374151', glow: '#9ca3af',  label: '×2',  count: 30 },
+    { mult: 3,  color: '#5b21b6', glow: '#a78bfa',  label: '×3',  count: 16 },
+    { mult: 5,  color: '#991b1b', glow: '#f87171',  label: '×5',  count: 5  },
+    { mult: 50, color: '#064e2e', glow: '#34d399',  label: '×50', count: 1  },
   ];
   const segs = [];
   defs.forEach(d => {
@@ -4952,7 +4985,7 @@ async function wheelPlaceBet(mult) {
   if (_wheelSpinning) { showToast('Дождись конца вращения!'); return; }
   if (_wheelLocked) { showToast('Ставки закрыты!'); return; }
   const betVal = parseInt(document.getElementById('wheel-bet-inp').value) || 0;
-  if (betVal < 1) { showToast('Введи ставку'); return; }
+  if (betVal < 100) { showToast('Мин. ставка 100'); return; }
   if (betVal > sharedBalance) { showToast('Недостаточно монет'); return; }
 
   try {
@@ -4975,7 +5008,7 @@ async function wheelPlaceBet(mult) {
 function wheelPickResultLocal() {
   const r = Math.random() * 100;
   let cumul = 0;
-  const chances = [{mult:2,pct:44.4},{mult:3,pct:33.3},{mult:5,pct:14.8},{mult:50,pct:7.5}];
+  const chances = [{mult:2,pct:57.7},{mult:3,pct:30.8},{mult:5,pct:9.6},{mult:50,pct:1.9}];
   let targetMult = 2;
   for (const c of chances) { cumul += c.pct; if (r < cumul) { targetMult = c.mult; break; } }
   const pool = WS.segments.filter(s => s.mult === targetMult);
@@ -4984,21 +5017,21 @@ function wheelPickResultLocal() {
 
 function wheelBetMod(factor) {
   const inp = document.getElementById('wheel-bet-inp');
-  let v = Math.max(1, Math.floor((parseInt(inp.value)||0) * factor));
+  let v = Math.max(100, Math.floor((parseInt(inp.value)||0) * factor));
   v = Math.min(v, Math.floor(sharedBalance));
   inp.value = v;
 }
 
 function wheelSetMax() {
   const inp = document.getElementById('wheel-bet-inp');
-  inp.value = Math.max(1, Math.floor(sharedBalance));
+  inp.value = Math.max(100, Math.floor(sharedBalance));
 }
 
 // ═══════════════════════════════════════════
 //  🗼 БАШНЯ
 // ═══════════════════════════════════════════
 const TW = {
-  CELLS: 5, FLOORS: 9, MIN_BET: 50,
+  CELLS: 5, FLOORS: 9, MIN_BET: 100,
   MULTIPLIERS: {
     1: [1.21,1.52,1.89,2.37,2.96,3.70,4.63,5.79,7.24],
     2: [1.62,2.62,4.25,6.89,11.16,18.08,29.28,47.44,76.85],
@@ -5241,7 +5274,51 @@ function twUpdateMultsStrip() {
   }
 }
 
+
+// ── Tower polling (синхронизация с ботом каждые 2 сек) ──
+let _twPollTimer = null;
+function twStartPoll() {
+  if (_twPollTimer) return;
+  _twPollTimer = setInterval(async () => {
+    if (!TW.playing || !TW.gameId) return;
+    try {
+      const r = await apiCall('GET', '/api/tower/poll?game_id=' + TW.gameId);
+      if (!r.ok) return;
+      if (r.status === 'lose') {
+        stopTwPoll();
+        TW.playing = false;
+        TW.locked = false;
+        sharedBalance = r.new_balance ?? sharedBalance;
+        syncBalanceUI();
+        document.getElementById('topbar-balance-val').textContent = fmt(sharedBalance);
+        twShowResult(false, 0, 0);
+        twExitPlay();
+      } else if (r.status === 'cashout' || r.status === 'win') {
+        stopTwPoll();
+        TW.playing = false;
+        sharedBalance = r.new_balance ?? sharedBalance;
+        syncBalanceUI();
+        document.getElementById('topbar-balance-val').textContent = fmt(sharedBalance);
+        twShowResult(true, r.earned_mult ?? TW.earnedMult, r.earned_prize ?? TW.earnedPrize);
+        twExitPlay();
+      } else if (r.status === 'active') {
+        // Синхронизируем этаж если изменился в боте
+        if (r.floor_num && r.floor_num !== TW.floorNum) {
+          TW.floorNum = r.floor_num;
+          TW.passedFloors = r.passed_floors || TW.passedFloors;
+          TW.earnedMult = r.earned_mult || TW.earnedMult;
+          TW.earnedPrize = r.earned_prize || TW.earnedPrize;
+          twRefreshBoard();
+          twUpdateInfo();
+        }
+      }
+    } catch(e) {}
+  }, 2000);
+}
+function stopTwPoll() { clearInterval(_twPollTimer); _twPollTimer = null; }
+
 function twEnterPlay() {
+  twStartPoll();
   document.getElementById('tower-settings').style.display = 'none';
   document.getElementById('tw-mults-strip').style.display = 'flex';
   document.getElementById('tower-info-row').style.display = 'flex';
@@ -5253,6 +5330,7 @@ function twEnterPlay() {
 }
 
 function twExitPlay() {
+  stopTwPoll();
   document.getElementById('tower-settings').style.display = 'block';
   document.getElementById('tw-mults-strip').style.display = 'flex';
   document.getElementById('tower-info-row').style.display = 'none';
