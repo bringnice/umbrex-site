@@ -2870,7 +2870,7 @@ body {
     </button>
     <button class="bj-action-btn bj-btn-stand"  id="bj-btn-stand"  onclick="bjStand()">
       <span class="bj-btn-label">Стоп</span>
-      <span class="bj-btn-sub">Передать</span>
+
     </button>
     <button class="bj-action-btn bj-btn-double" id="bj-btn-double" onclick="bjDouble()">
       <span class="bj-btn-label">×2</span>
@@ -5951,15 +5951,7 @@ function initWheelCardCanvas() {
 const BJ_SUITS = ['♠','♥','♦','♣'];
 const BJ_RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 const BJ_RED   = ['♥','♦'];
-let bjDeck=[], bjPlayer=[], bjDealer=[], bjPhase='bet', bjBetAmt=0, bjCanDouble=false, bjResTimer=null;
-
-function bjBuildDeck(){
-  const d=[];
-  for(const s of BJ_SUITS) for(const r of BJ_RANKS) d.push({s,r});
-  for(let i=d.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[d[i],d[j]]=[d[j],d[i]];}
-  return d;
-}
-function bjDraw(){if(bjDeck.length<15)bjDeck=[...bjDeck,...bjBuildDeck()];return bjDeck.pop();}
+let bjPlayer=[], bjDealer=[], bjPhase='bet', bjBetAmt=0, bjCanDouble=false, bjResTimer=null;
 
 function bjHandVal(hand){
   let v=0,aces=0;
@@ -6015,14 +6007,26 @@ function bjRenderCard(c,delay){
 function bjRenderHands(revealDealer){
   const pd=document.getElementById('bj-cards-dealer');
   const pp=document.getElementById('bj-cards-player');
-  pd.innerHTML=''; pp.innerHTML='';
+  // Дилер — всегда перерисовываем (открываем скрытую карту / добавляем новые)
+  pd.innerHTML='';
   bjDealer.forEach((c,i)=>{
     const card=revealDealer?{...c,hidden:false}:c;
-    pd.appendChild(bjRenderCard(card,i*80));
+    // Анимация только для новых карт (последней при reveal или всех при раздаче)
+    const isNew = revealDealer ? (i===bjDealer.length-1 && i>1) : true;
+    pd.appendChild(bjRenderCard(card, isNew ? i*80 : 0));
   });
-  bjPlayer.forEach((c,i)=>{
-    pp.appendChild(bjRenderCard(c,i*80));
-  });
+  // Игрок — перерисовываем только если у него новые карты (больше чем в DOM)
+  const existingPlayerCards = pp.children.length;
+  if(bjPlayer.length > existingPlayerCards){
+    // Добавляем только новые карты, не трогая существующие
+    for(let i=existingPlayerCards; i<bjPlayer.length; i++){
+      pp.appendChild(bjRenderCard(bjPlayer[i], 0));
+    }
+  } else if(bjPlayer.length !== existingPlayerCards){
+    // Полная перерисовка если что-то не так
+    pp.innerHTML='';
+    bjPlayer.forEach((c,i)=>{ pp.appendChild(bjRenderCard(c,i*80)); });
+  }
   // Счёт игрока
   const pv=bjHandVal(bjPlayer);
   const sp=document.getElementById('bj-score-player');
@@ -6068,52 +6072,61 @@ async function bjStart(){
   if(bet>sharedBalance){showToast('Недостаточно монет');tg?.HapticFeedback?.notificationOccurred('error');return;}
   if(bet<100){showToast('Минимальная ставка 100 🪙');return;}
 
-  bjBetAmt=bet; bjPhase='play';
-  sharedBalance-=bet; syncBalanceUI();
+  document.getElementById('bj-start-btn').disabled=true;
+  let r;
+  try{ r=await apiCall('POST','/api/blackjack/start',{bet}); }
+  catch(e){ showToast('Ошибка соединения'); document.getElementById('bj-start-btn').disabled=false; return; }
+  if(!r.ok){ showToast(r.error||'Ошибка'); document.getElementById('bj-start-btn').disabled=false; return; }
 
-  if(bjDeck.length<15) bjDeck=bjBuildDeck();
-  bjPlayer=[bjDraw(),bjDraw()];
-  bjDealer=[bjDraw(),{...bjDraw(),hidden:true}];
-  bjCanDouble=sharedBalance>=bet;
+  bjBetAmt=bet; bjPhase='play';
+  sharedBalance=r.new_balance; syncBalanceUI();
+
+  bjPlayer=r.player;
+  bjDealer=r.done ? r.dealer : [...r.dealer, {r:'?',s:'',hidden:true}];
+  bjCanDouble=r.can_double||false;
 
   document.getElementById('bj-settings').style.display='none';
   document.getElementById('bj-start-row').style.display='none';
-  document.getElementById('bj-action-btns').style.display='flex';
   document.getElementById('bj-info-row').style.display='flex';
-  document.getElementById('bj-btn-double').disabled=!bjCanDouble;
-  bjRenderHands(false);
+  document.getElementById('bj-start-btn').disabled=false;
   bjUpdateInfo();
   tg?.HapticFeedback?.impactOccurred('medium');
 
-  // Блэкджек у игрока?
-  setTimeout(()=>{
-    const pv=bjHandVal(bjPlayer);
-    if(pv===21){
-      bjDealer[1].hidden=false;
-      bjRenderHands(true);
-      const dv=bjHandVal(bjDealer);
-      if(dv===21){bjEnd('push');}
-      else {
-        const win=Math.floor(bjBetAmt*2.5);
-        sharedBalance+=win; syncBalanceUI();
-        bjEnd('bj',win-bjBetAmt);
-      }
-    }
-  },bjPlayer.length*80+250);
+  if(r.done){
+    bjRenderHands(true);
+    document.getElementById('bj-action-btns').style.display='none';
+    setTimeout(()=>bjEnd(r.outcome, r.profit, r.new_balance), bjPlayer.length*80+250);
+  } else {
+    document.getElementById('bj-action-btns').style.display='flex';
+    document.getElementById('bj-btn-double').disabled=!bjCanDouble;
+    bjRenderHands(false);
+  }
 }
 
-function bjHit(){
+async function bjHit(){
   if(bjPhase!=='play')return;
   bjCanDouble=false;
   document.getElementById('bj-btn-double').disabled=true;
-  bjPlayer.push(bjDraw());
-  bjRenderHands(false);
+  document.getElementById('bj-btn-hit').disabled=true;
+  document.getElementById('bj-btn-stand').disabled=true;
+
+  let r;
+  try{ r=await apiCall('POST','/api/blackjack/hit',{}); }
+  catch(e){ showToast('Ошибка соединения'); document.getElementById('bj-btn-hit').disabled=false; document.getElementById('bj-btn-stand').disabled=false; return; }
+  if(!r.ok){ showToast(r.error||'Ошибка'); document.getElementById('bj-btn-hit').disabled=false; document.getElementById('bj-btn-stand').disabled=false; return; }
+
+  bjPlayer=r.player;
   tg?.HapticFeedback?.impactOccurred('light');
-  const v=bjHandVal(bjPlayer);
-  if(v>21){
-    setTimeout(()=>{bjDealer[1].hidden=false;bjRenderHands(true);bjEnd('bust');},280);
-  } else if(v===21){
-    setTimeout(()=>bjStand(),380);
+
+  if(r.done){
+    bjDealer=r.dealer;
+    bjRenderHands(true);
+    document.getElementById('bj-action-btns').style.display='none';
+    setTimeout(()=>bjEnd(r.outcome, r.profit, r.new_balance), 280);
+  } else {
+    bjRenderHands(false);
+    document.getElementById('bj-btn-hit').disabled=false;
+    document.getElementById('bj-btn-stand').disabled=false;
   }
 }
 
@@ -6121,65 +6134,56 @@ async function bjStand(){
   if(bjPhase!=='play')return;
   bjPhase='dealing';
   document.getElementById('bj-action-btns').style.display='none';
-  bjDealer[1].hidden=false;
-  bjRenderHands(true);
   tg?.HapticFeedback?.impactOccurred('light');
-  // Дилер тянет до 17
-  await new Promise(resolve=>{
-    const tick=()=>{
-      const dv=bjHandVal(bjDealer.map(c=>({...c,hidden:false})));
-      if(dv<17){
-        bjDealer.push(bjDraw());
-        bjRenderHands(true);
-        setTimeout(tick,400);
-      } else { setTimeout(()=>{
-        const pv=bjHandVal(bjPlayer);
-        const dv2=bjHandVal(bjDealer.map(c=>({...c,hidden:false})));
-        let res;
-        if(dv2>21||pv>dv2) res='win';
-        else if(pv===dv2)   res='push';
-        else                 res='lose';
-        bjEnd(res); resolve();
-      },280);}
-    };
-    setTimeout(tick,350);
-  });
+
+  let r;
+  try{ r=await apiCall('POST','/api/blackjack/stand',{}); }
+  catch(e){ showToast('Ошибка соединения'); bjPhase='play'; document.getElementById('bj-action-btns').style.display='flex'; return; }
+  if(!r.ok){ showToast(r.error||'Ошибка'); bjPhase='play'; document.getElementById('bj-action-btns').style.display='flex'; return; }
+
+  bjDealer=r.dealer;
+  bjRenderHands(true);
+  setTimeout(()=>bjEnd(r.outcome, r.profit, r.new_balance), 400);
 }
 
 async function bjDouble(){
   if(bjPhase!=='play'||!bjCanDouble)return;
-  sharedBalance-=bjBetAmt; bjBetAmt*=2; syncBalanceUI();
   bjCanDouble=false;
   document.getElementById('bj-btn-double').disabled=true;
-  bjPlayer.push(bjDraw());
-  bjRenderHands(false);
+  document.getElementById('bj-btn-hit').disabled=true;
+  document.getElementById('bj-btn-stand').disabled=true;
+
+  let r;
+  try{ r=await apiCall('POST','/api/blackjack/double',{}); }
+  catch(e){ showToast('Ошибка соединения'); document.getElementById('bj-btn-hit').disabled=false; document.getElementById('bj-btn-stand').disabled=false; bjCanDouble=true; document.getElementById('bj-btn-double').disabled=false; return; }
+  if(!r.ok){ showToast(r.error||'Ошибка'); document.getElementById('bj-btn-hit').disabled=false; document.getElementById('bj-btn-stand').disabled=false; bjCanDouble=true; document.getElementById('bj-btn-double').disabled=false; return; }
+
+  bjBetAmt*=2; bjPlayer=r.player; bjDealer=r.dealer;
+  sharedBalance=r.new_balance; syncBalanceUI();
   bjUpdateInfo();
   tg?.HapticFeedback?.impactOccurred('medium');
-  const v=bjHandVal(bjPlayer);
-  if(v>21){
-    setTimeout(()=>{bjDealer[1].hidden=false;bjRenderHands(true);bjEnd('bust');},350);
-  } else {
-    setTimeout(()=>bjStand(),450);
-  }
+  bjRenderHands(true);
+  document.getElementById('bj-action-btns').style.display='none';
+  setTimeout(()=>bjEnd(r.outcome, r.profit, r.new_balance), 400);
 }
 
-function bjEnd(result,bjBonus){
+function bjEnd(result, profit, new_balance){
   bjPhase='end';
   document.getElementById('bj-action-btns').style.display='none';
 
+  if(new_balance !== undefined){ sharedBalance=new_balance; syncBalanceUI(); }
+
   const pv=bjHandVal(bjPlayer);
   const dv=bjHandVal(bjDealer.map(c=>({...c,hidden:false})));
+  const profitAmt = profit !== undefined ? Math.abs(profit) : bjBetAmt;
 
-  if(result==='bj'){
-    const net=Math.floor(bjBetAmt/2.5*1.5); // already credited above
-    bjShowResult('bj','БЛЭКДЖЕК 🃏',`+${fmt(Math.floor(bjBetAmt/2.5*1.5))} 🪙`,2800);
+  if(result==='blackjack'){
+    bjShowResult('bj','БЛЭКДЖЕК 🃏',`+${fmt(profitAmt)} 🪙`,2800);
     tg?.HapticFeedback?.notificationOccurred('success');
   } else if(result==='win'){
-    sharedBalance+=bjBetAmt*2; syncBalanceUI();
-    bjShowResult('win','ПОБЕДА!',`+${fmt(bjBetAmt)} 🪙`,2500);
+    bjShowResult('win','ПОБЕДА!',`+${fmt(profitAmt)} 🪙`,2500);
     tg?.HapticFeedback?.notificationOccurred('success');
   } else if(result==='push'){
-    sharedBalance+=bjBetAmt; syncBalanceUI();
     bjShowResult('push','НИЧЬЯ','Ставка возвращена',2200);
     tg?.HapticFeedback?.notificationOccurred('warning');
   } else if(result==='bust'){
