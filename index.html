@@ -6049,7 +6049,7 @@ function bjRenderHands(revealDealer){
 }
 
 function bjUpdateInfo(){
-  const payout=bjBetAmt*2;
+  const payout=Math.floor(bjBetAmt*1.9);
   document.getElementById('bj-bet-disp').textContent=fmt(bjBetAmt)+' 🪙';
   document.getElementById('bj-payout-disp').textContent=fmt(payout)+' 🪙';
 }
