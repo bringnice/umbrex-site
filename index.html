@@ -1597,6 +1597,215 @@ body {
 .gc-bj-bottom { position:absolute;bottom:0;left:0;right:0;padding:12px 14px 15px;z-index:7; }
 .gc-bj-name { font-size:17px;font-weight:900;color:#fff;margin-bottom:2px;font-family:-apple-system,sans-serif; }
 .gc-bj-desc { font-size:11px;color:rgba(255,255,255,.35);font-family:-apple-system,sans-serif; }
+/* Активная карточка блэкджека — кликабельная */
+.gc-bj-card-active { cursor:pointer; }
+.gc-bj-card-active:hover { transform:translateY(-2px); box-shadow:0 14px 36px rgba(251,191,36,.25),0 10px 28px rgba(0,0,0,.55),inset 0 1px 0 rgba(251,191,36,.15); }
+.gc-bj-card-active:active { transform:scale(.95); }
+
+/* ══════════ БЛЭКДЖЕК ЭКРАН ══════════ */
+#screen-blackjack {
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(40,120,60,.3) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 60% at 20% 80%, rgba(30,80,40,.25) 0%, transparent 55%),
+    var(--bg);
+  overflow: hidden;
+}
+
+/* Стол */
+.bj-table {
+  position:relative; z-index:10;
+  margin:0 14px 10px; flex:1; min-height:0;
+  background:linear-gradient(145deg,rgba(10,28,16,.97),rgba(8,20,12,.99));
+  border:1px solid rgba(40,100,60,.5);
+  border-radius:22px; overflow:hidden;
+  display:flex; flex-direction:column;
+  box-shadow:0 0 60px rgba(20,80,40,.15),inset 0 1px 0 rgba(255,255,255,.04),inset 0 0 40px rgba(10,40,20,.4);
+}
+/* Фетровая текстура */
+.bj-table::before {
+  content:'';position:absolute;inset:0;
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,.012) 3px,rgba(255,255,255,.012) 4px),
+    repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(255,255,255,.012) 3px,rgba(255,255,255,.012) 4px);
+  pointer-events:none; border-radius:22px;
+}
+
+/* Зоны */
+.bj-zone {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  position:relative; padding:8px 16px;
+}
+.bj-zone-label {
+  font-size:10px; letter-spacing:2px; text-transform:uppercase;
+  color:rgba(52,211,153,.45); font-weight:600; flex-shrink:0;
+}
+.bj-zone-score {
+  font-size:13px; font-weight:800; min-height:18px; letter-spacing:.3px;
+  flex-shrink:0; transition:opacity .3s;
+}
+.bj-zone-score.score-bust { color:var(--red); }
+.bj-zone-score.score-bj   { color:#fbbf24; }
+.bj-zone-score.score-ok   { color:var(--green); }
+.bj-zone-score.score-norm { color:var(--purple-light); }
+
+/* Разделитель */
+.bj-divider {
+  height:1px; flex-shrink:0; margin:0 20px;
+  background:linear-gradient(90deg,transparent,rgba(52,211,153,.15),transparent);
+}
+
+/* Ряд карт */
+.bj-cards-row {
+  display:flex; justify-content:center; align-items:flex-end;
+  min-height:90px; position:relative;
+  flex-shrink:0; gap:0;
+}
+
+/* Карта */
+.bj-card {
+  width:58px; height:84px; border-radius:8px;
+  margin-left:-18px; flex-shrink:0;
+  position:relative; transform-origin:bottom center;
+  animation:bjDeal .22s cubic-bezier(.2,.8,.4,1) both;
+}
+.bj-cards-row .bj-card:first-child { margin-left:0; }
+@keyframes bjDeal {
+  from { transform:translateY(-50px) scale(.8) rotate(-6deg); opacity:0; }
+  to   { transform:translateY(0) scale(1) rotate(0); opacity:1; }
+}
+.bj-card-inner {
+  width:100%; height:100%; border-radius:8px;
+  background:#fff;
+  border:1px solid rgba(0,0,0,.1);
+  box-shadow:0 4px 14px rgba(0,0,0,.55),0 1px 3px rgba(0,0,0,.3);
+  display:flex; flex-direction:column; padding:4px;
+  position:relative; overflow:hidden;
+}
+.bj-card-inner::after {
+  content:''; position:absolute; inset:0; border-radius:8px;
+  background:linear-gradient(135deg,rgba(255,255,255,.55) 0%,transparent 50%);
+  pointer-events:none;
+}
+.bj-corner { line-height:1.1; }
+.bj-corner .bj-rank { font-size:14px; font-weight:900; color:#111; display:block; }
+.bj-corner .bj-suit { font-size:11px; display:block; }
+.bj-corner.tl { align-self:flex-start; }
+.bj-corner.br { align-self:flex-end; margin-top:auto; transform:rotate(180deg); }
+.bj-card-center {
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:22px; pointer-events:none;
+}
+.bj-card.red .bj-corner .bj-rank,
+.bj-card.red .bj-corner .bj-suit,
+.bj-card.red .bj-card-center { color:var(--red); }
+/* Рубашка */
+.bj-card.back .bj-card-inner {
+  background:linear-gradient(135deg,#1a1060 0%,#2a1880 50%,#1a1060 100%);
+  display:flex; align-items:center; justify-content:center;
+}
+.bj-card.back .bj-card-inner::before {
+  content:'◆'; font-size:24px; color:rgba(139,92,246,.5); z-index:1;
+}
+.bj-card.back .bj-card-inner::after {
+  background:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(139,92,246,.06) 4px,rgba(139,92,246,.06) 8px);
+  border-radius:8px;
+}
+
+/* Оверлей результата */
+.bj-result-overlay {
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  z-index:20; pointer-events:none;
+  opacity:0; transition:opacity .25s;
+}
+.bj-result-overlay.show { opacity:1; }
+.bj-result-box {
+  background:rgba(8,13,24,.85); border-radius:14px;
+  padding:16px 28px; text-align:center;
+  backdrop-filter:blur(8px);
+}
+.bj-result-box.win  { border:1.5px solid rgba(52,211,153,.7); box-shadow:0 0 30px rgba(52,211,153,.2); }
+.bj-result-box.lose { border:1.5px solid rgba(248,113,113,.6); box-shadow:0 0 24px rgba(248,113,113,.15); }
+.bj-result-box.push { border:1.5px solid rgba(139,92,246,.5); }
+.bj-result-box.bj   { border:1.5px solid rgba(251,191,36,.7); box-shadow:0 0 30px rgba(251,191,36,.25); }
+.bj-res-title {
+  font-size:22px; font-weight:900; letter-spacing:.3px;
+}
+.bj-res-title.win  { color:var(--green); }
+.bj-res-title.lose { color:var(--red); }
+.bj-res-title.push { color:var(--purple-light); }
+.bj-res-title.bj   { color:#fbbf24; }
+.bj-res-sub { font-size:12px; color:var(--muted); margin-top:3px; }
+
+/* Декоративные масти */
+.bj-suits-deco {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  font-size:16px; opacity:.03; pointer-events:none; letter-spacing:8px; white-space:nowrap;
+}
+
+/* Инфо-строка (мульт + выигрыш) — как в HiLo/Tower */
+.bj-info-row {
+  position:relative; z-index:10; margin:0 14px 10px;
+  display:flex; gap:10px; flex-shrink:0;
+}
+.bj-info-box {
+  flex:1;
+  background:linear-gradient(145deg,rgba(18,14,38,.97),rgba(13,10,28,.99));
+  border:1px solid rgba(55,42,100,.6); border-radius:16px;
+  padding:12px 14px; text-align:center;
+}
+.bj-info-lbl { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; font-weight:600; margin-bottom:4px; }
+.bj-info-val { font-size:20px; font-weight:900; color:var(--purple-light); text-shadow:0 0 12px rgba(167,139,250,.5); }
+.bj-info-val.green { color:var(--green); text-shadow:0 0 12px rgba(52,211,153,.5); }
+
+/* Настройки ставки — точь-в-точь как hilo-settings */
+.bj-settings {
+  position:relative; z-index:10; margin:0 14px 8px;
+  background:var(--card); border:1px solid var(--border);
+  border-radius:16px; padding:14px; flex-shrink:0;
+}
+
+/* Кнопки действий во время игры */
+.bj-action-btns {
+  position:relative; z-index:10;
+  margin:0 14px 8px; display:flex; gap:8px; flex-shrink:0;
+}
+.bj-action-btn {
+  flex:1; padding:14px 6px; border:none; border-radius:14px;
+  font-size:14px; font-weight:900; cursor:pointer; letter-spacing:.3px;
+  transition:transform .12s, box-shadow .15s, opacity .15s;
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+}
+.bj-action-btn:active { transform:scale(.93); }
+.bj-action-btn:disabled { opacity:.3; cursor:default; transform:none; }
+.bj-btn-hit {
+  background:linear-gradient(145deg,#065f3c,#047a4e);
+  color:#fff; box-shadow:0 5px 20px rgba(5,150,105,.35);
+}
+.bj-btn-stand {
+  background:linear-gradient(145deg,#7f1d1d,#991b1b);
+  color:#fff; box-shadow:0 5px 20px rgba(185,28,28,.35);
+}
+.bj-btn-double {
+  background:linear-gradient(145deg,#4c1d95,#5b21b6);
+  color:#fff; box-shadow:0 5px 20px rgba(109,40,217,.3);
+  font-size:12px;
+}
+.bj-btn-label { font-size:15px; font-weight:900; letter-spacing:.3px; }
+.bj-btn-sub   { font-size:11px; font-weight:600; opacity:.8; }
+
+/* ЗАБРАТЬ (после победы/ничьей) — как hilo-cashout-btn */
+.bj-cashout-btn {
+  position:relative; z-index:10; margin:0 14px 6px;
+  width:calc(100% - 28px); padding:16px; border:none; border-radius:16px;
+  background:linear-gradient(135deg,#4c1d95,#6d28d9);
+  color:#fff; font-size:16px; font-weight:900; cursor:pointer;
+  box-shadow:0 6px 24px rgba(109,40,217,.4);
+  transition:transform .12s; display:none; flex-shrink:0;
+}
+.bj-cashout-btn:active { transform:scale(.97); }
 
 /* ══════════ КАРТОЧКА КОЛЕСА (Игры) ══════════ */
 .game-card-wheel-new {
@@ -2561,10 +2770,9 @@ body {
           <div class="gc-tw-desc">Поднимайся выше</div>
         </div>
       </div>
-      <!-- Блэкджек — SOON -->
-      <div class="gc-bj-card">
+      <!-- Блэкджек -->
+      <div class="gc-bj-card gc-bj-card-active" onclick="openBlackjack()" data-name="блэкджек blackjack 21 карты">
         <div class="gc-bj-glow"></div>
-        <div class="gc-bj-overlay"></div>
         <!-- 3 карты веером -->
         <div class="gc-bj-cards">
           <div class="gc-bj-c left">
@@ -2581,8 +2789,6 @@ body {
           </div>
         </div>
         <div class="gc-bj-fade"></div>
-        <!-- бейдж SOON -->
-        <div class="gc-bj-badge">Soon</div>
         <!-- инфо -->
         <div class="gc-bj-bottom">
           <div class="gc-bj-name">Блэкджек</div>
@@ -2604,6 +2810,88 @@ body {
         <div class="gc-wheel-info-desc">Испытай удачу — выиграй x50</div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ═══ БЛЭКДЖЕК ═══ -->
+<div id="screen-blackjack" class="screen">
+  <div class="header">
+    <div class="header-back" onclick="goGames()">←</div>
+    <div class="header-title"><h1>🃏 Блэкджек</h1><p>Umbrex</p></div>
+    <div style="width:38px"></div>
+  </div>
+
+  <!-- Стол -->
+  <div class="bj-table">
+    <div class="bj-suits-deco">♠ ♥ ♦ ♣</div>
+
+    <!-- Дилер -->
+    <div class="bj-zone">
+      <div class="bj-zone-label">Дилер</div>
+      <div class="bj-zone-score" id="bj-score-dealer"></div>
+      <div class="bj-cards-row" id="bj-cards-dealer"></div>
+    </div>
+
+    <div class="bj-divider"></div>
+
+    <!-- Игрок -->
+    <div class="bj-zone" style="justify-content:flex-start;padding-top:10px;">
+      <div class="bj-cards-row" id="bj-cards-player"></div>
+      <div class="bj-zone-score" id="bj-score-player" style="margin-top:6px;"></div>
+      <div class="bj-zone-label" style="margin-top:2px;">Вы</div>
+    </div>
+
+    <!-- Оверлей результата -->
+    <div class="bj-result-overlay" id="bj-result-overlay">
+      <div class="bj-result-box" id="bj-result-box">
+        <div class="bj-res-title" id="bj-res-title"></div>
+        <div class="bj-res-sub"   id="bj-res-sub"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Инфо: множитель + выигрыш (во время игры) -->
+  <div class="bj-info-row" id="bj-info-row" style="display:none">
+    <div class="bj-info-box">
+      <div class="bj-info-lbl">Ставка</div>
+      <div class="bj-info-val" id="bj-bet-disp">0 🪙</div>
+    </div>
+    <div class="bj-info-box">
+      <div class="bj-info-lbl">Выигрыш при победе</div>
+      <div class="bj-info-val green" id="bj-payout-disp">0 🪙</div>
+    </div>
+  </div>
+
+  <!-- Кнопки действий (во время игры) -->
+  <div class="bj-action-btns" id="bj-action-btns" style="display:none">
+    <button class="bj-action-btn bj-btn-hit"    id="bj-btn-hit"    onclick="bjHit()">
+      <span class="bj-btn-label">Ещё</span>
+      <span class="bj-btn-sub">+1 карта</span>
+    </button>
+    <button class="bj-action-btn bj-btn-stand"  id="bj-btn-stand"  onclick="bjStand()">
+      <span class="bj-btn-label">Стоп</span>
+      <span class="bj-btn-sub">Передать</span>
+    </button>
+    <button class="bj-action-btn bj-btn-double" id="bj-btn-double" onclick="bjDouble()">
+      <span class="bj-btn-label">×2</span>
+      <span class="bj-btn-sub">Удвоить</span>
+    </button>
+  </div>
+
+  <!-- Настройки ставки (до старта) -->
+  <div class="bj-settings" id="bj-settings">
+    <div class="setting-row">
+      <span class="setting-label">Ставка</span>
+      <div class="bet-input-wrap">
+        <button class="bet-mod" onclick="bjBetMult(.5)">½</button>
+        <button class="bet-mod" onclick="bjBetMult(2)">×2</button>
+        <input id="bj-bet-input" class="bet-inp" type="number" value="500" min="100" step="100" inputmode="numeric">
+        <button class="bet-mod" onclick="document.getElementById('bj-bet-input').value=Math.floor(sharedBalance)">MAX</button>
+      </div>
+    </div>
+  </div>
+  <div class="btn-row" id="bj-start-row">
+    <button class="btn btn-start" id="bj-start-btn" onclick="bjStart()">🃏 Раздать карты</button>
   </div>
 </div>
 
@@ -3144,6 +3432,7 @@ async function checkActiveHiloGame(){
   }catch(e){ hiloReset(); }
 }
 function openMines(){showScreen('screen-mines');document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);buildGrid();buildMineOpts();setupMinesInput();checkActiveGame();}
+function openBlackjack(){showScreen('screen-blackjack');document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);bjReset();}
 function openCrash(){showScreen('screen-crash');document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);initCrash();}
 
 // ── API ──
@@ -5656,6 +5945,272 @@ function initWheelCardCanvas() {
     requestAnimationFrame(loop);
   }
   loop();
+}
+
+// ══════════ БЛЭКДЖЕК ══════════
+const BJ_SUITS = ['♠','♥','♦','♣'];
+const BJ_RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+const BJ_RED   = ['♥','♦'];
+let bjDeck=[], bjPlayer=[], bjDealer=[], bjPhase='bet', bjBetAmt=0, bjCanDouble=false, bjResTimer=null;
+
+function bjBuildDeck(){
+  const d=[];
+  for(const s of BJ_SUITS) for(const r of BJ_RANKS) d.push({s,r});
+  for(let i=d.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[d[i],d[j]]=[d[j],d[i]];}
+  return d;
+}
+function bjDraw(){if(bjDeck.length<15)bjDeck=[...bjDeck,...bjBuildDeck()];return bjDeck.pop();}
+
+function bjHandVal(hand){
+  let v=0,aces=0;
+  for(const c of hand){
+    if(c.hidden)continue;
+    if(c.r==='A'){aces++;v+=11;}
+    else if(['J','Q','K'].includes(c.r))v+=10;
+    else v+=parseInt(c.r);
+  }
+  while(v>21&&aces){v-=10;aces--;}
+  return v;
+}
+
+function bjScoreClass(v,bj){
+  if(bj)return'score-bj';
+  if(v>21)return'score-bust';
+  if(v>=18)return'score-ok';
+  return'score-norm';
+}
+
+function bjReset(){
+  bjPhase='bet'; bjPlayer=[]; bjDealer=[];
+  const pd=document.getElementById('bj-cards-dealer');
+  const pp=document.getElementById('bj-cards-player');
+  if(pd)pd.innerHTML=''; if(pp)pp.innerHTML='';
+  const sd=document.getElementById('bj-score-dealer');
+  const sp=document.getElementById('bj-score-player');
+  if(sd){sd.textContent='';sd.className='bj-zone-score';}
+  if(sp){sp.textContent='';sp.className='bj-zone-score';}
+  document.getElementById('bj-settings').style.display='block';
+  document.getElementById('bj-start-row').style.display='flex';
+  document.getElementById('bj-action-btns').style.display='none';
+  document.getElementById('bj-info-row').style.display='none';
+  document.getElementById('bj-result-overlay').classList.remove('show');
+}
+
+function bjRenderCard(c,delay){
+  const div=document.createElement('div');
+  div.className='bj-card'+(c.hidden?' back':(BJ_RED.includes(c.s)?' red':''));
+  div.style.animationDelay=delay+'ms';
+  if(!c.hidden){
+    div.innerHTML=`<div class="bj-card-inner">
+      <div class="bj-corner tl"><span class="bj-rank">${c.r}</span><span class="bj-suit">${c.s}</span></div>
+      <div class="bj-card-center">${c.s}</div>
+      <div class="bj-corner br"><span class="bj-rank">${c.r}</span><span class="bj-suit">${c.s}</span></div>
+    </div>`;
+  } else {
+    div.innerHTML=`<div class="bj-card-inner"></div>`;
+  }
+  return div;
+}
+
+function bjRenderHands(revealDealer){
+  const pd=document.getElementById('bj-cards-dealer');
+  const pp=document.getElementById('bj-cards-player');
+  pd.innerHTML=''; pp.innerHTML='';
+  bjDealer.forEach((c,i)=>{
+    const card=revealDealer?{...c,hidden:false}:c;
+    pd.appendChild(bjRenderCard(card,i*80));
+  });
+  bjPlayer.forEach((c,i)=>{
+    pp.appendChild(bjRenderCard(c,i*80));
+  });
+  // Счёт игрока
+  const pv=bjHandVal(bjPlayer);
+  const sp=document.getElementById('bj-score-player');
+  if(bjPlayer.length){
+    const isBJ=pv===21&&bjPlayer.length===2;
+    sp.textContent=isBJ?'21 — Блэкджек!':pv>21?pv+' — Перебор':pv;
+    sp.className='bj-zone-score '+bjScoreClass(pv,isBJ);
+  } else { sp.textContent=''; sp.className='bj-zone-score'; }
+  // Счёт дилера
+  const sd=document.getElementById('bj-score-dealer');
+  if(revealDealer){
+    const dv=bjHandVal(bjDealer.map(c=>({...c,hidden:false})));
+    sd.textContent=dv>21?dv+' — Перебор':dv;
+    sd.className='bj-zone-score '+bjScoreClass(dv,false);
+  } else if(bjDealer.length){
+    const vis=bjDealer.filter(c=>!c.hidden);
+    if(vis.length){const v=bjHandVal(vis);sd.textContent=v;sd.className='bj-zone-score score-norm';}
+    else{sd.textContent='';sd.className='bj-zone-score';}
+  }
+}
+
+function bjUpdateInfo(){
+  const payout=bjBetAmt*2;
+  document.getElementById('bj-bet-disp').textContent=fmt(bjBetAmt)+' 🪙';
+  document.getElementById('bj-payout-disp').textContent=fmt(payout)+' 🪙';
+}
+
+function bjShowResult(cls,title,sub,duration){
+  clearTimeout(bjResTimer);
+  const ov=document.getElementById('bj-result-overlay');
+  const box=document.getElementById('bj-result-box');
+  document.getElementById('bj-res-title').textContent=title;
+  document.getElementById('bj-res-title').className='bj-res-title '+cls;
+  document.getElementById('bj-res-sub').textContent=sub;
+  box.className='bj-result-box '+cls;
+  ov.classList.add('show');
+  if(duration) bjResTimer=setTimeout(()=>ov.classList.remove('show'),duration);
+}
+
+async function bjStart(){
+  const inp=document.getElementById('bj-bet-input');
+  const bet=Math.max(100,parseInt(inp.value)||500);
+  if(bet>sharedBalance){showToast('Недостаточно монет');tg?.HapticFeedback?.notificationOccurred('error');return;}
+  if(bet<100){showToast('Минимальная ставка 100 🪙');return;}
+
+  bjBetAmt=bet; bjPhase='play';
+  sharedBalance-=bet; syncBalanceUI();
+
+  if(bjDeck.length<15) bjDeck=bjBuildDeck();
+  bjPlayer=[bjDraw(),bjDraw()];
+  bjDealer=[bjDraw(),{...bjDraw(),hidden:true}];
+  bjCanDouble=sharedBalance>=bet;
+
+  document.getElementById('bj-settings').style.display='none';
+  document.getElementById('bj-start-row').style.display='none';
+  document.getElementById('bj-action-btns').style.display='flex';
+  document.getElementById('bj-info-row').style.display='flex';
+  document.getElementById('bj-btn-double').disabled=!bjCanDouble;
+  bjRenderHands(false);
+  bjUpdateInfo();
+  tg?.HapticFeedback?.impactOccurred('medium');
+
+  // Блэкджек у игрока?
+  setTimeout(()=>{
+    const pv=bjHandVal(bjPlayer);
+    if(pv===21){
+      bjDealer[1].hidden=false;
+      bjRenderHands(true);
+      const dv=bjHandVal(bjDealer);
+      if(dv===21){bjEnd('push');}
+      else {
+        const win=Math.floor(bjBetAmt*2.5);
+        sharedBalance+=win; syncBalanceUI();
+        bjEnd('bj',win-bjBetAmt);
+      }
+    }
+  },bjPlayer.length*80+250);
+}
+
+function bjHit(){
+  if(bjPhase!=='play')return;
+  bjCanDouble=false;
+  document.getElementById('bj-btn-double').disabled=true;
+  bjPlayer.push(bjDraw());
+  bjRenderHands(false);
+  tg?.HapticFeedback?.impactOccurred('light');
+  const v=bjHandVal(bjPlayer);
+  if(v>21){
+    setTimeout(()=>{bjDealer[1].hidden=false;bjRenderHands(true);bjEnd('bust');},280);
+  } else if(v===21){
+    setTimeout(()=>bjStand(),380);
+  }
+}
+
+async function bjStand(){
+  if(bjPhase!=='play')return;
+  bjPhase='dealing';
+  document.getElementById('bj-action-btns').style.display='none';
+  bjDealer[1].hidden=false;
+  bjRenderHands(true);
+  tg?.HapticFeedback?.impactOccurred('light');
+  // Дилер тянет до 17
+  await new Promise(resolve=>{
+    const tick=()=>{
+      const dv=bjHandVal(bjDealer.map(c=>({...c,hidden:false})));
+      if(dv<17){
+        bjDealer.push(bjDraw());
+        bjRenderHands(true);
+        setTimeout(tick,400);
+      } else { setTimeout(()=>{
+        const pv=bjHandVal(bjPlayer);
+        const dv2=bjHandVal(bjDealer.map(c=>({...c,hidden:false})));
+        let res;
+        if(dv2>21||pv>dv2) res='win';
+        else if(pv===dv2)   res='push';
+        else                 res='lose';
+        bjEnd(res); resolve();
+      },280);}
+    };
+    setTimeout(tick,350);
+  });
+}
+
+async function bjDouble(){
+  if(bjPhase!=='play'||!bjCanDouble)return;
+  sharedBalance-=bjBetAmt; bjBetAmt*=2; syncBalanceUI();
+  bjCanDouble=false;
+  document.getElementById('bj-btn-double').disabled=true;
+  bjPlayer.push(bjDraw());
+  bjRenderHands(false);
+  bjUpdateInfo();
+  tg?.HapticFeedback?.impactOccurred('medium');
+  const v=bjHandVal(bjPlayer);
+  if(v>21){
+    setTimeout(()=>{bjDealer[1].hidden=false;bjRenderHands(true);bjEnd('bust');},350);
+  } else {
+    setTimeout(()=>bjStand(),450);
+  }
+}
+
+function bjEnd(result,bjBonus){
+  bjPhase='end';
+  document.getElementById('bj-action-btns').style.display='none';
+
+  const pv=bjHandVal(bjPlayer);
+  const dv=bjHandVal(bjDealer.map(c=>({...c,hidden:false})));
+
+  if(result==='bj'){
+    const net=Math.floor(bjBetAmt/2.5*1.5); // already credited above
+    bjShowResult('bj','БЛЭКДЖЕК 🃏',`+${fmt(Math.floor(bjBetAmt/2.5*1.5))} 🪙`,2800);
+    tg?.HapticFeedback?.notificationOccurred('success');
+  } else if(result==='win'){
+    sharedBalance+=bjBetAmt*2; syncBalanceUI();
+    bjShowResult('win','ПОБЕДА!',`+${fmt(bjBetAmt)} 🪙`,2500);
+    tg?.HapticFeedback?.notificationOccurred('success');
+  } else if(result==='push'){
+    sharedBalance+=bjBetAmt; syncBalanceUI();
+    bjShowResult('push','НИЧЬЯ','Ставка возвращена',2200);
+    tg?.HapticFeedback?.notificationOccurred('warning');
+  } else if(result==='bust'){
+    bjShowResult('lose','ПЕРЕБОР',`${pv} — потеряно ${fmt(bjBetAmt)} 🪙`,2500);
+    tg?.HapticFeedback?.notificationOccurred('error');
+  } else {
+    bjShowResult('lose','ПРОИГРЫШ',`${pv} против ${dv} — потеряно ${fmt(bjBetAmt)} 🪙`,2500);
+    tg?.HapticFeedback?.notificationOccurred('error');
+  }
+
+  // Через 2.7с — сброс на ставку
+  setTimeout(()=>{
+    document.getElementById('bj-result-overlay').classList.remove('show');
+    bjPlayer=[]; bjDealer=[];
+    const pd=document.getElementById('bj-cards-dealer');
+    const pp=document.getElementById('bj-cards-player');
+    if(pd)pd.innerHTML=''; if(pp)pp.innerHTML='';
+    const sd=document.getElementById('bj-score-dealer');
+    const sp=document.getElementById('bj-score-player');
+    if(sd){sd.textContent='';sd.className='bj-zone-score';}
+    if(sp){sp.textContent='';sp.className='bj-zone-score';}
+    bjPhase='bet';
+    document.getElementById('bj-settings').style.display='block';
+    document.getElementById('bj-start-row').style.display='flex';
+    document.getElementById('bj-info-row').style.display='none';
+  }, 2750);
+}
+
+function bjBetMult(m){
+  const inp=document.getElementById('bj-bet-input');
+  inp.value=Math.max(100,Math.round((parseFloat(inp.value)||500)*m));
 }
 
 // ══════════ ДЕСКТОП НАВИГАЦИЯ ══════════
