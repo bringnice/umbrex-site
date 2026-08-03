@@ -26,18 +26,17 @@ body {
     radial-gradient(ellipse 100% 100% at 50% 50%,#0a0818 40%,#130c2a 100%);
   color:var(--text);
   height:100%; overflow:hidden;
-  position:fixed; width:100%;
-  touch-action:pan-y;
+  position:relative;
 }
-
-/* SCREENS */
 .screen {
   display:none; position:absolute; top:0; left:0; right:0; margin:0 auto;
   width:100%; max-width:480px; height:100vh;
-  flex-direction:column; overflow-y:auto; overflow-x:hidden;
+  flex-direction:column; overflow-y:scroll; overflow-x:hidden;
   -webkit-overflow-scrolling:touch; padding-bottom:24px;
 }
 .screen.active { display:flex; }
+
+/* SCREENS */
 
 /* HEADER */
 .header { position:relative; z-index:10; padding:14px 16px 10px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
@@ -3743,7 +3742,17 @@ async function apiCall(method,path,body){
   const res=await fetch(API+path,opts);return res.json();
 }
 async function loadBalance(){
-  try{const r=await apiCall('GET','/api/balance');if(r.ok){sharedBalance=r.balance;document.getElementById('menu-balance-val').textContent=fmt(sharedBalance);}}catch(e){}
+  try{
+    const r=await apiCall('GET','/api/balance');
+    if(r.ok){
+      sharedBalance=r.balance;
+      syncBalanceUI();
+    } else {
+      document.getElementById('menu-balance-val').textContent='—';
+    }
+  }catch(e){
+    document.getElementById('menu-balance-val').textContent='—';
+  }
 }
 
 // ── POLLING БАЛАНСА каждые 5 сек ──
