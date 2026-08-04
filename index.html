@@ -177,78 +177,81 @@ body {
 .plinko-balance { font-size:13px;font-weight:700;color:rgba(167,139,250,.8); }
 
 .plinko-canvas-wrap {
-  flex:1;position:relative;margin:0 12px;
+  flex:none;position:relative;margin:8px 12px 6px;
   border-radius:20px;overflow:hidden;
-  background:linear-gradient(180deg,rgba(20,12,45,.9),rgba(10,6,25,.95));
-  border:1px solid rgba(80,50,160,.25);
-  min-height:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%,rgba(80,30,140,.4) 0%,transparent 70%),
+    linear-gradient(180deg,#0d0820 0%,#080514 100%);
+  border:1px solid rgba(80,50,160,.3);
+  box-shadow:0 0 40px rgba(80,30,140,.2),inset 0 1px 0 rgba(255,255,255,.05);
+  height:52vh;
 }
 #plinko-canvas { width:100%;height:100%;display:block; }
 
 .plinko-controls {
-  flex-shrink:0;margin:10px 12px 8px;
-  background:rgba(18,12,38,.95);border:1px solid rgba(60,40,120,.4);
-  border-radius:18px;padding:14px;
+  flex-shrink:0;margin:0 12px 8px;
+  background:rgba(14,9,30,.97);border:1px solid rgba(50,35,100,.5);
+  border-radius:18px;padding:12px 14px;
 }
-.plinko-ctrl-row { display:flex;align-items:center;gap:10px;margin-bottom:10px; }
+.plinko-ctrl-row { display:flex;align-items:center;gap:8px;margin-bottom:8px; }
 .plinko-ctrl-row:last-child { margin-bottom:0; }
-.plinko-ctrl-label { font-size:10px;color:rgba(150,130,200,.7);text-transform:uppercase;letter-spacing:.8px;font-weight:700;min-width:46px; }
+.plinko-ctrl-label { font-size:9px;color:rgba(140,120,190,.6);text-transform:uppercase;letter-spacing:1px;font-weight:800;min-width:42px; }
 
-.plinko-rows-btns { display:flex;gap:5px;flex:1; }
+.plinko-rows-btns { display:flex;gap:4px;flex:1; }
 .plinko-row-btn {
-  flex:1;padding:7px 4px;border-radius:10px;border:1px solid rgba(80,50,160,.35);
-  background:rgba(30,20,60,.8);color:rgba(180,160,220,.7);
-  font-size:12px;font-weight:800;cursor:pointer;text-align:center;
+  flex:1;padding:6px 2px;border-radius:9px;border:1px solid rgba(60,40,120,.3);
+  background:rgba(20,14,45,.9);color:rgba(150,130,200,.5);
+  font-size:11px;font-weight:800;cursor:pointer;text-align:center;
   transition:all .15s;font-family:inherit;
 }
-.plinko-row-btn.active { background:rgba(124,58,237,.35);border-color:#7c3aed;color:#c4b5fd; box-shadow:0 0 10px rgba(124,58,237,.3); }
+.plinko-row-btn.active { background:rgba(100,40,220,.25);border-color:rgba(139,92,246,.7);color:#c4b5fd;box-shadow:0 0 8px rgba(124,58,237,.25); }
 
-.plinko-risk-btns { display:flex;gap:5px;flex:1; }
+.plinko-risk-btns { display:flex;gap:4px;flex:1; }
 .plinko-risk-btn {
-  flex:1;padding:7px 4px;border-radius:10px;border:1px solid rgba(80,50,160,.35);
-  background:rgba(30,20,60,.8);color:rgba(180,160,220,.7);
-  font-size:12px;font-weight:800;cursor:pointer;text-align:center;
+  flex:1;padding:6px 4px;border-radius:9px;border:1px solid rgba(60,40,120,.3);
+  background:rgba(20,14,45,.9);color:rgba(150,130,200,.5);
+  font-size:11px;font-weight:800;cursor:pointer;text-align:center;
   transition:all .15s;font-family:inherit;
 }
-.plinko-risk-btn.active { background:rgba(124,58,237,.35);border-color:#7c3aed;color:#c4b5fd; box-shadow:0 0 10px rgba(124,58,237,.3); }
+.plinko-risk-btn.active { background:rgba(100,40,220,.25);border-color:rgba(139,92,246,.7);color:#c4b5fd;box-shadow:0 0 8px rgba(124,58,237,.25); }
 
-.plinko-bet-row { display:flex;align-items:center;gap:8px; }
+.plinko-bet-row { display:flex;align-items:center;gap:6px; }
 .plinko-bet-inp {
-  flex:1;background:rgba(15,10,35,.9);border:1px solid rgba(80,50,160,.4);
-  border-radius:12px;padding:10px 14px;color:#fff;font-size:15px;font-weight:800;
+  flex:1;background:rgba(10,7,25,.95);border:1px solid rgba(60,40,120,.4);
+  border-radius:11px;padding:9px 12px;color:#fff;font-size:15px;font-weight:800;
   font-family:inherit;outline:none;
 }
-.plinko-bet-inp:focus { border-color:#7c3aed;box-shadow:0 0 0 2px rgba(124,58,237,.2); }
-.plinko-quick { display:flex;gap:5px; }
+.plinko-bet-inp:focus { border-color:#7c3aed;box-shadow:0 0 0 2px rgba(124,58,237,.15); }
+.plinko-quick { display:flex;gap:4px; }
 .plinko-qbtn {
-  padding:8px 10px;border-radius:10px;border:1px solid rgba(80,50,160,.3);
-  background:rgba(30,20,60,.7);color:rgba(180,160,220,.7);
+  padding:7px 9px;border-radius:9px;border:1px solid rgba(60,40,120,.3);
+  background:rgba(20,14,45,.9);color:rgba(150,130,200,.6);
   font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;
   transition:all .12s;
 }
-.plinko-qbtn:active { transform:scale(.92); }
+.plinko-qbtn:active { transform:scale(.9); }
 
 .plinko-play-btn {
-  width:100%;padding:14px;border-radius:14px;border:none;
+  width:100%;padding:13px;border-radius:13px;border:none;
   background:linear-gradient(135deg,#7c3aed,#5b21b6);
-  color:#fff;font-size:16px;font-weight:900;cursor:pointer;
-  font-family:inherit;margin-top:10px;
-  box-shadow:0 4px 20px rgba(124,58,237,.45);
+  color:#fff;font-size:15px;font-weight:900;cursor:pointer;
+  font-family:inherit;margin-top:8px;
+  box-shadow:0 4px 20px rgba(124,58,237,.4);
   transition:transform .12s,box-shadow .12s;
 }
-.plinko-play-btn:active { transform:scale(.96);box-shadow:0 2px 10px rgba(124,58,237,.3); }
-.plinko-play-btn:disabled { opacity:.5;cursor:default;transform:none; }
+.plinko-play-btn:active { transform:scale(.96); }
+.plinko-play-btn:disabled { opacity:.45;cursor:default;transform:none; }
 
 .plinko-result-toast {
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);
-  background:rgba(15,10,35,.97);border:1px solid rgba(124,58,237,.5);
-  border-radius:18px;padding:16px 28px;text-align:center;
+  position:absolute;top:42%;left:50%;transform:translate(-50%,-50%) scale(.8);
+  background:rgba(10,6,25,.97);border:1px solid rgba(124,58,237,.5);
+  border-radius:16px;padding:14px 26px;text-align:center;
   opacity:0;pointer-events:none;transition:all .25s cubic-bezier(.34,1.56,.64,1);
-  z-index:10;
+  z-index:10;backdrop-filter:blur(8px);
 }
 .plinko-result-toast.show { opacity:1;transform:translate(-50%,-50%) scale(1); }
-.plinko-result-mult { font-size:32px;font-weight:900;color:#a78bfa; }
-.plinko-result-amt { font-size:14px;color:rgba(200,180,255,.7);margin-top:4px; }
+.plinko-result-mult { font-size:34px;font-weight:900;color:#a78bfa; }
+.plinko-result-amt { font-size:13px;color:rgba(180,160,240,.6);margin-top:3px; }
 
 .grid-wrap { position:relative;z-index:10;margin:0 14px 16px;background:linear-gradient(145deg,rgba(18,14,38,.95),rgba(14,10,30,.98));border:1px solid rgba(60,48,100,.6);border-radius:22px;padding:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 60px rgba(80,30,180,.12),inset 0 1px 0 rgba(255,255,255,.04),inset 0 0 40px rgba(30,15,70,.3);flex-shrink:0; }
 .grid { display:grid;grid-template-columns:repeat(5,1fr);gap:10px;width:100%; }
@@ -575,9 +578,9 @@ body {
   white-space:nowrap;
 }
 .global-topbar-divider {
-  position:fixed; top:42px; left:50%; transform:translateX(-50%));
+  position:fixed; top:42px; left:50%; transform:translateX(-50%);
   width:100%; max-width:480px; z-index:699;
-  height:1px;
+  height:1px; pointer-events:none;
   background:linear-gradient(90deg,transparent,rgba(139,92,246,.7) 20%,rgba(167,139,250,.9) 50%,rgba(139,92,246,.7) 80%,transparent);
   box-shadow:0 0 8px rgba(139,92,246,.3);
 }
@@ -1457,9 +1460,11 @@ body {
 .screen {
   opacity: 0;
   transition: opacity 0.2s ease;
+  pointer-events: none;
 }
 .screen.screen-visible {
   opacity: 1;
+  pointer-events: auto;
 }
 
 /* ══════ SKELETON ══════ */
@@ -4285,9 +4290,10 @@ function crashBetAll(){document.getElementById('crash-bet-input').value=Math.flo
 
 // ── ОБЩЕЕ ──
 function syncBalanceUI(){
-  document.getElementById('menu-balance-val').textContent=fmt(sharedBalance);
-  const tb=document.getElementById('topbar-balance-val');if(tb)tb.textContent=fmt(sharedBalance);
-  const db=document.getElementById('desk-balance-val');if(db)db.textContent=fmt(sharedBalance);
+  const v = fmt(sharedBalance);
+  const mb = document.getElementById('menu-balance-val'); if(mb) mb.textContent = v;
+  const tb = document.getElementById('topbar-balance-val'); if(tb) tb.textContent = v;
+  const db = document.getElementById('desk-balance-val'); if(db) db.textContent = v;
 }
 function updateAllBalances(){ syncBalanceUI(); }
 
@@ -6678,31 +6684,37 @@ function plinkoCalcLayout() {
   const slots = rows + 1;
   const mults = PLINKO_MULTS[PL.risk][rows];
 
-  const padX = PL.W * 0.06;
-  const padTop = PL.H * 0.05;
-  const slotH = 28;
-  const pegArea = PL.H - padTop - slotH - 10;
-  const rowGap = pegArea / rows;
+  const padX = PL.W * 0.08;
+  const padTop = PL.H * 0.04;
+  const slotH = 26;
+  const pegArea = PL.H - padTop - slotH - 16;
+  const rowGap = pegArea / (rows + 1);
+
+  // Максимальная ширина — последний ряд (rows+1 штырей)
+  const maxCols = rows + 1;
+  const totalW = PL.W - padX * 2;
+  const pegSpacing = totalW / (maxCols - 1); // расстояние между штырями в последнем ряду
 
   PL.pegs = [];
   for (let r = 0; r < rows; r++) {
-    const cols = r + 2;
-    const totalW = PL.W - padX * 2;
-    const colGap = totalW / (cols - 1);
-    const y = padTop + rowGap * r + rowGap * 0.5;
+    const cols = r + 2; // ряд 0 = 2 штыря, ряд 1 = 3, ...
+    const rowWidth = (cols - 1) * pegSpacing;
+    const startX = (PL.W - rowWidth) / 2;
+    const y = padTop + rowGap * (r + 1);
     for (let c = 0; c < cols; c++) {
-      const x = padX + colGap * c;
-      PL.pegs.push({ x, y, r: 4 });
+      PL.pegs.push({ x: startX + pegSpacing * c, y, r: 3.5 });
     }
   }
 
+  // Слоты — выровнены по последнему ряду штырей
   PL.slots = [];
-  const slotW = (PL.W - padX * 2) / slots;
   const slotY = PL.H - slotH - 4;
+  const slotW = pegSpacing - 3;
+  const startSlotX = (PL.W - (maxCols - 1) * pegSpacing) / 2 - slotW / 2;
   for (let i = 0; i < slots; i++) {
-    const x = padX + slotW * i;
+    const x = startSlotX + pegSpacing * i;
     const mult = mults[i];
-    PL.slots.push({ x, y: slotY, w: slotW - 3, mult, col: plinkoSlotColor(mult) });
+    PL.slots.push({ x, y: slotY, w: slotW, mult, col: plinkoSlotColor(mult) });
   }
 }
 
@@ -6711,34 +6723,68 @@ function plinkoDrawStatic() {
   const ctx = PL.ctx;
   ctx.clearRect(0, 0, PL.W, PL.H);
 
-  // Штыри
-  for (const p of PL.pegs) {
+  // Фон — звёзды
+  if (!PL._stars) {
+    PL._stars = [];
+    for (let i = 0; i < 40; i++) {
+      PL._stars.push({
+        x: Math.random() * PL.W,
+        y: Math.random() * PL.H * 0.85,
+        r: Math.random() * 1.2 + 0.3,
+        a: Math.random() * 0.5 + 0.15
+      });
+    }
+  }
+  for (const s of PL._stars) {
     ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(167,139,250,0.75)';
-    ctx.shadowColor = 'rgba(139,92,246,0.8)';
-    ctx.shadowBlur = 6;
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(200,180,255,${s.a})`;
     ctx.fill();
-    ctx.shadowBlur = 0;
   }
 
-  // Ячейки
-  for (const s of PL.slots) {
-    const radius = 6;
+  // Штыри
+  for (const p of PL.pegs) {
+    // glow
     ctx.beginPath();
-    ctx.roundRect(s.x, s.y, s.w, 24, radius);
+    ctx.arc(p.x, p.y, p.r + 4, 0, Math.PI * 2);
+    const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r + 4);
+    g.addColorStop(0, 'rgba(139,92,246,0.25)');
+    g.addColorStop(1, 'rgba(139,92,246,0)');
+    ctx.fillStyle = g;
+    ctx.fill();
+    // штырь
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = '#7c3aed';
+    ctx.fill();
+    // блик
+    ctx.beginPath();
+    ctx.arc(p.x - p.r * 0.3, p.y - p.r * 0.3, p.r * 0.4, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.fill();
+  }
+
+  // Слоты
+  for (const s of PL.slots) {
+    const r = 5;
+    // фон
+    ctx.beginPath();
+    ctx.roundRect(s.x, s.y, s.w, 22, r);
     ctx.fillStyle = s.col.bg;
     ctx.fill();
+    // рамка
     ctx.strokeStyle = s.col.border;
     ctx.lineWidth = 1;
     ctx.stroke();
-
+    // текст
+    const mult = s.mult;
+    const label = mult >= 1 ? `×${mult % 1 === 0 ? mult : mult.toFixed(1)}` : `×${mult.toFixed(1)}`;
+    const fs = s.w < 24 ? 7 : s.w < 32 ? 8 : 9;
     ctx.fillStyle = s.col.text;
-    ctx.font = `bold ${s.mult >= 100 ? 9 : s.mult >= 10 ? 10 : 11}px Manrope,sans-serif`;
+    ctx.font = `800 ${fs}px Manrope,sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    const label = s.mult >= 1 ? `×${s.mult}` : `×${s.mult.toFixed(1)}`;
-    ctx.fillText(label, s.x + s.w / 2, s.y + 12);
+    ctx.fillText(label, s.x + s.w / 2, s.y + 11);
   }
 }
 
@@ -6796,12 +6842,11 @@ function plinkoAnimate() {
       }
     }
 
-    // Границы по X
-    if (b.x - b.r < PL.slots[0].x) { b.x = PL.slots[0].x + b.r; b.vx = Math.abs(b.vx) * 0.5; }
-    if (b.x + b.r > PL.slots[PL.slots.length-1].x + PL.slots[PL.slots.length-1].w) {
-      b.x = PL.slots[PL.slots.length-1].x + PL.slots[PL.slots.length-1].w - b.r;
-      b.vx = -Math.abs(b.vx) * 0.5;
-    }
+    // Границы по X — по крайним слотам
+    const leftBound = PL.slots[0].x + b.r;
+    const rightBound = PL.slots[PL.slots.length-1].x + PL.slots[PL.slots.length-1].w - b.r;
+    if (b.x < leftBound) { b.x = leftBound; b.vx = Math.abs(b.vx) * 0.5; }
+    if (b.x > rightBound) { b.x = rightBound; b.vx = -Math.abs(b.vx) * 0.5; }
 
     // Попал в ячейку
     if (!b.done && b.y + b.r >= PL.slots[0].y) {
@@ -6872,43 +6917,35 @@ async function plinkoPlay() {
   if (bet < 100) { showToast('Минимальная ставка 100 🪙'); return; }
   if (bet > sharedBalance) { showToast('Недостаточно средств'); return; }
 
-  const btn = document.getElementById('plinko-play-btn');
-  btn.disabled = true;
-
   let r;
   try {
     r = await apiCall('POST', '/api/plinko/play', { bet, rows: PL.rows, risk: PL.risk });
-  } catch(e) {
-    showToast('Ошибка соединения'); btn.disabled = false; return;
-  }
-  if (!r.ok) { showToast(r.error || 'Ошибка'); btn.disabled = false; return; }
+  } catch(e) { showToast('Ошибка соединения'); return; }
+  if (!r.ok) { showToast(r.error || 'Ошибка'); return; }
 
   sharedBalance = r.new_balance;
   syncBalanceUI();
   document.getElementById('plinko-balance-val').textContent = fmt(sharedBalance);
 
-  // Запускаем шарик по заданному пути
-  const startX = PL.W / 2 + (Math.random() - 0.5) * 4;
-  const ball = { x: startX, y: 10, vx: (Math.random()-0.5)*0.5, vy: 1, r: 7, done: false, finished: false, path: r.path, slotIdx: r.slot };
+  const startX = PL.W / 2 + (Math.random() - 0.5) * 2;
+  const startY = PL.pegs[0] ? PL.pegs[0].y - 30 : 10;
+  const ball = { x: startX, y: startY, vx: (Math.random()-0.5)*0.3, vy: 1, r: 6, done: false, finished: false, slotIdx: r.slot, mult: r.mult, profit: r.profit };
   PL.balls.push(ball);
 
   if (!PL.animId) PL.animId = requestAnimationFrame(plinkoAnimate);
 
-  // Показываем результат после анимации
-  const delay = 1200 + PL.rows * 80;
+  const delay = 1000 + PL.rows * 70;
   setTimeout(() => {
-    const mult = r.mult;
-    const profit = r.profit;
     const toast = document.getElementById('plinko-result-toast');
     const multEl = document.getElementById('plinko-result-mult');
     const amtEl = document.getElementById('plinko-result-amt');
-    multEl.textContent = `×${mult}`;
-    multEl.style.color = profit > 0 ? '#34d399' : profit < 0 ? '#f87171' : '#a78bfa';
-    amtEl.textContent = profit > 0 ? `+${fmt(profit)} 🪙` : profit < 0 ? `${fmt(profit)} 🪙` : 'Ставка возвращена';
+    multEl.textContent = `×${r.mult}`;
+    multEl.style.color = r.profit > 0 ? '#34d399' : r.profit < 0 ? '#f87171' : '#a78bfa';
+    amtEl.textContent = r.profit > 0 ? `+${fmt(r.profit)} 🪙` : r.profit < 0 ? `-${fmt(Math.abs(r.profit))} 🪙` : 'Ставка возвращена';
     toast.classList.add('show');
-    if (profit > 0) { tg?.HapticFeedback?.notificationOccurred('success'); setTimeout(() => launchConfetti(), 50); }
-    else tg?.HapticFeedback?.notificationOccurred('error');
-    setTimeout(() => { toast.classList.remove('show'); btn.disabled = false; }, 2000);
+    if (r.profit > 0) { tg?.HapticFeedback?.notificationOccurred('success'); setTimeout(() => launchConfetti(), 50); }
+    else tg?.HapticFeedback?.impactOccurred('medium');
+    setTimeout(() => toast.classList.remove('show'), 1500);
   }, delay);
 }
 
