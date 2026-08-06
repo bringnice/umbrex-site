@@ -134,22 +134,25 @@ body {
   grid-column: 1 / -1;
   position:relative;border-radius:22px;overflow:hidden;cursor:pointer;
   background:linear-gradient(145deg,#0d0a1f,#1a0f38);
-  border:1px solid rgba(124,58,237,.35);
-  box-shadow:0 8px 32px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.05);
-  min-height:140px; display:flex; flex-direction:column; justify-content:flex-end;
-  transition:transform .12s; -webkit-tap-highlight-color:transparent;
+  border:1px solid rgba(124,58,237,.4);
+  box-shadow:0 8px 32px rgba(0,0,0,.5),0 0 0 1px rgba(139,92,246,.08),inset 0 1px 0 rgba(255,255,255,.06);
+  min-height:160px; display:flex; flex-direction:column; justify-content:flex-end;
+  transition:transform .12s,box-shadow .12s; -webkit-tap-highlight-color:transparent;
 }
-.gc-plinko-card:active { transform:scale(.97); }
+.gc-plinko-card:active { transform:scale(.97); box-shadow:0 4px 16px rgba(0,0,0,.5); }
 .gc-plinko-bg { position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:14px 16px 0; }
-.gc-plinko-pegs { display:flex;flex-direction:column;align-items:center;gap:10px;width:100%; }
+/* Фиолетовое свечение сверху для атмосферы */
+.gc-plinko-bg::before { content:'';position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:60%;height:80px;background:radial-gradient(ellipse,rgba(124,58,237,.3) 0%,transparent 70%);pointer-events:none; }
+.gc-plinko-pegs { display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;position:relative;z-index:1; }
 .gc-plinko-peg-row { display:flex;justify-content:center;gap:22px; }
-.gc-plinko-peg-row span { width:6px;height:6px;border-radius:50%;background:rgba(167,139,250,.5);box-shadow:0 0 6px rgba(139,92,246,.6); }
+.gc-plinko-peg-row span { width:6px;height:6px;border-radius:50%;background:rgba(167,139,250,.6);box-shadow:0 0 6px rgba(139,92,246,.7),0 0 2px rgba(200,180,255,.4); }
 .gc-plinko-ball {
   width:10px;height:10px;border-radius:50%;
   background:radial-gradient(circle at 35% 30%,#fff,#a78bfa);
-  box-shadow:0 0 10px rgba(167,139,250,.9);
+  box-shadow:0 0 12px rgba(167,139,250,1),0 0 4px rgba(255,255,255,.6);
   animation:plinkoBallDemo 3s ease-in-out infinite;
   position:absolute;top:18px;left:50%;transform:translateX(-50%);
+  z-index:2;
 }
 @keyframes plinkoBallDemo {
   0%{top:18px;left:50%;transform:translateX(-50%);}
@@ -157,17 +160,19 @@ body {
   40%{top:58px;left:52%;}
   60%{top:74px;left:44%;}
   75%{top:88px;left:38%;}
-  85%{top:100px;left:14%;transform:scale(1.3);}
+  85%{top:105px;left:14%;transform:scale(1.4);}
   100%{top:18px;left:50%;transform:translateX(-50%);}
 }
-.gc-plinko-buckets { display:flex;gap:3px;width:100%;padding-bottom:8px; }
+.gc-plinko-buckets { display:flex;gap:3px;width:100%;padding-bottom:8px;position:relative;z-index:1; }
 .gc-plinko-bucket { flex:1;text-align:center;font-size:9px;font-weight:900;border-radius:6px;padding:3px 0; }
-.gc-plinko-bucket.hi { background:rgba(239,68,68,.25);color:#f87171;border:1px solid rgba(239,68,68,.3); }
-.gc-plinko-bucket.mid { background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.2); }
-.gc-plinko-bucket.lo { background:rgba(52,211,153,.15);color:#34d399;border:1px solid rgba(52,211,153,.2); }
-.gc-plinko-info { position:relative;z-index:2;padding:10px 16px 14px; }
-.gc-plinko-name { font-size:17px;font-weight:900;color:#fff; }
-.gc-plinko-desc { font-size:12px;color:rgba(167,139,250,.7);margin-top:2px; }
+.gc-plinko-bucket.hi { background:rgba(239,68,68,.3);color:#fca5a5;border:1px solid rgba(239,68,68,.45); }
+.gc-plinko-bucket.mid { background:rgba(251,191,36,.2);color:#fde68a;border:1px solid rgba(251,191,36,.35); }
+.gc-plinko-bucket.lo { background:rgba(52,211,153,.2);color:#6ee7b7;border:1px solid rgba(52,211,153,.35); }
+/* Текстовый блок — с градиентным фоном снизу, не перекрывает визуал грубо */
+.gc-plinko-info { position:relative;z-index:2;padding:14px 16px 16px;background:linear-gradient(to top,rgba(10,6,28,.98) 0%,rgba(10,6,28,.85) 55%,transparent 100%); }
+.gc-plinko-name { font-size:17px;font-weight:900;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.9);display:flex;align-items:center;gap:6px; }
+.gc-plinko-name::after { content:'×100';font-size:11px;font-weight:800;color:#a78bfa;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.35);border-radius:6px;padding:1px 6px;letter-spacing:.3px; }
+.gc-plinko-desc { font-size:12px;color:rgba(180,160,255,.8);margin-top:3px; }
 
 /* ══════════ PLINKO SCREEN ══════════ */
 #screen-plinko { background:linear-gradient(180deg,#0d0820 0%,#080612 100%); }
@@ -3079,10 +3084,6 @@ body {
   </div>
   <div class="plinko-canvas-wrap">
     <canvas id="plinko-canvas"></canvas>
-    <div class="plinko-result-toast" id="plinko-result-toast">
-      <div class="plinko-result-mult" id="plinko-result-mult">×5</div>
-      <div class="plinko-result-amt" id="plinko-result-amt">+500 🪙</div>
-    </div>
   </div>
   <div class="plinko-controls">
     <div class="plinko-ctrl-row">
@@ -6818,8 +6819,26 @@ function plinkoAnimate() {
   if (!PL.balls.length) { plinkoDrawStatic(); PL.animId = null; return; }
 
   for (const b of PL.balls) {
-    b.vy += 0.28; // гравитация
-    b.vx *= 0.995;
+    // Если шарик ждёт ответа API (уже достиг низа, но slotIdx ещё не пришёл)
+    if (b.waiting) {
+      if (b.slotIdx !== null) {
+        // Ответ пришёл — финализируем
+        b.waiting = false;
+        b.done = true;
+        b.vy = 0; b.vx = 0;
+        const slotIdx = b.slotIdx;
+        b.y = PL.slots[0].y - b.r - 2;
+        b.x = PL.slots[slotIdx].x + PL.slots[slotIdx].w / 2;
+        plinkoFlashSlot(slotIdx, b.profit);
+        if (b.profit > 0) tg?.HapticFeedback?.notificationOccurred('success');
+        else tg?.HapticFeedback?.impactOccurred('medium');
+        setTimeout(() => { b.finished = true; }, 500);
+      }
+      continue; // не трогаем физику пока ждём
+    }
+
+    b.vy += 0.45; // гравитация — быстрее
+    b.vx *= 0.998;
     b.x += b.vx;
     b.y += b.vy;
 
@@ -6850,20 +6869,22 @@ function plinkoAnimate() {
 
     // Попал в ячейку
     if (!b.done && b.y + b.r >= PL.slots[0].y) {
-      b.done = true;
       b.vy = 0; b.vx = 0;
-      // Находим в какую ячейку попал
-      let slotIdx = 0;
-      for (let i = 0; i < PL.slots.length; i++) {
-        const s = PL.slots[i];
-        if (b.x >= s.x && b.x <= s.x + s.w) { slotIdx = i; break; }
-      }
-      b.slotIdx = slotIdx;
       b.y = PL.slots[0].y - b.r - 2;
+      if (b.slotIdx === null) {
+        // Ответ API ещё не пришёл — переходим в режим ожидания
+        b.waiting = true;
+        continue;
+      }
+      b.done = true;
+      const slotIdx = b.slotIdx;
       b.x = PL.slots[slotIdx].x + PL.slots[slotIdx].w / 2;
-      // Подсветить ячейку
-      plinkoFlashSlot(slotIdx);
-      setTimeout(() => { b.finished = true; }, 400);
+      // Подсветка слота
+      plinkoFlashSlot(slotIdx, b.profit);
+      // Вибрация
+      if (b.profit > 0) tg?.HapticFeedback?.notificationOccurred('success');
+      else tg?.HapticFeedback?.impactOccurred('medium');
+      setTimeout(() => { b.finished = true; }, 500);
     }
   }
 
@@ -6874,20 +6895,49 @@ function plinkoAnimate() {
   PL.animId = requestAnimationFrame(plinkoAnimate);
 }
 
-function plinkoFlashSlot(idx) {
+function plinkoFlashSlot(idx, profit) {
   const s = PL.slots[idx];
+  if (!s) return;
+  // Определяем цвет вспышки по результату
+  const flashColor = profit > 0 ? 'rgba(52,211,153,0.9)' : profit < 0 ? 'rgba(248,113,113,0.7)' : 'rgba(167,139,250,0.8)';
+  const borderColor = profit > 0 ? '#34d399' : profit < 0 ? '#f87171' : '#a78bfa';
+
   let t = 0;
   const flash = () => {
-    if (t > 8) return;
+    if (!PL.ctx || t > 6) return;
     const ctx = PL.ctx;
     ctx.beginPath();
-    ctx.roundRect(s.x, s.y, s.w, 24, 6);
-    ctx.fillStyle = t % 2 === 0 ? 'rgba(255,255,255,0.35)' : s.col.bg;
-    ctx.fill();
-    ctx.strokeStyle = s.col.border;
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-    t++; setTimeout(flash, 60);
+    ctx.roundRect(s.x, s.y, s.w, 22, 5);
+    if (t % 2 === 0) {
+      ctx.fillStyle = flashColor;
+      ctx.fill();
+      ctx.strokeStyle = borderColor;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      // текст множителя поверх
+      const label = s.mult >= 1 ? `×${s.mult % 1 === 0 ? s.mult : s.mult.toFixed(1)}` : `×${s.mult.toFixed(1)}`;
+      const fs = s.w < 24 ? 7 : s.w < 32 ? 8 : 9;
+      ctx.fillStyle = '#fff';
+      ctx.font = `900 ${fs}px Manrope,sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(label, s.x + s.w / 2, s.y + 11);
+    } else {
+      ctx.fillStyle = s.col.bg;
+      ctx.fill();
+      ctx.strokeStyle = s.col.border;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      const label = s.mult >= 1 ? `×${s.mult % 1 === 0 ? s.mult : s.mult.toFixed(1)}` : `×${s.mult.toFixed(1)}`;
+      const fs = s.w < 24 ? 7 : s.w < 32 ? 8 : 9;
+      ctx.fillStyle = s.col.text;
+      ctx.font = `800 ${fs}px Manrope,sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(label, s.x + s.w / 2, s.y + 11);
+    }
+    t++;
+    setTimeout(flash, 80);
   };
   flash();
 }
@@ -6917,36 +6967,30 @@ async function plinkoPlay() {
   if (bet < 100) { showToast('Минимальная ставка 100 🪙'); return; }
   if (bet > sharedBalance) { showToast('Недостаточно средств'); return; }
 
-  let r;
-  try {
-    r = await apiCall('POST', '/api/plinko/play', { bet, rows: PL.rows, risk: PL.risk });
-  } catch(e) { showToast('Ошибка соединения'); return; }
-  if (!r.ok) { showToast(r.error || 'Ошибка'); return; }
-
-  sharedBalance = r.new_balance;
+  // Сразу списываем локально и запускаем шарик — не ждём API
+  sharedBalance -= bet;
   syncBalanceUI();
   document.getElementById('plinko-balance-val').textContent = fmt(sharedBalance);
+  tg?.HapticFeedback?.impactOccurred('light');
 
   const startX = PL.W / 2 + (Math.random() - 0.5) * 2;
   const startY = PL.pegs[0] ? PL.pegs[0].y - 30 : 10;
-  const ball = { x: startX, y: startY, vx: (Math.random()-0.5)*0.3, vy: 1, r: 6, done: false, finished: false, slotIdx: r.slot, mult: r.mult, profit: r.profit };
+  const ball = { x: startX, y: startY, vx: (Math.random()-0.5)*0.3, vy: 2, r: 6, done: false, waiting: false, finished: false, slotIdx: null, mult: null, profit: null };
   PL.balls.push(ball);
-
   if (!PL.animId) PL.animId = requestAnimationFrame(plinkoAnimate);
 
-  const delay = 1000 + PL.rows * 70;
-  setTimeout(() => {
-    const toast = document.getElementById('plinko-result-toast');
-    const multEl = document.getElementById('plinko-result-mult');
-    const amtEl = document.getElementById('plinko-result-amt');
-    multEl.textContent = `×${r.mult}`;
-    multEl.style.color = r.profit > 0 ? '#34d399' : r.profit < 0 ? '#f87171' : '#a78bfa';
-    amtEl.textContent = r.profit > 0 ? `+${fmt(r.profit)} 🪙` : r.profit < 0 ? `-${fmt(Math.abs(r.profit))} 🪙` : 'Ставка возвращена';
-    toast.classList.add('show');
-    if (r.profit > 0) { tg?.HapticFeedback?.notificationOccurred('success'); setTimeout(() => launchConfetti(), 50); }
-    else tg?.HapticFeedback?.impactOccurred('medium');
-    setTimeout(() => toast.classList.remove('show'), 1500);
-  }, delay);
+  // API параллельно
+  try {
+    const r = await apiCall('POST', '/api/plinko/play', { bet, rows: PL.rows, risk: PL.risk });
+    if (r.ok) {
+      sharedBalance = r.new_balance;
+      syncBalanceUI();
+      document.getElementById('plinko-balance-val').textContent = fmt(sharedBalance);
+      ball.slotIdx = r.slot;
+      ball.mult = r.mult;
+      ball.profit = r.profit;
+    }
+  } catch(e) {}
 }
 
 function openPlinko() {
