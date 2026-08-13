@@ -6882,14 +6882,22 @@ function plinkoDrawFrame() {
   }
 }
 
-function plinkoAnimate() {
+function plinkoAnimate(ts) {
   if (!PL.balls.length) { plinkoDrawStatic(); PL.animId = null; return; }
 
+  // dt-based: целевой fps = 50, нормируем скорость под него
+  if (!PL._lastTs) PL._lastTs = ts;
+  const dt = Math.min((ts - PL._lastTs) / (1000 / 50), 2.5); // макс 2.5 чтобы не прыгало при потере фокуса
+  PL._lastTs = ts;
+
   for (const b of PL.balls) {
-    b.vy += 0.45; // гравитация — быстрее
-    b.vx *= 0.998;
-    b.x += b.vx;
-    b.y += b.vy;
+    if (b.done) continue;
+
+    // Физика с dt
+    b.vy += 0.55 * dt;
+    b.vx *= Math.pow(0.998, dt);
+    b.x += b.vx * dt;
+    b.y += b.vy * dt;
 
     // Коллизия со штырями
     for (const p of PL.pegs) {
@@ -6898,40 +6906,51 @@ function plinkoAnimate() {
       const minD = b.r + p.r + 1;
       if (dist < minD && dist > 0) {
         const nx = dx / dist, ny = dy / dist;
-        // Отталкиваем
         b.x = p.x + nx * minD;
         b.y = p.y + ny * minD;
         const dot = b.vx * nx + b.vy * ny;
         b.vx -= 2 * dot * nx * 0.6;
         b.vy -= 2 * dot * ny * 0.6;
-        // Случайный боковой толчок
         b.vx += (Math.random() - 0.5) * 0.8;
       }
     }
 
-    // Границы по X — по крайним слотам
+    // Границы по X
     const leftBound = PL.slots[0].x + b.r;
     const rightBound = PL.slots[PL.slots.length-1].x + PL.slots[PL.slots.length-1].w - b.r;
     if (b.x < leftBound) { b.x = leftBound; b.vx = Math.abs(b.vx) * 0.5; }
     if (b.x > rightBound) { b.x = rightBound; b.vx = -Math.abs(b.vx) * 0.5; }
 
-    // Попал в ячейку
-    if (!b.done && b.y + b.r >= PL.slots[0].y) {
+    // Достиг нижней границы
+    if (b.y + b.r >= PL.slots[0].y) {
       b.vy = 0; b.vx = 0;
       b.y = PL.slots[0].y - b.r - 2;
 
-      // Ждём ответа API — зависаем у нижней границы
-      if (b.slotIdx === null) continue;
-
-      b.done = true;
-      const slotIdx = b.slotIdx;
-      b.x = PL.slots[slotIdx].x + PL.slots[slotIdx].w / 2;
-      // Вибрация
-      if (b.profit > 0) tg?.HapticFeedback?.notificationOccurred('success');
-      else tg?.HapticFeedback?.impactOccurred('medium');
-      // Подсветка — через небольшую задержку чтоб кадр отрисовался
-      setTimeout(() => plinkoFlashSlot(slotIdx, b.profit), 16);
-      setTimeout(() => { b.finished = true; }, 700);
+      if (!b.done) {
+        b.done = true;
+        // Визуальная ячейка — куда упал физически, никакой телепортации
+        let visualSlot = PL.slots.length - 1;
+        for (let i = 0; i < PL.slots.length; i++) {
+          if (b.x >= PL.slots[i].x && b.x <= PL.slots[i].x + PL.slots[i].w) { visualSlot = i; break; }
+        }
+        // Ждём profit от API (polling каждые 30мс), потом показываем результат
+        const checkResult = () => {
+          if (b.profit !== null) {
+            if (b._pendingBalance !== undefined) {
+              sharedBalance = b._pendingBalance;
+              syncBalanceUI();
+              document.getElementById('plinko-balance-val').textContent = fmt(sharedBalance);
+            }
+            if (b.profit > 0) tg?.HapticFeedback?.notificationOccurred('success');
+            else tg?.HapticFeedback?.impactOccurred('medium');
+            plinkoFlashSlot(visualSlot, b.profit);
+            setTimeout(() => { b.finished = true; }, 700);
+          } else {
+            setTimeout(checkResult, 30);
+          }
+        };
+        checkResult();
+      }
     }
   }
 
@@ -6988,17 +7007,16 @@ async function plinkoPlay() {
 
   const startX = PL.W / 2 + (Math.random() - 0.5) * 2;
   const startY = PL.pegs[0] ? PL.pegs[0].y - 30 : 10;
-  const ball = { x: startX, y: startY, vx: (Math.random()-0.5)*0.3, vy: 2, r: 6, done: false, finished: false, slotIdx: null, mult: null, profit: null };
+  const ball = { x: startX, y: startY, vx: (Math.random()-0.5)*0.3, vy: 2, r: 6, done: false, waiting: false, finished: false, slotIdx: null, mult: null, profit: null };
   PL.balls.push(ball);
-  if (!PL.animId) PL.animId = requestAnimationFrame(plinkoAnimate);
+  if (!PL.animId) { PL._lastTs = null; PL.animId = requestAnimationFrame(plinkoAnimate); }
 
-  // API — баланс обновляем только после ответа
+  // API — баланс и slotIdx обновляем только после ответа
   try {
     const r = await apiCall('POST', '/api/plinko/play', { bet, rows: PL.rows, risk: PL.risk });
     if (r.ok) {
-      sharedBalance = r.new_balance;
-      syncBalanceUI();
-      document.getElementById('plinko-balance-val').textContent = fmt(sharedBalance);
+      // Баланс покажем только когда шарик приземлится
+      ball._pendingBalance = r.new_balance;
       ball.slotIdx = r.slot;
       ball.mult = r.mult;
       ball.profit = r.profit;
