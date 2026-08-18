@@ -3934,28 +3934,35 @@ function multBet(f){const i=document.getElementById('bet-input');i.value=Math.ma
 function setBetAll(){document.getElementById('bet-input').value=Math.floor(sharedBalance);}
 
 // ── КРАШ ──
-const CRASH_GROWTH_RATE = 0.15; // скорость роста множителя (mult = e^(RATE*t)); было 0.3 — вдвое медленнее
+const CRASH_GROWTH_RATE = 0.15;
+
 let CC = {
-  phase: 'waiting',
-  mult: 1, targetCrash: 2,
-  betPlaced: false, cashedOut: false,
-  bet: 500, cashoutMult: null,
+  phase: 'waiting',       // waiting | flying | crashed
+  mult: 1,
+  betPlaced: false,
+  cashedOut: false,
+  bet: 0,
+  cashoutMult: null,
   gameId: null,
-  startTime: null, animId: null, waitTimer: null,
+  roundId: null,
+  startTime: null,        // performance.now() момент старта flying (синхронизируем с сервером)
+  animId: null,
+  pollTimer: null,
   points: [],
   history: [],
+  waitLeft: 0,
 };
 
 let cCanvas, cCtx, cW, cH;
 
 function initCrash(){
-  // Останавливаем предыдущую анимацию, если была
   if(CC.animId){ cancelAnimationFrame(CC.animId); CC.animId=null; }
+  if(CC.pollTimer){ clearInterval(CC.pollTimer); CC.pollTimer=null; }
+
   cCanvas = document.getElementById('crash-canvas');
   cCtx = cCanvas.getContext('2d');
   const wrap = cCanvas.parentElement;
-  // Используем getBoundingClientRect вместо clientWidth/clientHeight — надёжнее
-  // когда экран только что стал видимым (layout может ещё не завершиться)
+
   function _initCrashSize(){
     const r = wrap.getBoundingClientRect();
     const w = r.width || wrap.offsetWidth;
@@ -3966,191 +3973,190 @@ function initCrash(){
       cCtx = cCanvas.getContext('2d');
       cCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
       cW = w; cH = h;
-      drawCrashGraph(); // сразу рисуем сетку как только получили размеры
+      drawCrashGraph();
     }
   }
   _initCrashSize();
-  // Если размеры нулевые — повторяем после layout (десктоп: grid может не завершить рендер)
   if(!cW || !cH){
     setTimeout(_initCrashSize, 50);
     setTimeout(_initCrashSize, 150);
     setTimeout(_initCrashSize, 400);
-    setTimeout(_initCrashSize, 800);
   }
-  // Переинициализируем при изменении размера окна
   if(!window._crashResizeHandler){
     window._crashResizeHandler = ()=>{ _initCrashSize(); drawCrashGraph(); };
     window.addEventListener('resize', window._crashResizeHandler);
   }
 
-  // Если мини-апп был закрыт/перезапущен посреди раунда — ставка оставалась
-  // "зависшей" на сервере и деньги не возвращались. Проверяем и возвращаем.
-  apiCall('GET','/api/crash/state').then(r=>{
-    if(r.ok && r.refunded){
-      sharedBalance = r.new_balance; syncBalanceUI();
-      document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);
-      showToast('Незавершённая ставка '+fmt(r.refund_amount)+' 🪙 возвращена');
-      CC.betPlaced=false; CC.cashedOut=false; CC.gameId=null;
-      updateCrashBtn();
-    }
-  }).catch(()=>{});
-
-  // Загружаем историю с сервера
+  // Загружаем историю
   apiCall('GET','/api/crash/history').then(r=>{
     if(r.ok && r.history) CC.history = r.history;
     renderCrashHistory();
-  }).catch(()=>renderCrashHistory());
-  if(CC.phase === 'waiting' && !CC.waitTimer) scheduleCrash();
-  else if(CC.phase === 'flying') animateCrash();
-  updateCrashBtn();
+  }).catch(()=>{});
+
+  // Первый poll сразу, потом каждые 200мс
+  pollCrash();
+  CC.pollTimer = setInterval(pollCrash, 200);
 }
 
-let crashCountdownTimer=null;
-function startCrashCountdown(durationMs, label){
-  clearInterval(crashCountdownTimer);
-  const wrap=document.getElementById('crash-countdown-wrap');
-  const fill=document.getElementById('crash-countdown-fill');
-  const txt=document.getElementById('crash-countdown-txt');
-  const start=performance.now();
-  wrap.style.display='flex';
-  const tick=()=>{
-    const elapsed=performance.now()-start;
-    const left=Math.max(0,durationMs-elapsed);
-    const pct=Math.max(0,Math.min(1,1-elapsed/durationMs));
-    fill.style.width=(pct*100)+'%';
-    txt.textContent=label+' '+(left/1000).toFixed(1)+'с';
-    if(left<=0) clearInterval(crashCountdownTimer);
-  };
-  tick();
-  crashCountdownTimer=setInterval(tick,100);
-}
-function stopCrashCountdown(){
-  clearInterval(crashCountdownTimer);
-  document.getElementById('crash-countdown-wrap').style.display='none';
-}
+let _lastRoundId = null;
+let _flyingStartServerTime = null; // когда сервер стартовал фазу flying (чтобы синхронизировать mult)
 
-function scheduleCrash(){
-  CC.phase='waiting'; CC.mult=1; CC.betPlaced=false; CC.cashedOut=false;
-  CC.cashoutMult=null; CC.points=[];
-  setBigVal('waiting','ОЖИДАНИЕ РАУНДА...');
-  document.getElementById('crash-rocket').style.display='none';
-  document.getElementById('crash-payout-bar').style.display='none';
-  drawCrashGraph();
-  updateCrashBtn();
-  const wait = 4000+Math.random()*2000;
-  startCrashCountdown(wait, 'Старт через');
-  CC.waitTimer = setTimeout(()=>{CC.waitTimer=null;launchCrash();}, wait);
-}
+async function pollCrash(){
+  let r;
+  try { r = await apiCall('GET', '/api/crash/state'); } catch(e){ return; }
+  if(!r.ok) return;
 
-function launchCrash(){
-  CC.phase='flying'; CC.startTime=performance.now(); CC.points=[[0,1]];
-  const r=Math.random();
-  CC.targetCrash = r<0.45 ? 1.01+Math.random()*0.99
-                 : r<0.70 ? 2+Math.random()*3
-                 : r<0.88 ? 5+Math.random()*10
-                 : 15+Math.random()*30;
-  CC.targetCrash = Math.max(1.01, CC.targetCrash);
-  document.getElementById('crash-rocket').style.display='block';
-  stopCrashCountdown();
-  updateCrashBtn();
-  animateCrash();
+  const prevPhase = CC.phase;
+  const serverPhase = r.phase;
+  const serverRoundId = r.round_id;
+
+  // Новый раунд — сбрасываем состояние ставки
+  if(serverRoundId !== _lastRoundId){
+    _lastRoundId = serverRoundId;
+    CC.roundId = serverRoundId;
+    CC.points = [];
+    _flyingStartServerTime = null;
+
+    // Если была ставка в прошлом раунде и не успели забрать — проигрыш уже засчитан сервером
+    if(CC.betPlaced && !CC.cashedOut && serverPhase !== 'flying'){
+      CC.betPlaced = false;
+      CC.cashedOut = false;
+      CC.gameId = null;
+    }
+
+    // Подхватываем ставку если она есть в текущем раунде
+    if(r.my_bet && r.my_game_id){
+      CC.betPlaced = true;
+      CC.bet = r.my_bet;
+      CC.gameId = r.my_game_id;
+      CC.cashedOut = r.cashed_out || false;
+      CC.cashoutMult = r.cashout_mult || null;
+    }
+  }
+
+  CC.phase = serverPhase;
+  CC.mult  = r.mult || 1;
+  CC.waitLeft = r.wait_left || 0;
+
+  if(serverPhase === 'waiting'){
+    // Синхронизируем таймер ожидания
+    if(prevPhase !== 'waiting'){
+      CC.points = [];
+      setBigVal('waiting','ОЖИДАНИЕ РАУНДА...');
+      document.getElementById('crash-rocket').style.display='none';
+      document.getElementById('crash-payout-bar').style.display='none';
+      drawCrashGraph();
+      renderCrashHistory();
+    }
+    startCrashCountdown(CC.waitLeft * 1000, 'Старт через');
+    updateCrashBtn();
+
+  } else if(serverPhase === 'flying'){
+    if(prevPhase !== 'flying'){
+      // Только что стартовал — запускаем анимацию
+      _flyingStartServerTime = performance.now() - (CC.mult > 1 ? Math.log(CC.mult)/CRASH_GROWTH_RATE * 1000 : 0);
+      CC.points = [[0,1]];
+      stopCrashCountdown();
+      document.getElementById('crash-rocket').style.display='block';
+      if(!CC.animId) animateCrash();
+    }
+    updateCrashBtn();
+
+  } else if(serverPhase === 'crashed'){
+    if(prevPhase === 'flying'){
+      // Краш только что случился
+      cancelAnimationFrame(CC.animId); CC.animId = null;
+      CC.mult = r.crash_point || CC.mult;
+      CC.points.push([CC.points.length ? CC.points[CC.points.length-1][0]+0.05 : 0, CC.mult]);
+
+      if(CC.betPlaced && !CC.cashedOut){
+        tg?.HapticFeedback?.notificationOccurred('error');
+        showResult(false, CC.bet, CC.mult);
+        CC.betPlaced = false;
+      }
+
+      CC.history.unshift(+CC.mult.toFixed(2));
+      if(CC.history.length>25) CC.history.pop();
+      setBigVal('crashed','×'+CC.mult.toFixed(2));
+      drawCrashGraph();
+      document.getElementById('crash-rocket').style.display='none';
+      renderCrashHistory();
+      updateCrashBtn();
+
+      const field=document.querySelector('.crash-field');
+      field.classList.add('shake','flash');
+      setTimeout(()=>field.classList.remove('shake','flash'), 450);
+      startCrashCountdown(3000, 'Новый раунд через');
+    }
+  }
 }
 
 function animateCrash(){
-  if(CC.phase!=='flying')return;
-  const t=(performance.now()-CC.startTime)/1000;
-  CC.mult = Math.pow(Math.E, CRASH_GROWTH_RATE*t);
+  if(CC.phase !== 'flying'){ CC.animId=null; return; }
+
+  const t = (performance.now() - (_flyingStartServerTime||performance.now())) / 1000;
+  CC.mult = Math.pow(Math.E, CRASH_GROWTH_RATE * t);
   CC.points.push([t, CC.mult]);
 
   // авто-вывод
-  const av=parseFloat(document.getElementById('crash-auto-inp').value);
-  if(CC.betPlaced&&!CC.cashedOut&&!isNaN(av)&&av>=1.01&&CC.mult>=av) doCashout();
+  const av = parseFloat(document.getElementById('crash-auto-inp').value);
+  if(CC.betPlaced && !CC.cashedOut && !isNaN(av) && av>=1.01 && CC.mult>=av) doCashout();
 
-  if(CC.mult>=CC.targetCrash){ doCrash(); return; }
+  const bigEl = document.getElementById('crash-big-val');
+  bigEl.textContent = '×'+CC.mult.toFixed(2);
+  bigEl.className = 'crash-big-val flying';
+  bigEl.style.color = multColor(CC.mult);
+  bigEl.style.textShadow = `0 0 30px ${multColor(CC.mult,0.7)}, 0 0 60px ${multColor(CC.mult,0.35)}`;
 
-  const bigEl=document.getElementById('crash-big-val');
-  bigEl.textContent='×'+CC.mult.toFixed(2);
-  bigEl.className='crash-big-val flying';
-  bigEl.style.color=multColor(CC.mult);
-  bigEl.style.textShadow=`0 0 30px ${multColor(CC.mult,0.7)}, 0 0 60px ${multColor(CC.mult,0.35)}`;
-  if(CC.betPlaced&&!CC.cashedOut){
-    const btn=document.getElementById('crash-main-btn');
-    btn.textContent=`💰 Забрать ×${CC.mult.toFixed(2)}`;
-    // живой счётчик суммы
-    const bar=document.getElementById('crash-payout-bar');
-    const val=document.getElementById('crash-payout-val');
+  if(CC.betPlaced && !CC.cashedOut){
+    const btn = document.getElementById('crash-main-btn');
+    btn.textContent = `💰 Забрать ×${CC.mult.toFixed(2)}`;
+    const bar = document.getElementById('crash-payout-bar');
+    const val = document.getElementById('crash-payout-val');
     bar.style.display='flex';
-    val.textContent=fmt(Math.round(CC.bet*CC.mult))+' 🪙';
+    val.textContent = fmt(Math.round(CC.bet*CC.mult))+' 🪙';
   } else if(CC.cashedOut){
     document.getElementById('crash-payout-bar').style.display='none';
   }
+
   drawCrashGraph();
   moveRocket();
-  CC.animId=requestAnimationFrame(animateCrash);
-}
-
-function doCrash(){
-  cancelAnimationFrame(CC.animId);
-  CC.phase='crashed';
-  if(CC.betPlaced&&!CC.cashedOut){
-    tg?.HapticFeedback?.notificationOccurred('error');
-    if(CC.gameId){
-      apiCall('POST','/api/crash/result',{game_id:CC.gameId, crash_point:CC.mult}).then(r=>{
-        if(r.ok){ sharedBalance=Math.max(0,sharedBalance); syncBalanceUI(); }
-        // История обновится на следующем открытии
-      }).catch(()=>{});
-    }
-    showResult(false,CC.bet,CC.mult);
-  }
-  CC.history.unshift(+CC.mult.toFixed(2));
-  if(CC.history.length>25)CC.history.pop();
-  setBigVal('crashed','×'+CC.mult.toFixed(2));
-  drawCrashGraph();
-  document.getElementById('crash-rocket').style.display='none';
-  renderCrashHistory();
-  updateCrashBtn();
-  const field=document.querySelector('.crash-field');
-  field.classList.add('shake','flash');
-  setTimeout(()=>field.classList.remove('shake','flash'), 450);
-  const cooldown = 3500;
-  startCrashCountdown(cooldown, 'Новый раунд через');
-  setTimeout(()=>scheduleCrash(), cooldown);
+  CC.animId = requestAnimationFrame(animateCrash);
 }
 
 function doCashout(){
   if(CC.cashedOut) return;
-  CC.cashedOut=true; CC.cashoutMult=CC.mult;
+  CC.cashedOut = true; CC.cashoutMult = CC.mult;
   document.getElementById('crash-payout-bar').style.display='none';
   tg?.HapticFeedback?.notificationOccurred('success');
   updateCrashBtn();
-  apiCall('POST','/api/crash/cashout',{game_id:CC.gameId, mult:CC.mult}).then(r=>{
+  // mult не передаём — сервер сам берёт текущий
+  apiCall('POST','/api/crash/cashout',{}).then(r=>{
     if(!r.ok){
-      // Краш уже был — проигрыш
-      showResult(false, CC.bet, CC.mult);
+      showResult(false, CC.bet, CC.cashoutMult);
       sharedBalance=Math.max(0,sharedBalance); syncBalanceUI();
       return;
     }
-    sharedBalance=r.new_balance; syncBalanceUI();
-    showResult(true, r.profit, CC.mult);
+    sharedBalance = r.new_balance; syncBalanceUI();
+    document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);
+    showResult(true, r.profit, r.mult);
   }).catch(()=>{
-    // При ошибке соединения — не начисляем ничего локально
-    // Незавершённая ставка вернётся при следующем входе через /api/crash/state
-    showToast('Ошибка соединения — ставка будет возвращена при следующем входе');
+    showToast('Ошибка соединения');
     sharedBalance=Math.max(0,sharedBalance); syncBalanceUI();
   });
 }
 
 function crashMainAction(){
-  if(CC.phase==='flying'&&CC.betPlaced&&!CC.cashedOut){ doCashout(); return; }
-  if(CC.phase!=='waiting'||CC.betPlaced){ showToast('Дождись начала нового раунда'); return; }
-  const bet=parseFloat(document.getElementById('crash-bet-input').value);
+  if(CC.phase==='flying' && CC.betPlaced && !CC.cashedOut){ doCashout(); return; }
+  if(CC.phase!=='waiting' || CC.betPlaced){ showToast('Дождись начала нового раунда'); return; }
+  const bet = parseFloat(document.getElementById('crash-bet-input').value);
   if(!bet||bet<100){showToast('Мин. ставка 100');return;}
   if(bet>sharedBalance){showToast('Недостаточно средств');return;}
-  // Ставка через API — списываем реально
   apiCall('POST','/api/crash/start',{bet}).then(r=>{
     if(!r.ok){showToast(r.error||'Ошибка');return;}
     CC.bet=bet; CC.betPlaced=true; CC.cashedOut=false; CC.gameId=r.game_id;
     sharedBalance-=bet; syncBalanceUI();
+    document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);
     updateCrashBtn();
     showToast('Ставка принята!');
   }).catch(()=>showToast('Ошибка соединения'));
