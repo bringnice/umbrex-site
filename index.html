@@ -672,27 +672,6 @@ body {
   z-index:600; transition:opacity .15s, transform .15s;
 }
 .tabbar.hidden { display:none; }
-
-/* ── Футер ── */
-.ux-footer { padding:24px 20px 16px; text-align:center; }
-.ux-footer-links { display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap; }
-.ux-footer-link { display:inline-flex;align-items:center;gap:5px;color:rgba(167,139,250,.65);font-size:13px;font-weight:600;text-decoration:none;transition:color .15s; }
-.ux-footer-link:hover,.ux-footer-link:active { color:#a78bfa; }
-.ux-footer-sep { color:rgba(167,139,250,.25);font-size:13px; }
-.ux-footer-copy { margin-top:10px;font-size:11px;color:rgba(167,139,250,.3);letter-spacing:.3px; }
-
-/* ── Модалка правил ── */
-.rules-overlay { display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center; }
-.rules-overlay.open { display:flex; }
-.rules-sheet { background:#13102a;border-radius:20px 20px 0 0;width:100%;max-width:520px;max-height:80vh;overflow-y:auto;padding:24px 20px 40px;animation:slideUp .25s ease; }
-@keyframes slideUp { from{transform:translateY(60px);opacity:0} to{transform:translateY(0);opacity:1} }
-.rules-handle { width:36px;height:4px;border-radius:2px;background:rgba(167,139,250,.25);margin:0 auto 20px; }
-.rules-title { font-size:18px;font-weight:900;color:#fff;margin-bottom:16px; }
-.rules-section { margin-bottom:16px; }
-.rules-section h3 { font-size:13px;font-weight:800;color:#a78bfa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px; }
-.rules-section p { font-size:13px;color:rgba(200,185,255,.75);line-height:1.6;margin:0; }
-.rules-close { display:block;width:100%;margin-top:20px;padding:13px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.35);border-radius:12px;color:#a78bfa;font-size:14px;font-weight:700;cursor:pointer;text-align:center; }
-
 .tab-item {
   flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
   gap:3px; padding:8px 2px 7px; border-radius:16px; cursor:pointer; position:relative;
@@ -2829,6 +2808,18 @@ body {
 </div>
 <div class="global-topbar-divider"></div>
 
+<!-- ═══ БАН ОВЕРЛЕЙ ═══ -->
+<div id="ban-overlay" style="display:none;position:fixed;inset:0;z-index:99999;background:linear-gradient(160deg,#0d0820,#1a0533);flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;">
+  <div style="font-size:64px;margin-bottom:16px;">🚫</div>
+  <div style="font-size:22px;font-weight:900;color:#fff;margin-bottom:8px;">Аккаунт заблокирован</div>
+  <div style="font-size:14px;color:rgba(200,180,255,.7);margin-bottom:6px;">Вы заблокированы в Umbrex.</div>
+  <div id="ban-reason-text" style="font-size:13px;color:rgba(167,139,250,.6);margin-bottom:32px;"></div>
+  <a href="https://t.me/bringnice" style="display:inline-flex;align-items:center;gap:8px;background:rgba(124,58,237,.25);border:1px solid rgba(124,58,237,.4);border-radius:14px;padding:13px 24px;color:#a78bfa;font-size:15px;font-weight:700;text-decoration:none;">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
+    Написать в поддержку
+  </a>
+</div>
+
 <div id="screen-menu" class="screen active has-tabbar" style="position:relative">
   <div class="ptr-indicator" id="ptr-indicator">↓</div>
   <div class="menu-divider" style="display:none"></div>
@@ -3089,54 +3080,9 @@ body {
       </div>
     </div>
   </div>
-
-  <!-- Футер -->
-  <div class="ux-footer">
-    <div class="ux-footer-links">
-      <a class="ux-footer-link" href="https://t.me/umbrex_gamebot" target="_blank">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
-        Бот
-      </a>
-      <span class="ux-footer-sep">·</span>
-      <a class="ux-footer-link" href="https://t.me/bringnice" target="_blank">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
-        Поддержка
-      </a>
-      <span class="ux-footer-sep">·</span>
-      <a class="ux-footer-link ux-footer-link--rules" href="#" onclick="openRules();return false;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6M9 16h6M9 8h6M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/></svg>
-        Правила
-      </a>
-    </div>
-    <div class="ux-footer-copy">© Umbrex 2026</div>
-  </div>
 </div>
 
-<!-- ═══ ПРАВИЛА ═══ -->
-<div class="rules-overlay" id="rules-overlay" onclick="if(event.target===this)closeRules()">
-  <div class="rules-sheet">
-    <div class="rules-handle"></div>
-    <div class="rules-title">📋 Правила и условия</div>
-    <div class="rules-section">
-      <h3>Общие</h3>
-      <p>Umbrex — развлекательная платформа. Все игры проводятся через Telegram-бота @umbrex_gamebot. Участие доступно только зарегистрированным пользователям бота.</p>
-    </div>
-    <div class="rules-section">
-      <h3>Ставки и баланс</h3>
-      <p>Минимальная ставка — 100 🪙. Баланс пополняется и выводится согласно условиям бота. Администрация вправе заморозить счёт при подозрении в мошенничестве.</p>
-    </div>
-    <div class="rules-section">
-      <h3>Честность</h3>
-      <p>Результаты всех игр определяются сервером случайным образом. Umbrex не манипулирует исходами. При технических сбоях спорные раунды аннулируются.</p>
-    </div>
-    <div class="rules-section">
-      <h3>Ответственная игра</h3>
-      <p>Играйте ответственно. Не делайте ставки на средства, которые не можете позволить себе потерять. По вопросам — <a href="https://t.me/bringnice" style="color:#a78bfa">@bringnice</a>.</p>
-    </div>
-    <div class="rules-close" onclick="closeRules()">Понятно</div>
-  </div>
-</div>
-
+<!-- ═══ PLINKO ═══ -->
 <div id="screen-plinko" class="screen has-tabbar" style="display:flex;flex-direction:column;padding:0">
   <div class="plinko-header">
     <div class="plinko-back" onclick="goGames()">←</div>
@@ -4187,10 +4133,10 @@ function doCashout(){
     sharedBalance=r.new_balance; syncBalanceUI();
     showResult(true, r.profit, CC.mult);
   }).catch(()=>{
-    // Оффлайн fallback
-    const win=Math.round(CC.bet*CC.mult);
-    sharedBalance+=win; syncBalanceUI();
-    showResult(true, win-CC.bet, CC.mult);
+    // При ошибке соединения — не начисляем ничего локально
+    // Незавершённая ставка вернётся при следующем входе через /api/crash/state
+    showToast('Ошибка соединения — ставка будет возвращена при следующем входе');
+    sharedBalance=Math.max(0,sharedBalance); syncBalanceUI();
   });
 }
 
@@ -5002,6 +4948,16 @@ document.addEventListener('DOMContentLoaded',async()=>{
   const initScreen = document.querySelector('.screen.active');
   if(initScreen) requestAnimationFrame(()=>requestAnimationFrame(()=>initScreen.classList.add('screen-visible')));
   await loadBalance();
+  // Проверка бана
+  try {
+    const rp = await apiCall('GET', '/api/profile');
+    if (rp.ok && rp.is_banned) {
+      const overlay = document.getElementById('ban-overlay');
+      overlay.style.display = 'flex';
+      const reasonEl = document.getElementById('ban-reason-text');
+      if (rp.ban_reason) reasonEl.textContent = 'Причина: ' + rp.ban_reason;
+    }
+  } catch(e) {}
   loadLiveBets();
   loadRecentGames();checkBonusDot();loadMiniLeaderboard();
 });
@@ -6829,27 +6785,19 @@ function plinkoDrawStatic() {
   // Слоты
   for (const s of PL.slots) {
     const r = 5;
-    const isFlashing = s._flashUntil && Date.now() < s._flashUntil;
+    const flashing = s._flashing && s._flashColor;
     ctx.beginPath();
     ctx.roundRect(s.x, s.y, s.w, 22, r);
-    if (isFlashing) {
-      ctx.fillStyle = s._flashColor || s.col.bg;
-      ctx.fill();
-      ctx.strokeStyle = s._flashBorder || s.col.border;
-      ctx.lineWidth = 2;
-      ctx.stroke();
-    } else {
-      ctx.fillStyle = s.col.bg;
-      ctx.fill();
-      ctx.strokeStyle = s.col.border;
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    }
+    ctx.fillStyle = flashing ? s._flashColor : s.col.bg;
+    ctx.fill();
+    ctx.strokeStyle = flashing ? s._flashBorder : s.col.border;
+    ctx.lineWidth = flashing ? 1.5 : 1;
+    ctx.stroke();
     const mult = s.mult;
     const label = mult >= 1 ? `×${mult % 1 === 0 ? mult : mult.toFixed(1)}` : `×${mult.toFixed(1)}`;
     const fs = s.w < 24 ? 7 : s.w < 32 ? 8 : 9;
-    ctx.fillStyle = isFlashing ? '#fff' : s.col.text;
-    ctx.font = `${isFlashing ? '900' : '800'} ${fs}px Manrope,sans-serif`;
+    ctx.fillStyle = flashing ? '#fff' : s.col.text;
+    ctx.font = `${flashing ? '900' : '800'} ${fs}px Manrope,sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(label, s.x + s.w / 2, s.y + 11);
@@ -6882,22 +6830,36 @@ function plinkoDrawFrame() {
   }
 }
 
-function plinkoAnimate(ts) {
+function plinkoAnimate() {
   if (!PL.balls.length) { plinkoDrawStatic(); PL.animId = null; return; }
-
-  // dt-based: целевой fps = 50, нормируем скорость под него
-  if (!PL._lastTs) PL._lastTs = ts;
-  const dt = Math.min((ts - PL._lastTs) / (1000 / 50), 2.5); // макс 2.5 чтобы не прыгало при потере фокуса
-  PL._lastTs = ts;
 
   for (const b of PL.balls) {
     if (b.done) continue;
 
-    // Физика с dt
-    b.vy += 0.55 * dt;
-    b.vx *= Math.pow(0.998, dt);
-    b.x += b.vx * dt;
-    b.y += b.vy * dt;
+    // Гравитация
+    b.vy += 0.45;
+    b.vx *= 0.98;
+    b.x += b.vx;
+    b.y += b.vy;
+
+    // Если path пришёл от сервера — тянем шарик к нужному штырю на каждом ряду
+    if (b.path && b.pathRow < PL.rows) {
+      const pegSpacing = PL.W / (PL.rows + 1);
+      const padTop = PL.H * 0.06;
+      const rowGap = (PL.H * 0.78) / (PL.rows + 1);
+      const rowY = padTop + rowGap * (b.pathRow + 1);
+      if (b.y >= rowY - 20) {
+        const dir = b.path[b.pathRow];
+        const cols = b.pathRow + 2;
+        const rowWidth = (cols - 1) * pegSpacing;
+        const rowStartX = (PL.W - rowWidth) / 2;
+        let pos = 0;
+        for (let i = 0; i < b.pathRow; i++) pos += b.path[i];
+        const targetPegX = rowStartX + pegSpacing * Math.min(pos + dir, cols - 1);
+        b.vx += (targetPegX - b.x) * 0.045;
+        b.pathRow++;
+      }
+    }
 
     // Коллизия со штырями
     for (const p of PL.pegs) {
@@ -6911,7 +6873,7 @@ function plinkoAnimate(ts) {
         const dot = b.vx * nx + b.vy * ny;
         b.vx -= 2 * dot * nx * 0.6;
         b.vy -= 2 * dot * ny * 0.6;
-        b.vx += (Math.random() - 0.5) * 0.8;
+        b.vx += (Math.random() - 0.5) * 0.25;
       }
     }
 
@@ -6921,36 +6883,37 @@ function plinkoAnimate(ts) {
     if (b.x < leftBound) { b.x = leftBound; b.vx = Math.abs(b.vx) * 0.5; }
     if (b.x > rightBound) { b.x = rightBound; b.vx = -Math.abs(b.vx) * 0.5; }
 
-    // Достиг нижней границы
+    // Приземление
     if (b.y + b.r >= PL.slots[0].y) {
+      b.done = true;
       b.vy = 0; b.vx = 0;
       b.y = PL.slots[0].y - b.r - 2;
 
-      if (!b.done) {
-        b.done = true;
-        // Визуальная ячейка — куда упал физически, никакой телепортации
-        let visualSlot = PL.slots.length - 1;
+      // Slot от сервера (сумма path) или физический
+      let slotIdx = 0;
+      if (b.path) {
+        slotIdx = b.path.reduce((s, v) => s + v, 0);
+      } else {
         for (let i = 0; i < PL.slots.length; i++) {
-          if (b.x >= PL.slots[i].x && b.x <= PL.slots[i].x + PL.slots[i].w) { visualSlot = i; break; }
+          if (b.x >= PL.slots[i].x && b.x <= PL.slots[i].x + PL.slots[i].w) { slotIdx = i; break; }
+          if (i === PL.slots.length - 1) slotIdx = i;
         }
-        // Ждём profit от API (polling каждые 30мс), потом показываем результат
-        const checkResult = () => {
-          if (b.profit !== null) {
-            if (b._pendingBalance !== undefined) {
-              sharedBalance = b._pendingBalance;
-              syncBalanceUI();
-              document.getElementById('plinko-balance-val').textContent = fmt(sharedBalance);
-            }
-            if (b.profit > 0) tg?.HapticFeedback?.notificationOccurred('success');
-            else tg?.HapticFeedback?.impactOccurred('medium');
-            plinkoFlashSlot(visualSlot, b.profit);
-            setTimeout(() => { b.finished = true; }, 700);
-          } else {
-            setTimeout(checkResult, 30);
-          }
-        };
-        checkResult();
       }
+      b.x = PL.slots[slotIdx].x + PL.slots[slotIdx].w / 2;
+
+      const finish = () => {
+        if (b.profit === null) { setTimeout(finish, 30); return; }
+        if (b._newBalance !== null) {
+          sharedBalance = b._newBalance;
+          syncBalanceUI();
+          document.getElementById('plinko-balance-val').textContent = fmt(sharedBalance);
+        }
+        if (b.profit > 0) tg?.HapticFeedback?.notificationOccurred('success');
+        else tg?.HapticFeedback?.impactOccurred('medium');
+        plinkoFlashSlot(slotIdx, b.profit);
+        setTimeout(() => { b.finished = true; }, 500);
+      };
+      finish();
     }
   }
 
@@ -6964,18 +6927,16 @@ function plinkoAnimate(ts) {
 function plinkoFlashSlot(idx, profit) {
   const s = PL.slots[idx];
   if (!s) return;
-  s._flashColor = profit > 0 ? 'rgba(52,211,153,0.85)' : profit < 0 ? 'rgba(248,113,113,0.75)' : 'rgba(139,92,246,0.8)';
+  s._flashColor = profit > 0 ? 'rgba(52,211,153,0.9)' : profit < 0 ? 'rgba(248,113,113,0.7)' : 'rgba(167,139,250,0.8)';
   s._flashBorder = profit > 0 ? '#34d399' : profit < 0 ? '#f87171' : '#a78bfa';
-  s._flashUntil = Date.now() + 600;
-  // Мигание — переключаем флаг 3 раза
   let t = 0;
-  const blink = () => {
-    if (t >= 6) { s._flashUntil = 0; return; }
-    s._flashUntil = t % 2 === 0 ? Date.now() + 600 : 0;
+  const flash = () => {
+    if (t >= 6) { delete s._flashColor; delete s._flashBorder; return; }
+    s._flashing = t % 2 === 0;
     t++;
-    setTimeout(blink, 100);
+    setTimeout(flash, 80);
   };
-  setTimeout(blink, 100);
+  flash();
 }
 
 function plinkoPick(type, val, btn) {
@@ -7005,23 +6966,40 @@ async function plinkoPlay() {
 
   tg?.HapticFeedback?.impactOccurred('light');
 
+  // Запускаем шарик сразу визуально, API параллельно
   const startX = PL.W / 2 + (Math.random() - 0.5) * 2;
   const startY = PL.pegs[0] ? PL.pegs[0].y - 30 : 10;
-  const ball = { x: startX, y: startY, vx: (Math.random()-0.5)*0.3, vy: 2, r: 6, done: false, waiting: false, finished: false, slotIdx: null, mult: null, profit: null };
+  const ball = {
+    x: startX, y: startY,
+    vx: 0, vy: 2.5, r: 6,
+    done: false, finished: false,
+    path: null,       // массив 0/1 от сервера
+    pathRow: 0,       // текущий ряд штырей
+    profit: null, mult: null, _newBalance: null
+  };
   PL.balls.push(ball);
-  if (!PL.animId) { PL._lastTs = null; PL.animId = requestAnimationFrame(plinkoAnimate); }
+  if (!PL.animId) PL.animId = requestAnimationFrame(plinkoAnimate);
 
-  // API — баланс и slotIdx обновляем только после ответа
   try {
     const r = await apiCall('POST', '/api/plinko/play', { bet, rows: PL.rows, risk: PL.risk });
     if (r.ok) {
-      // Баланс покажем только когда шарик приземлится
-      ball._pendingBalance = r.new_balance;
-      ball.slotIdx = r.slot;
+      ball.path = r.path;       // [0,1,0,1,...] — влево/вправо на каждом ряду
       ball.mult = r.mult;
       ball.profit = r.profit;
+      ball._newBalance = r.new_balance;
+      // Списываем баланс локально только после подтверждения сервера
+      sharedBalance = r.new_balance + r.profit; // баланс ДО выплаты (покажем после приземления)
+      syncBalanceUI();
+      document.getElementById('plinko-balance-val').textContent = fmt(sharedBalance);
+    } else {
+      // API вернул ошибку — убираем шарик
+      ball.finished = true;
+      showToast(r.error || 'Ошибка');
     }
-  } catch(e) {}
+  } catch(e) {
+    ball.finished = true;
+    showToast('Ошибка соединения');
+  }
 }
 
 function openPlinko() {
@@ -7088,15 +7066,6 @@ function openPlinko() {
     if(alive) _raf = requestAnimationFrame(_draw);
     else { ctx.clearRect(0,0,cv.width,cv.height); _raf=null; }
   }
-
-function openRules() {
-  document.getElementById('rules-overlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeRules() {
-  document.getElementById('rules-overlay').classList.remove('open');
-  document.body.style.overflow = '';
-}
 
   window.launchConfetti = function(){
     const cx = window.innerWidth/2;
