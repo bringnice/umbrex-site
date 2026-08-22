@@ -4948,9 +4948,7 @@ async function hiloCashout(){
 }
 
 document.addEventListener('DOMContentLoaded',async()=>{
-  // Reset scroll on all screens so TG WebApp never opens mid-scroll
   document.querySelectorAll('.screen').forEach(s=>{s.scrollTop=0;});
-  // Показываем начальный экран с fade
   const initScreen = document.querySelector('.screen.active');
   if(initScreen) requestAnimationFrame(()=>requestAnimationFrame(()=>initScreen.classList.add('screen-visible')));
   await loadBalance();
@@ -4964,9 +4962,48 @@ document.addEventListener('DOMContentLoaded',async()=>{
       if (rp.ban_reason) reasonEl.textContent = 'Причина: ' + rp.ban_reason;
     }
   } catch(e) {}
+  // Статус игр — отключаем карточки недоступных
+  try {
+    const gs = await apiCall('GET', '/api/games/status');
+    if (gs.ok && gs.games) applyGameStatus(gs.games);
+  } catch(e) {}
   loadLiveBets();
   loadRecentGames();checkBonusDot();loadMiniLeaderboard();
 });
+
+function applyGameStatus(games) {
+  const MAP = {
+    'plinko':     '[onclick="openPlinko()"]',
+    'mines':      '[onclick="openMines()"]',
+    'tower':      '[onclick="openTower()"]',
+    'crash':      '[onclick="openCrash()"]',
+    'blackjack':  '[onclick="openBlackjack()"]',
+    'hilo':       '[onclick="openHilo()"]',
+    'wheel':      '[onclick="openWheel()"]',
+  };
+  for (const [game, selector] of Object.entries(MAP)) {
+    const enabled = games[game] !== false;
+    document.querySelectorAll(selector).forEach(el => {
+      if (!enabled) {
+        el.style.opacity = '0.4';
+        el.style.pointerEvents = 'none';
+        // Добавляем бейдж "Недоступно" если ещё нет
+        if (!el.querySelector('.game-disabled-badge')) {
+          const badge = document.createElement('div');
+          badge.className = 'game-disabled-badge';
+          badge.textContent = '🔒 Недоступно';
+          badge.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;background:rgba(0,0,0,0.55);border-radius:inherit;z-index:10;';
+          el.style.position = 'relative';
+          el.appendChild(badge);
+        }
+      } else {
+        el.style.opacity = '';
+        el.style.pointerEvents = '';
+        el.querySelectorAll('.game-disabled-badge').forEach(b => b.remove());
+      }
+    });
+  }
+}
 window.addEventListener('load',()=>{
   document.querySelectorAll('.screen').forEach(s=>{s.scrollTop=0;});
   if(tg){tg.expand();}
