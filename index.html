@@ -2648,53 +2648,63 @@ h1,h2{
 }
 </style>
 
-<style id="umbrex-telegram-redesign">
-:root{
- --u-bg:#05020f;
- --u-panel:rgba(20,10,45,.72);
- --u-border:rgba(150,80,255,.35);
- --u-purple:#a855ff;
- --u-blue:#386cff;
-}
+<style id="umbrex-full-ui-rebuild">
+*{box-sizing:border-box}
 body{
+ margin:0!important;
  background:
- radial-gradient(circle at 50% 0%,#31106b 0%,transparent 35%),
- radial-gradient(circle at 20% 80%,#101f70 0%,transparent 30%),
- #05020f !important;
+ radial-gradient(circle at 50% 0,#34106b 0,transparent 35%),
+ radial-gradient(circle at 10% 70%,#101a55 0,transparent 30%),
+ #04030b!important;
+ font-family:Manrope,Arial,sans-serif!important;
 }
-.card,.game-card,.panel,.balance-card{
- background:linear-gradient(135deg,rgba(120,60,255,.18),rgba(10,8,30,.85)) !important;
- border:1px solid var(--u-border) !important;
- box-shadow:0 0 35px rgba(130,60,255,.18), inset 0 0 30px rgba(255,255,255,.03);
- backdrop-filter:blur(18px);
- border-radius:28px !important;
+body:before{
+ content:"";
+ position:fixed;
+ inset:0;
+ pointer-events:none;
+ background-image:radial-gradient(#9d5cff 1px,transparent 1px);
+ background-size:45px 45px;
+ opacity:.18;
+}
+.container,main,.app,.content{
+ max-width:430px!important;
+ margin:auto!important;
+}
+.card,.game-card,.balance-card,.panel,[class*="card"]{
+ border-radius:28px!important;
+ background:linear-gradient(145deg,rgba(72,25,140,.35),rgba(8,7,25,.9))!important;
+ border:1px solid rgba(151,91,255,.4)!important;
+ box-shadow:0 0 35px rgba(132,60,255,.2)!important;
+ backdrop-filter:blur(18px)!important;
+}
+.balance-card{
+ min-height:150px!important;
+ padding:25px!important;
 }
 button,.btn{
- background:linear-gradient(135deg,#c43cff,#6528ff)!important;
- border:1px solid #d48aff!important;
- box-shadow:0 0 25px rgba(168,85,255,.55);
+ border-radius:18px!important;
+ background:linear-gradient(135deg,#d33cff,#6b2cff)!important;
+ box-shadow:0 0 25px #8b35ff!important;
 }
-.logo,.brand{
- filter:drop-shadow(0 0 18px #a855ff);
+.logo,.brand,#logo{
+ filter:drop-shadow(0 0 18px #b65cff);
 }
-*{
- scrollbar-color:#873cff #090414;
+.game-card{
+ overflow:hidden;
 }
-.bottom-nav,.navigation,.footer-menu{
- background:rgba(15,8,35,.75)!important;
- backdrop-filter:blur(25px);
- border:1px solid rgba(150,80,255,.25);
+.game-card:hover{
+ transform:translateY(-5px);
+ transition:.25s;
+}
+.bottom-nav,.mobile-nav,.nav-bottom{
+ background:rgba(12,7,30,.8)!important;
+ border:1px solid rgba(150,80,255,.3)!important;
  border-radius:30px!important;
+ backdrop-filter:blur(25px);
 }
-.stat-card{
- background:rgba(20,10,50,.7)!important;
- border:1px solid rgba(168,85,255,.25)!important;
- border-radius:22px!important;
-}
-.game-card:hover,.card:hover{
- transform:translateY(-4px);
- box-shadow:0 0 45px rgba(168,85,255,.35);
- transition:.3s;
+h1,h2,h3{
+ letter-spacing:-.03em;
 }
 </style>
 
@@ -7192,3 +7202,81 @@ function openPlinko() {
 })();
 
 </script>
+<div id="umbrex-new-home">
+  <div class="u-top">
+    <div class="u-logo">💎 <b>umbrex</b></div>
+    <div class="u-balance">13 816 ◉</div>
+  </div>
+
+  <div class="u-card balance">
+    <small>ВАШ БАЛАНС</small>
+    <strong>13 816 ◉</strong>
+  </div>
+
+  <div class="u-live">● LIVE</div>
+
+  <div class="u-title">
+    <span>ИГРЫ</span>
+    <button>Все игры →</button>
+  </div>
+
+  <div class="u-crash">
+    <label>● LIVE</label>
+    <div class="mult">1.76x</div>
+    <div class="line"></div>
+    <h2>🚀 Краш</h2>
+    <p>Забери до краша</p>
+  </div>
+
+  <div class="u-games">
+    <div class="u-game mines">
+      <b>💎</b>
+      <h2>Мины</h2>
+      <p>Найди алмазы, избегай мин</p>
+    </div>
+    <div class="u-game hilo">
+      <b>🃏 8</b>
+      <h2>HiLo</h2>
+      <p>Выше или ниже?</p>
+    </div>
+  </div>
+
+  <div class="u-stats">
+    <div>👥<b>128 540</b><span>Пользователей</span></div>
+    <div>🎮<b>2 450 719</b><span>Игр сыграно</span></div>
+    <div>🏆<b>356 784</b><span>Выигрышей</span></div>
+  </div>
+
+  <div class="u-nav">
+    <span>▦<br>Меню</span>
+    <span>🎮<br>Игры</span>
+    <span>🏆<br>Топ</span>
+    <span>🎁<br>Бонус</span>
+    <span>👤<br>Профиль</span>
+  </div>
+</div>
+
+<style id="umbrex-new-layout">
+#umbrex-new-home{display:block;max-width:430px;margin:auto;padding:18px;color:#fff;font-family:Arial,sans-serif}
+.u-top{display:flex;justify-content:space-between;align-items:center;margin:20px 0;font-size:26px;color:#c06cff}
+.u-balance,.u-card,.u-crash,.u-game,.u-stats,.u-nav{background:linear-gradient(145deg,#24104a,#090515);border:1px solid #6e3bff;border-radius:28px;box-shadow:0 0 30px #5420aa55}
+.u-balance{padding:15px 20px;font-size:18px}
+.u-card{padding:25px;margin-bottom:18px}
+.u-card small{display:block;color:#aaa}
+.u-card strong{display:block;font-size:44px;margin-top:12px}
+.u-live{color:#df73ff;margin:15px 0;font-size:22px}
+.u-title{display:flex;justify-content:space-between;margin:20px 0;color:#aaa}
+.u-title button{background:#24104a;color:#d78cff;border:1px solid #793fff;border-radius:20px;padding:10px}
+.u-crash{padding:25px;height:330px;position:relative;overflow:hidden}
+.u-crash label{color:#e16cff}
+.mult{font-size:76px;font-weight:900;margin-top:60px;color:#e47cff;text-align:center}
+.line{height:4px;background:#e45cff;transform:rotate(-12deg);margin-top:35px}
+.u-games{display:flex;gap:12px;margin-top:18px}
+.u-game{width:50%;padding:20px;height:210px}
+.u-game b{font-size:45px}
+.u-game h2{margin-top:60px}
+.u-game p{color:#aaa}
+.u-stats{margin-top:18px;padding:15px;display:flex;justify-content:space-around;text-align:center}
+.u-stats div{font-size:20px}.u-stats b,.u-stats span{display:block;font-size:12px}
+.u-nav{position:sticky;bottom:10px;margin-top:20px;padding:15px;display:flex;justify-content:space-around;text-align:center;color:#aaa}
+</style>
