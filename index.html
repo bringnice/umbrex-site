@@ -1571,6 +1571,54 @@ body {
 @keyframes gcFlt { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
 @keyframes gcFlt2 { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(-4px)} }
 
+/* ══════════ КАРТОЧКА ФЛИПА ══════════ */
+.game-card-small-new.is-flip {
+  background:linear-gradient(155deg,#1a1000 0%,#120b00 60%,#0c0700 100%);
+  border-color:rgba(251,191,36,.28);
+  box-shadow:0 10px 28px rgba(0,0,0,.55),inset 0 1px 0 rgba(251,191,36,.1);
+}
+.gc-glow-flip-el { position:absolute;top:-20px;right:-20px;width:120px;height:120px;background:radial-gradient(circle,rgba(251,191,36,.22) 0%,transparent 65%);pointer-events:none; }
+.gc-badge-gold-new { position:absolute;top:12px;right:12px;border-radius:8px;padding:3px 9px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;background:rgba(251,191,36,.18);color:#fbbf24;border:1px solid rgba(251,191,36,.35); }
+.gc-fade-flip-new { position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(transparent,rgba(12,7,0,.96));pointer-events:none;border-radius:0 0 22px 22px; }
+/* визуал флипа — монетка */
+.flip-vis-new { position:absolute;top:18px;left:50%;transform:translateX(-50%);width:68px;height:68px;display:flex;align-items:center;justify-content:center;animation:gcFlt3 3.2s ease-in-out infinite; }
+.flip-coin-new { font-size:52px;line-height:1;filter:drop-shadow(0 0 12px rgba(251,191,36,.6)); }
+@keyframes gcFlt3 { 0%,100%{transform:translateX(-50%) translateY(0) rotate(0deg)} 50%{transform:translateX(-50%) translateY(-5px) rotate(8deg)} }
+
+/* ══════════ ЭКРАН ФЛИПА ══════════ */
+#screen-flip { background:linear-gradient(180deg,#110900 0%,#080500 100%); }
+.flip-progress-bar { display:flex;gap:6px;justify-content:center;margin:14px 16px;flex-shrink:0; }
+.flip-dot { width:24px;height:24px;border-radius:50%;border:1.5px solid rgba(251,191,36,.25);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .25s; }
+.flip-dot.eagle { background:rgba(251,191,36,.2);border-color:rgba(251,191,36,.7);box-shadow:0 0 10px rgba(251,191,36,.35); }
+.flip-dot.tails { background:rgba(167,139,250,.2);border-color:rgba(167,139,250,.7);box-shadow:0 0 10px rgba(167,139,250,.35); }
+.flip-coin-big { width:140px;height:140px;border-radius:50%;margin:8px auto;display:flex;align-items:center;justify-content:center;font-size:80px;background:radial-gradient(circle at 35% 35%,#fde68a,#f59e0b 45%,#b45309 100%);box-shadow:0 0 40px rgba(251,191,36,.35),0 8px 28px rgba(0,0,0,.5),inset 0 2px 4px rgba(255,255,255,.25);transition:transform .15s;flex-shrink:0; }
+.flip-coin-big.flip-spinning { animation:flipSpin .5s ease-in-out; }
+@keyframes flipSpin { 0%{transform:rotateY(0)} 50%{transform:rotateY(90deg) scale(0.85)} 100%{transform:rotateY(0)} }
+.flip-coin-big.result-win { box-shadow:0 0 60px rgba(52,211,153,.5),0 8px 28px rgba(0,0,0,.5),inset 0 2px 4px rgba(255,255,255,.25); }
+.flip-coin-big.result-lose { box-shadow:0 0 60px rgba(248,113,113,.5),0 8px 28px rgba(0,0,0,.5),inset 0 2px 4px rgba(255,255,255,.25);filter:grayscale(.5); }
+.flip-info-row { display:flex;gap:10px;margin:8px 16px;flex-shrink:0; }
+.flip-info-box { flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 12px;text-align:center; }
+.flip-info-lbl { font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:4px; }
+.flip-info-val { font-size:18px;font-weight:900;color:#fbbf24;text-shadow:0 0 12px rgba(251,191,36,.4); }
+.flip-info-val.green { color:var(--green);text-shadow:0 0 12px rgba(52,211,153,.5); }
+.flip-btns { display:flex;gap:10px;margin:8px 16px;flex-shrink:0; }
+.flip-btn { flex:1;border:none;border-radius:16px;padding:14px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font-family:-apple-system,sans-serif;transition:transform .12s,box-shadow .15s; }
+.flip-btn:active { transform:scale(.95); }
+.flip-btn:disabled { opacity:.35;cursor:default; }
+.flip-btn-eagle { background:linear-gradient(145deg,#92400e,#b45309);box-shadow:0 6px 24px rgba(180,83,9,.45); }
+.flip-btn-eagle:hover:not(:disabled) { box-shadow:0 8px 30px rgba(251,191,36,.5); }
+.flip-btn-tails { background:linear-gradient(145deg,#2e1065,#4c1d95);box-shadow:0 6px 24px rgba(76,29,149,.45); }
+.flip-btn-tails:hover:not(:disabled) { box-shadow:0 8px 30px rgba(139,92,246,.5); }
+.flip-btn-icon { font-size:24px; }
+.flip-btn-label { font-size:15px;font-weight:900;letter-spacing:.5px;color:#fff; }
+.flip-btn-mult { font-size:11px;font-weight:700;opacity:.85;color:#fff; }
+.flip-cashout-btn { margin:6px 16px;border:none;border-radius:16px;padding:14px;cursor:pointer;background:linear-gradient(145deg,#065f46,#047857);box-shadow:0 6px 24px rgba(5,150,105,.4);color:#fff;font-size:16px;font-weight:900;font-family:-apple-system,sans-serif;display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .12s,box-shadow .15s;flex-shrink:0; }
+.flip-cashout-btn:hover:not(:disabled) { box-shadow:0 8px 30px rgba(52,211,153,.5); }
+.flip-cashout-btn:active { transform:scale(.97); }
+.flip-cashout-btn:disabled { opacity:.3;cursor:default; }
+.flip-cashout-sub { font-size:13px;font-weight:600;opacity:.85; }
+.flip-settings { background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:16px;margin:8px 16px;padding:14px;flex-shrink:0; }
+
 /* ══════════ КАРТОЧКА БАШНИ ══════════ */
 .gc-tower-card {
   position:relative; border-radius:22px; overflow:hidden; cursor:pointer;
@@ -2402,6 +2450,7 @@ body {
   #screen-mines,
   #screen-hilo,
   #screen-tower,
+  #screen-flip,
   #screen-crash,
   #screen-wheel { display: none !important; }
 
@@ -2586,73 +2635,6 @@ body {
   .desk-sidebar-item { font-size: 14px; padding: 11px 14px; border-radius: 12px; }
   .desk-sidebar-section { font-size: 11px; padding: 14px 12px 8px; }
 }
-
-/* UMBREX PREMIUM REDESIGN OVERRIDE */
-:root{
- --bg:#07080d;
- --panel:rgba(18,20,30,.72);
- --line:rgba(255,255,255,.08);
- --accent:#a78bfa;
- --accent2:#22d3ee;
-}
-body{
- background:
- radial-gradient(circle at 15% 10%,rgba(167,139,250,.18),transparent 35%),
- radial-gradient(circle at 85% 20%,rgba(34,211,238,.14),transparent 30%),
- #07080d!important;
- font-family:'Manrope',sans-serif!important;
-}
-body:before{
- content:"";
- position:fixed;
- inset:0;
- pointer-events:none;
- background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
- background-size:60px 60px;
- mask-image:linear-gradient(to bottom,black,transparent);
-}
-header,.header,.topbar,.nav{
- backdrop-filter:blur(18px);
- background:rgba(7,8,13,.55)!important;
- border-bottom:1px solid var(--line)!important;
-}
-.card,.game-card,.item,.panel,.box{
- background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.025))!important;
- border:1px solid var(--line)!important;
- border-radius:28px!important;
- box-shadow:0 25px 80px rgba(0,0,0,.35)!important;
- transition:.35s ease!important;
-}
-.card:hover,.game-card:hover,.item:hover{
- transform:translateY(-8px)!important;
- border-color:rgba(167,139,250,.45)!important;
-}
-button,.btn{
- border-radius:18px!important;
- background:linear-gradient(135deg,#a78bfa,#22d3ee)!important;
- color:#050507!important;
- font-weight:800!important;
- box-shadow:0 12px 35px rgba(167,139,250,.25)!important;
- transition:.25s!important;
-}
-button:hover,.btn:hover{
- transform:scale(1.04)!important;
-}
-h1,h2{
- letter-spacing:-.04em!important;
-}
-.hero,.main-screen,.welcome{
- min-height:90vh;
- display:flex;
- align-items:center;
-}
-</style>
-
-<style id="umbrex-final-ui">
-/* Full visual rebuild layer - keeps existing JS */
-body{background:#05020d!important}
-:root{--u:#9b4dff;--u2:#d36cff}
-.umbrex-new-overlay{}
 </style>
 </head>
 <body>
@@ -3110,6 +3092,23 @@ body{background:#05020d!important}
         </div>
       </div>
     </div>
+    <!-- Флип -->
+    <div class="games-grid-row">
+      <div class="game-card-small-new is-flip" data-name="флип flip монета орёл решка" onclick="openFlip()">
+        <div class="gc-glow-flip-el"></div>
+        <div class="gc-badge-gold-new">×{FLIP}</div>
+        <div class="flip-vis-new">
+          <div class="flip-coin-new">🪙</div>
+        </div>
+        <div class="gc-fade-flip-new"></div>
+        <div class="gc-card-bottom-new">
+          <div class="gc-card-name-new">Флип</div>
+          <div class="gc-card-desc-new">Орёл или решка?</div>
+        </div>
+      </div>
+      <!-- пустая ячейка для выравнивания сетки -->
+      <div style="visibility:hidden"></div>
+    </div>
     <!-- Плинко -->
     <div class="gc-plinko-card" data-name="плинко plinko шарик штыри" onclick="openPlinko()">
       <div class="gc-plinko-bg">
@@ -3276,6 +3275,71 @@ body{background:#05020d!important}
 </div>
 
 <!-- ═══ БАШНЯ ═══ -->
+<!-- ═══ ФЛИП ═══ -->
+<div id="screen-flip" class="screen">
+  <div class="header">
+    <div class="header-back" onclick="goGames()">←</div>
+    <div class="header-title"><h1>🪙 Флип</h1><p>Umbrex</p></div>
+    <div style="width:38px"></div>
+  </div>
+
+  <!-- Прогресс-бар уровней -->
+  <div class="flip-progress-bar" id="flip-progress-bar">
+    <!-- 10 точек, рендерятся через JS -->
+  </div>
+
+  <!-- Монета -->
+  <div class="flip-coin-big" id="flip-coin-big">🪙</div>
+
+  <!-- Инфо: множитель + текущий выигрыш -->
+  <div class="flip-info-row" id="flip-info-row" style="display:none">
+    <div class="flip-info-box">
+      <div class="flip-info-lbl">Уровень</div>
+      <div class="flip-info-val" id="flip-level-val">0 / 10</div>
+    </div>
+    <div class="flip-info-box">
+      <div class="flip-info-lbl">Текущий выигрыш</div>
+      <div class="flip-info-val green" id="flip-payout-val">0 🪙</div>
+    </div>
+  </div>
+
+  <!-- Кнопки Орёл / Решка -->
+  <div class="flip-btns" id="flip-action-btns" style="display:none">
+    <button class="flip-btn flip-btn-eagle" id="flip-btn-eagle" onclick="flipMove('eagle')">
+      <span class="flip-btn-icon">🦅</span>
+      <span class="flip-btn-label">ОРЁЛ</span>
+      <span class="flip-btn-mult" id="flip-next-mult">×—</span>
+    </button>
+    <button class="flip-btn flip-btn-tails" id="flip-btn-tails" onclick="flipMove('tails')">
+      <span class="flip-btn-icon">🪙</span>
+      <span class="flip-btn-label">РЕШКА</span>
+      <span class="flip-btn-mult" id="flip-next-mult2">×—</span>
+    </button>
+  </div>
+
+  <!-- Кнопка забрать -->
+  <button class="flip-cashout-btn" id="flip-cashout-btn" onclick="flipCashout()" style="display:none">
+    ЗАБРАТЬ
+    <span class="flip-cashout-sub" id="flip-cashout-sub">0 🪙</span>
+  </button>
+
+  <!-- Настройки до старта -->
+  <div class="flip-settings" id="flip-settings">
+    <div class="setting-row">
+      <span class="setting-label">Ставка</span>
+      <div class="bet-input-wrap">
+        <button class="bet-mod" onclick="flipMultBet(.5)">½</button>
+        <button class="bet-mod" onclick="flipMultBet(2)">×2</button>
+        <input id="flip-bet-input" class="bet-inp" type="number" value="500" min="100" step="100" inputmode="numeric">
+        <button class="bet-mod" onclick="document.getElementById('flip-bet-input').value=Math.floor(sharedBalance)">MAX</button>
+      </div>
+    </div>
+  </div>
+  <div class="btn-row" id="flip-start-row">
+    <button class="btn btn-start" id="flip-start-btn" onclick="flipStart()">🪙 Начать</button>
+  </div>
+</div>
+
 <div id="screen-tower" class="screen">
   <div class="header">
     <div class="header-back" onclick="goMenu()">←</div>
@@ -5014,10 +5078,200 @@ async function hiloCashout(){
   }catch(e){ showToast('Ошибка'); }
 }
 
+// ── ФЛИП ──
+const FLIP_MAX_LVLS = 10;
+const FLIP_BASE_MULT = 1.9;
+let FS = { playing:false, bet:500, level:0, history:[] };
+
+function flipGetMult(level){
+  if(level===0) return 0;
+  return Math.round(FLIP_BASE_MULT * Math.pow(2, level-1) * 100) / 100;
+}
+
+function flipMultBet(f){
+  const i=document.getElementById('flip-bet-input');
+  i.value=Math.max(100,Math.round(parseFloat(i.value||500)*f));
+}
+
+function flipRenderProgress(){
+  const bar=document.getElementById('flip-progress-bar');
+  bar.innerHTML='';
+  for(let i=0;i<FLIP_MAX_LVLS;i++){
+    const d=document.createElement('div');
+    d.className='flip-dot';
+    if(i<FS.history.length){
+      d.classList.add(FS.history[i]==='eagle'?'eagle':'tails');
+      d.textContent=FS.history[i]==='eagle'?'🦅':'🪙';
+    } else {
+      d.textContent='';
+    }
+    bar.appendChild(d);
+  }
+}
+
+function flipUpdateInfo(){
+  const mult=flipGetMult(FS.level);
+  const payout=FS.level>0?Math.round(FS.bet*mult):0;
+  const nextMult=flipGetMult(FS.level+1);
+  document.getElementById('flip-level-val').textContent=FS.level+' / '+FLIP_MAX_LVLS;
+  document.getElementById('flip-payout-val').textContent=fmt(payout)+' 🪙';
+  document.getElementById('flip-next-mult').textContent='×'+nextMult;
+  document.getElementById('flip-next-mult2').textContent='×'+nextMult;
+  if(FS.level>0){
+    document.getElementById('flip-cashout-btn').style.display='flex';
+    document.getElementById('flip-cashout-sub').textContent=fmt(payout)+' 🪙';
+  }
+}
+
+function flipReset(){
+  FS={playing:false, bet:500, level:0, history:[]};
+  document.getElementById('flip-settings').style.display='block';
+  document.getElementById('flip-start-row').style.display='flex';
+  document.getElementById('flip-start-btn').disabled=false;
+  document.getElementById('flip-info-row').style.display='none';
+  document.getElementById('flip-action-btns').style.display='none';
+  document.getElementById('flip-cashout-btn').style.display='none';
+  const coin=document.getElementById('flip-coin-big');
+  coin.textContent='🪙';
+  coin.className='flip-coin-big';
+  flipRenderProgress();
+}
+
+function openFlip(){
+  showScreen('screen-flip');
+  document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);
+  flipReset();
+  // Проверяем активную игру на сервере
+  apiCall('GET','/api/flip/state').then(r=>{
+    if(r.ok && r.active){
+      FS.playing=true;
+      FS.bet=r.bet;
+      FS.level=r.level;
+      FS.history=r.history||[];
+      flipRenderProgress();
+      document.getElementById('flip-settings').style.display='none';
+      document.getElementById('flip-start-row').style.display='none';
+      document.getElementById('flip-info-row').style.display='flex';
+      document.getElementById('flip-action-btns').style.display='flex';
+      flipUpdateInfo();
+    }
+  }).catch(()=>{});
+}
+
+async function flipStart(){
+  const bet=parseFloat(document.getElementById('flip-bet-input').value);
+  if(!bet||bet<100){showToast('Мин. ставка 100');return;}
+  if(bet>sharedBalance){showToast('Недостаточно средств');return;}
+  document.getElementById('flip-start-btn').disabled=true;
+  try{
+    const r=await apiCall('POST','/api/flip/start',{bet});
+    if(!r.ok){showToast(r.error||'Ошибка');document.getElementById('flip-start-btn').disabled=false;return;}
+    FS.playing=true;
+    FS.bet=bet;
+    FS.level=0;
+    FS.history=[];
+    sharedBalance=r.new_balance;
+    syncBalanceUI();
+    document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);
+    document.getElementById('flip-settings').style.display='none';
+    document.getElementById('flip-start-row').style.display='none';
+    document.getElementById('flip-info-row').style.display='flex';
+    document.getElementById('flip-action-btns').style.display='flex';
+    flipRenderProgress();
+    flipUpdateInfo();
+  }catch(e){showToast('Ошибка соединения');document.getElementById('flip-start-btn').disabled=false;}
+}
+
+async function flipMove(choice){
+  if(!FS.playing)return;
+  document.getElementById('flip-btn-eagle').disabled=true;
+  document.getElementById('flip-btn-tails').disabled=true;
+  document.getElementById('flip-cashout-btn').disabled=true;
+  const coin=document.getElementById('flip-coin-big');
+  coin.classList.add('flip-spinning');
+  try{
+    const r=await apiCall('POST','/api/flip/move',{choice});
+    setTimeout(()=>{
+      coin.classList.remove('flip-spinning');
+      if(!r.ok){
+        showToast(r.error||'Ошибка');
+        document.getElementById('flip-btn-eagle').disabled=false;
+        document.getElementById('flip-btn-tails').disabled=false;
+        document.getElementById('flip-cashout-btn').disabled=false;
+        return;
+      }
+      // Показываем результат броска
+      const isEagle=r.coin==='eagle';
+      coin.textContent=isEagle?'🦅':'🪙';
+
+      if(r.result==='win'||r.result==='win_all'){
+        coin.className='flip-coin-big result-win';
+        FS.level=r.level;
+        FS.history.push(r.coin);
+        flipRenderProgress();
+        tg?.HapticFeedback?.impactOccurred('light');
+        if(r.result==='win_all'){
+          // Максимум!
+          sharedBalance=r.new_balance;
+          syncBalanceUI();
+          document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);
+          document.getElementById('flip-action-btns').style.display='none';
+          document.getElementById('flip-cashout-btn').style.display='none';
+          document.getElementById('flip-info-row').style.display='flex';
+          document.getElementById('flip-level-val').textContent=FLIP_MAX_LVLS+' / '+FLIP_MAX_LVLS;
+          document.getElementById('flip-payout-val').textContent=fmt(r.payout)+' 🪙';
+          tg?.HapticFeedback?.notificationOccurred('success');
+          showResult(true, r.profit, r.mult);
+          setTimeout(()=>flipReset(),2800);
+        } else {
+          // Продолжаем
+          flipUpdateInfo();
+          document.getElementById('flip-btn-eagle').disabled=false;
+          document.getElementById('flip-btn-tails').disabled=false;
+          document.getElementById('flip-cashout-btn').disabled=false;
+        }
+      } else {
+        // Проигрыш
+        coin.className='flip-coin-big result-lose';
+        FS.playing=false;
+        sharedBalance=r.new_balance;
+        syncBalanceUI();
+        document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);
+        document.getElementById('flip-action-btns').style.display='none';
+        document.getElementById('flip-cashout-btn').style.display='none';
+        tg?.HapticFeedback?.notificationOccurred('error');
+        showResult(false, FS.bet, 0);
+        setTimeout(()=>flipReset(),400);
+      }
+    },520); // ждём конца анимации монеты
+  }catch(e){
+    coin.classList.remove('flip-spinning');
+    showToast('Ошибка');
+    document.getElementById('flip-btn-eagle').disabled=false;
+    document.getElementById('flip-btn-tails').disabled=false;
+    document.getElementById('flip-cashout-btn').disabled=false;
+  }
+}
+
+async function flipCashout(){
+  if(!FS.playing||FS.level===0)return;
+  document.getElementById('flip-cashout-btn').disabled=true;
+  document.getElementById('flip-btn-eagle').disabled=true;
+  document.getElementById('flip-btn-tails').disabled=true;
+  try{
+    const r=await apiCall('POST','/api/flip/cashout',{});
+    if(!r.ok){showToast(r.error||'Ошибка');document.getElementById('flip-cashout-btn').disabled=false;document.getElementById('flip-btn-eagle').disabled=false;document.getElementById('flip-btn-tails').disabled=false;return;}
+    sharedBalance=r.new_balance;
+    syncBalanceUI();
+    document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);
+    tg?.HapticFeedback?.notificationOccurred('success');
+    showResult(true, r.profit, r.mult);
+    setTimeout(()=>flipReset(),2800);
+  }catch(e){showToast('Ошибка');}
+}
+
 document.addEventListener('DOMContentLoaded',async()=>{
-  // Reset scroll on all screens so TG WebApp never opens mid-scroll
   document.querySelectorAll('.screen').forEach(s=>{s.scrollTop=0;});
-  // Показываем начальный экран с fade
   const initScreen = document.querySelector('.screen.active');
   if(initScreen) requestAnimationFrame(()=>requestAnimationFrame(()=>initScreen.classList.add('screen-visible')));
   await loadBalance();
@@ -5031,9 +5285,49 @@ document.addEventListener('DOMContentLoaded',async()=>{
       if (rp.ban_reason) reasonEl.textContent = 'Причина: ' + rp.ban_reason;
     }
   } catch(e) {}
+  // Статус игр — отключаем карточки недоступных
+  try {
+    const gs = await apiCall('GET', '/api/games/status');
+    if (gs.ok && gs.games) applyGameStatus(gs.games);
+  } catch(e) {}
   loadLiveBets();
   loadRecentGames();checkBonusDot();loadMiniLeaderboard();
 });
+
+function applyGameStatus(games) {
+  const MAP = {
+    'plinko':     '[onclick="openPlinko()"]',
+    'mines':      '[onclick="openMines()"]',
+    'tower':      '[onclick="openTower()"]',
+    'crash':      '[onclick="openCrash()"]',
+    'blackjack':  '[onclick="openBlackjack()"]',
+    'hilo':       '[onclick="openHilo()"]',
+    'wheel':      '[onclick="openWheel()"]',
+    'flip':       '[onclick="openFlip()"]',
+  };
+  for (const [game, selector] of Object.entries(MAP)) {
+    const enabled = games[game] !== false;
+    document.querySelectorAll(selector).forEach(el => {
+      if (!enabled) {
+        el.style.opacity = '0.4';
+        el.style.pointerEvents = 'none';
+        // Добавляем бейдж "Недоступно" если ещё нет
+        if (!el.querySelector('.game-disabled-badge')) {
+          const badge = document.createElement('div');
+          badge.className = 'game-disabled-badge';
+          badge.textContent = '🔒 Недоступно';
+          badge.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;background:rgba(0,0,0,0.55);border-radius:inherit;z-index:10;';
+          el.style.position = 'relative';
+          el.appendChild(badge);
+        }
+      } else {
+        el.style.opacity = '';
+        el.style.pointerEvents = '';
+        el.querySelectorAll('.game-disabled-badge').forEach(b => b.remove());
+      }
+    });
+  }
+}
 window.addEventListener('load',()=>{
   document.querySelectorAll('.screen').forEach(s=>{s.scrollTop=0;});
   if(tg){tg.expand();}
