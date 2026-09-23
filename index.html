@@ -4644,20 +4644,18 @@ async function pollCrash(){
     CC.points = [];
     _flyingStartServerTime = null;
 
-    // Если была ставка в прошлом раунде и не успели забрать — проигрыш уже засчитан сервером
-    if(CC.betPlaced && !CC.cashedOut && serverPhase !== 'flying'){
-      CC.betPlaced = false;
-      CC.cashedOut = false;
-      CC.gameId = null;
-    }
-
-    // Подхватываем ставку если она есть в текущем раунде
+    // Подхватываем ставку если она есть в текущем раунде (приоритет)
     if(r.my_bet && r.my_game_id){
       CC.betPlaced = true;
       CC.bet = r.my_bet;
       CC.gameId = r.my_game_id;
       CC.cashedOut = r.cashed_out || false;
       CC.cashoutMult = r.cashout_mult || null;
+    } else {
+      // Ставки нет — сбрасываем состояние
+      CC.betPlaced = false;
+      CC.cashedOut = false;
+      CC.gameId = null;
     }
   }
 
@@ -4669,6 +4667,12 @@ async function pollCrash(){
     // Синхронизируем таймер ожидания
     if(prevPhase !== 'waiting'){
       CC.points = [];
+      // Если ставка была в прошлом раунде и раунд сменился — сбрасываем
+      if(CC.betPlaced && !r.my_bet){
+        CC.betPlaced = false;
+        CC.cashedOut = false;
+        CC.gameId = null;
+      }
       setBigVal('waiting','ОЖИДАНИЕ РАУНДА...');
       document.getElementById('crash-rocket').style.display='none';
       document.getElementById('crash-payout-bar').style.display='none';
@@ -4680,12 +4684,17 @@ async function pollCrash(){
 
   } else if(serverPhase === 'flying'){
     if(prevPhase !== 'flying'){
-      // Только что стартовал — запускаем анимацию
-      _flyingStartServerTime = performance.now() - (CC.mult > 1 ? Math.log(CC.mult)/CRASH_GROWTH_RATE * 1000 : 0);
-      CC.points = [[0,1]];
+      // Только что стартовал — вычисляем смещение времени от сервера
+      // mult сервера = e^(k*t) => t = ln(mult)/k
+      const serverMult = r.mult || 1;
+      const elapsedSec = serverMult > 1 ? Math.log(serverMult) / CRASH_GROWTH_RATE : 0;
+      _flyingStartServerTime = performance.now() - (elapsedSec * 1000);
+      CC.points = [];  // animateCrash сам заполнит
       stopCrashCountdown();
       document.getElementById('crash-rocket').style.display='block';
-      if(!CC.animId) animateCrash();
+      cancelAnimationFrame(CC.animId);
+      CC.animId = null;
+      requestAnimationFrame(animateCrash);
     }
     updateCrashBtn();
 
@@ -4755,6 +4764,9 @@ function doCashout(){
   if(CC.cashedOut) return;
   CC.cashedOut = true; CC.cashoutMult = CC.mult;
   document.getElementById('crash-payout-bar').style.display='none';
+  // Сбрасываем betPlaced чтобы в следующем раунде кнопка была активна
+  // (делаем с задержкой чтобы успел отрисоваться результат)
+  setTimeout(()=>{ CC.betPlaced = false; updateCrashBtn(); }, 2500);
   tg?.HapticFeedback?.notificationOccurred('success');
   updateCrashBtn();
   // mult не передаём — сервер сам берёт текущий
@@ -4779,14 +4791,19 @@ function crashMainAction(){
   const bet = parseFloat(document.getElementById('crash-bet-input').value);
   if(!bet||bet<100){showToast('Мин. ставка 100');return;}
   if(bet>sharedBalance){showToast('Недостаточно средств');return;}
+  // Блокируем кнопку на время запроса
+  const mainBtn = document.getElementById('crash-main-btn');
+  mainBtn.disabled = true;
   apiCall('POST','/api/crash/start',{bet}).then(r=>{
-    if(!r.ok){showToast(r.error||'Ошибка');return;}
+    if(!r.ok){showToast(r.error||'Ошибка');mainBtn.disabled=false;return;}
     CC.bet=bet; CC.betPlaced=true; CC.cashedOut=false; CC.gameId=r.game_id;
+    CC.roundId=r.round_id||CC.roundId; // запоминаем round_id ставки
+    _lastRoundId=CC.roundId; // синхронизируем с poll чтобы не сбросился
     sharedBalance-=bet; syncBalanceUI();
     document.getElementById('topbar-balance-val').textContent=fmt(sharedBalance);
     updateCrashBtn();
-    showToast('Ставка принята!');
-  }).catch(()=>showToast('Ошибка соединения'));
+    showToast('✅ Ставка принята!');
+  }).catch(()=>{showToast('Ошибка соединения');mainBtn.disabled=false;});
 }
 
 function updateCrashBtn(){
